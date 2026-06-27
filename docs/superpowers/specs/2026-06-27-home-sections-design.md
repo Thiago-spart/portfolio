@@ -9,10 +9,10 @@
 Three sections that follow the hero on the home page (`index.tsx`): Timeline, Skills, and Q&A. All share the "A Light That Never Comes" dark electric aesthetic. The page order is:
 
 ```
-Hero → Timeline → Skills → Q&A (+ final CTA)
+Hero → Timeline → Skills → Q&A → Contact
 ```
 
-No projects section on the home page — "See my work" on the hero links directly to `/projects` (separate route, separate brainstorm).
+No projects section on the home page — "See my work" on the hero links directly to `/projects` (separate route, separate brainstorm). Contact is an anchor section (`#contact`), not a dedicated route.
 
 All sections are **mobile-first**. The portfolio's primary audience is expected to visit on mobile.
 
@@ -161,13 +161,27 @@ Data lives in `src/data/qa.ts`. No external fetch.
 
 ---
 
-## 4. Final CTA (below Q&A)
+## 4. Contact Section (`id="contact"`)
 
-A centered block at the very bottom of the home page, before the footer:
+Anchor section at the bottom of the home page, scrolled to by all "Get in touch" buttons (hero + Q&A CTA).
 
-- Heading: `"Want to talk?"` — display font, white
-- Subline: short one-liner (e.g. `"I'm always open to new projects and opportunities."`)
-- Primary button: `"Get in touch"` → `<Link to="/contact">` — same glowing electric blue style as hero CTA
+**Heading**: `"Let's connect"` — display font, centered  
+**Subline**: `"Open to new projects, opportunities, and conversations."` — muted, centered
+
+**Two contact cards** side by side on desktop, stacked on mobile:
+
+| Card | Icon (lucide-react) | Link |
+|------|---------------------|------|
+| LinkedIn | `Linkedin` | `https://www.linkedin.com/in/thiago-moraes-souza/` (opens new tab) |
+| Email | `Mail` | `mailto:thiagomoraes.contact@gmail.com` |
+
+Each card:
+- Background: `rgba(8,13,26,0.85)` dark surface
+- Border: `1px solid rgba(0,170,255,0.3)` electric blue
+- Icon: `#00aaff`, large (32px)
+- Label: bold white (`"LinkedIn"` / `"Email"`)
+- Address/URL: `#5a6a7a` muted gray, small
+- Hover: border glow intensifies, icon transitions to full `#00aaff` brightness
 
 ---
 
@@ -182,7 +196,7 @@ src/
     SkillCard.tsx           — single category card with skill tags
     ArchDiagram.tsx         — SVG architecture diagram (placeholder until project data decision)
     QASection.tsx           — chat window wrapper, question + answer bubbles
-    HomeCTA.tsx             — final "Want to talk?" block
+    ContactSection.tsx      — #contact anchor, two contact cards (LinkedIn + Email)
   data/
     timeline.ts             — TimelineEntry[] static data
     skills.ts               — SkillCategory[] static data

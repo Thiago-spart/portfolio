@@ -53,12 +53,12 @@ Two buttons, side by side, with `gap-4`:
 - Style: dark base (`rgba(5,5,8,0.9)`), glowing electric blue border (`1px solid #00aaff` + `box-shadow: 0 0 12px rgba(0,170,255,0.35)`)
 - Text: `#c8f0ff` (cyan-white from design ref)
 - Hover: border glow intensifies + 2-frame horizontal glitch flicker animation (horizontal slice offset, ~100ms total, CSS keyframes)
-- Route: `<Link to="/contact">` (TanStack Router)
+- Action: smooth-scrolls to `#contact` anchor section on the home page (not a separate route)
 
 **Secondary — "See my work →"**
 - Style: ghost/text, no background, muted white text with arrow
 - Hover: text brightens to `#ffffff`, arrow translates right 4px
-- Route: `<Link to="/projects">` (TanStack Router)
+- Route: `<Link to="/projects">` (TanStack Router — dedicated projects page, separate brainstorm)
 
 ---
 
