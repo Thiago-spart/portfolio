@@ -12,12 +12,24 @@ const mockItems: SanityQA[] = [
     question: { en: 'Are you available?', pt: 'Está disponível?', es: '¿Estás disponible?' },
     answer:   { en: 'Yes, I am.',         pt: 'Sim, estou.',       es: 'Sí, lo estoy.' },
   },
+  {
+    _id: '2',
+    order: 2,
+    question: { en: 'Do you work remotely?', pt: 'Você trabalha remotamente?', es: '¿Trabajas de forma remota?' },
+    answer:   { en: 'Absolutely.',           pt: 'Com certeza.',                es: 'Por supuesto.' },
+  },
 ]
 
 describe('QASection', () => {
+  it('renders section heading', () => {
+    render(<LanguageProvider><QASection items={mockItems} lang="en" /></LanguageProvider>)
+    expect(screen.getByText('Ask me anything')).toBeInTheDocument()
+  })
+
   it('renders question bubbles', () => {
     render(<LanguageProvider><QASection items={mockItems} lang="en" /></LanguageProvider>)
     expect(screen.getByText('Are you available?')).toBeInTheDocument()
+    expect(screen.getByText('Do you work remotely?')).toBeInTheDocument()
   })
 
   it('does not show answer by default', () => {

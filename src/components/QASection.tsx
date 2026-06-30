@@ -21,7 +21,7 @@ export default function QASection({ items, lang }: Props) {
   }
 
   return (
-    <section className="px-6 py-24">
+    <section id="qa" className="px-6 py-24">
       <div className="mx-auto max-w-2xl">
         <p className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
           {t('qa.title')}
