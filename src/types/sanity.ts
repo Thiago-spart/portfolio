@@ -1,0 +1,56 @@
+export type Lang = 'en' | 'pt' | 'es'
+
+export interface LocaleString {
+  en: string
+  pt: string
+  es: string
+}
+
+export interface SanityHighlight {
+  value: string
+  label: LocaleString
+}
+
+export interface SanityExperience {
+  _id: string
+  company: string
+  companyUrl?: string
+  companyLogoUrl?: string
+  role: LocaleString
+  description: LocaleString
+  startDate: string       // ISO date string "YYYY-MM-DD"
+  endDate: string | null  // null = "Present"
+  techStack: string[]
+  highlights: SanityHighlight[]
+}
+
+export interface SanityQA {
+  _id: string
+  question: LocaleString
+  answer: LocaleString
+  order: number
+}
+
+export interface SanitySkill {
+  name: string
+  icon?: string
+}
+
+export interface SanitySkillCategory {
+  _id: string
+  category: LocaleString
+  skills: SanitySkill[]
+  order: number
+}
+
+export interface SanityProject {
+  _id: string
+  title: LocaleString
+  slug: { current: string }
+  shortDescription: LocaleString
+  coverImageUrl?: string
+  techStack: string[]
+  category: 'web' | 'mobile' | 'api' | 'other'
+  status: 'completed' | 'in-progress' | 'archived'
+  featured: boolean
+}
