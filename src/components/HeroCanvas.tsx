@@ -39,6 +39,15 @@ export default function HeroCanvas({ scrollProgress }: Props) {
         </Suspense>
       </Canvas>
 
+      <p className="absolute bottom-2 right-3 text-[10px] text-[var(--muted-gray,#5a6a7a)] opacity-60">
+        <a href="https://skfb.ly/6TTyx" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-100">
+          "LIVING THINGS"
+        </a>{' '}
+        by luc1906 is licensed under{' '}
+        <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-100">
+          CC BY 4.0
+        </a>
+      </p>
     </div>
   )
 }
