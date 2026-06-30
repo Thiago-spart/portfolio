@@ -40,37 +40,37 @@ export default function TimelineSection({ experiences, lang }: Props) {
   useGlitchRise(listRef as React.RefObject<HTMLElement>)
 
   return (
-    <section className="py-24 px-6">
+    <section id="experience" className="py-24 px-6">
       <div className="mx-auto max-w-4xl">
         {/* Section heading */}
-        <p className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
+        <h2 className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
           {t('timeline.title')}
-        </p>
+        </h2>
 
         {/* Desktop: center spine + alternating; Mobile: left spine */}
         <div className="relative">
           {/* Spine */}
           <div
-            className="absolute left-4 top-0 h-full w-px lg:left-1/2"
+            className="absolute left-4 top-0 h-full w-px md:left-1/2"
             style={{ background: '#00aaff', boxShadow: '0 0 8px rgba(0,170,255,0.5)' }}
           />
 
-          <div ref={listRef} className="flex flex-col gap-8 pl-10 lg:pl-0">
+          <div ref={listRef} className="flex flex-col gap-8 pl-10 md:pl-0">
             {experiences.map((entry, i) => (
               <div
                 key={entry._id}
-                className={`relative opacity-0 lg:w-[calc(50%-2rem)] ${
-                  i % 2 === 0 ? 'lg:ml-auto lg:pl-8' : 'lg:mr-auto lg:pr-8'
+                className={`relative opacity-0 md:w-[calc(50%-2rem)] ${
+                  i % 2 === 0 ? 'md:ml-auto md:pl-8' : 'md:mr-auto md:pr-8'
                 }`}
               >
                 {/* Mobile: dot always on left */}
                 <span
-                  className="absolute -left-10 top-5 h-3 w-3 rounded-full bg-[#00aaff] lg:hidden"
+                  className="absolute -left-10 top-5 h-3 w-3 rounded-full bg-[#00aaff] md:hidden"
                   style={{ boxShadow: '0 0 8px rgba(0,170,255,0.8)' }}
                 />
                 {/* Desktop: dot on the spine side of this entry */}
                 <span
-                  className={`absolute top-5 hidden h-3 w-3 rounded-full bg-[#00aaff] lg:block ${
+                  className={`absolute top-5 hidden h-3 w-3 rounded-full bg-[#00aaff] md:block ${
                     i % 2 === 0 ? 'left-[-1.625rem]' : 'right-[-1.625rem]'
                   }`}
                   style={{ boxShadow: '0 0 8px rgba(0,170,255,0.8)' }}
