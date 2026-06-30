@@ -12,7 +12,7 @@ export default function SkillsSection({ categories, lang }: Props) {
   const { t } = useTranslation()
 
   return (
-    <section className="px-6 py-24">
+    <section id="skills" className="px-6 py-24">
       <div className="mx-auto max-w-5xl">
         <p className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
           {t('skills.title')}
