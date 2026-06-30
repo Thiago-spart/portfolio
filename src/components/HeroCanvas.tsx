@@ -39,18 +39,6 @@ export default function HeroCanvas({ scrollProgress }: Props) {
         </Suspense>
       </Canvas>
 
-      {/* Attribution */}
-      <p className="absolute bottom-2 right-3 text-[10px] text-[#5a6a7a]">
-        3D model: &quot;Living Things&quot; by [author] —{' '}
-        <a
-          href="https://creativecommons.org/licenses/by/4.0/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          CC BY 4.0
-        </a>
-      </p>
     </div>
   )
 }

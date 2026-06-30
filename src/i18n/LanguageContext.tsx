@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { Lang } from '#/types/sanity'
 
 interface LanguageContextValue {
@@ -21,11 +21,9 @@ function detectLang(): Lang {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('en')
-
-  useEffect(() => {
-    setLangState(detectLang())
-  }, [])
+  const [lang, setLangState] = useState<Lang>(() =>
+    typeof window !== 'undefined' ? detectLang() : 'en'
+  )
 
   function setLang(l: Lang) {
     localStorage.setItem('lang', l)

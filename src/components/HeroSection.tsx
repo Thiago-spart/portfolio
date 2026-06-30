@@ -1,7 +1,19 @@
 // src/components/HeroSection.tsx
-import { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
 import HeroCanvas from './HeroCanvas'
+
+class HeroErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { error: false }
+  }
+  static getDerivedStateFromError() { return { error: true } }
+  render() {
+    if (this.state.error) return null
+    return this.props.children
+  }
+}
 
 export default function HeroSection() {
   const { t } = useTranslation()
@@ -14,6 +26,7 @@ export default function HeroSection() {
       if (!el) return
       const rect = el.getBoundingClientRect()
       const scrollable = el.offsetHeight - window.innerHeight
+      if (scrollable <= 0) { setScrollProgress(0); return }
       const progress = Math.max(0, Math.min(1, -rect.top / scrollable))
       setScrollProgress(progress)
     }
@@ -72,7 +85,9 @@ export default function HeroSection() {
 
           {/* Right column — 3D canvas */}
           <div className="flex items-center justify-center lg:h-[100dvh]">
-            <HeroCanvas scrollProgress={scrollProgress} />
+            <HeroErrorBoundary>
+              <HeroCanvas scrollProgress={scrollProgress} />
+            </HeroErrorBoundary>
           </div>
         </div>
       </div>
