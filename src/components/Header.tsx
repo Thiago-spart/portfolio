@@ -1,6 +1,30 @@
 import { Link } from '@tanstack/react-router'
 import TanChatAIAssistant from './demo-AIAssistant.tsx'
 import ThemeToggle from './ThemeToggle'
+import { useLanguage } from '../i18n/LanguageContext'
+import type { Lang } from '../types/sanity'
+
+function LangToggle() {
+  const { lang, setLang } = useLanguage()
+  const langs: Lang[] = ['en', 'pt', 'es']
+  return (
+    <div className="flex items-center gap-0.5 rounded-xl border border-[var(--line)] p-0.5">
+      {langs.map((l) => (
+        <button
+          key={l}
+          onClick={() => setLang(l)}
+          className={`rounded-lg px-2 py-1 text-xs font-bold uppercase transition ${
+            lang === l
+              ? 'bg-[var(--electric-blue,#00aaff)] text-[#050508]'
+              : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'
+          }`}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function Header() {
   return (
@@ -107,6 +131,7 @@ export default function Header() {
               />
             </svg>
           </a>
+          <LangToggle />
           <TanChatAIAssistant />
 
           <ThemeToggle />
