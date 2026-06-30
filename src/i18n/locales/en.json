@@ -1,0 +1,18 @@
+{
+  "nav.home": "Home",
+  "nav.projects": "Projects",
+  "hero.badge": "Available for work",
+  "hero.headline.line1": "Building things",
+  "hero.headline.line2": "for the web",
+  "hero.subtitle": "Full-stack developer passionate about building great digital experiences.",
+  "hero.cta.contact": "Get in touch",
+  "hero.cta.projects": "See my work",
+  "timeline.title": "Experience",
+  "timeline.present": "Present",
+  "skills.title": "Skills",
+  "qa.title": "Ask me anything",
+  "contact.title": "Let's connect",
+  "contact.subtitle": "Open to new projects, opportunities, and conversations.",
+  "contact.linkedin": "LinkedIn",
+  "contact.email": "Email"
+}
