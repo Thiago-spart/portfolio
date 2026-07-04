@@ -1,8 +1,32 @@
+import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import ThemeToggle from './ThemeToggle'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
 import type { Lang } from '#/types/sanity'
+
+// The Hero section's wrapper is 250dvh tall with a 100dvh pinned inner
+// section, so it fully releases at 250dvh - 100dvh = 1.5x viewport height.
+// Reusing that threshold everywhere keeps the header's reveal point
+// consistent across pages that don't have a Hero at all.
+const REVEAL_THRESHOLD_VIEWPORTS = 1.5
+
+function useScrollPastHero(): boolean {
+  const [pastHero, setPastHero] = useState(false)
+
+  useEffect(() => {
+    function check() {
+      setPastHero(
+        window.scrollY >= window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
+      )
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [])
+
+  return pastHero
+}
 
 function LangToggle() {
   const { lang, setLang } = useLanguage()
@@ -28,9 +52,14 @@ function LangToggle() {
 
 export default function Header() {
   const { t } = useTranslation()
+  const pastHero = useScrollPastHero()
+
+  if (!pastHero) {
+    return null
+  }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
+    <header className="fixed top-0 inset-x-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
       <nav className="page-wrap flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-4">
         <h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
           <Link

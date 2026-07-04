@@ -1,5 +1,5 @@
 // src/test/Header.test.tsx
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import {
   RouterProvider,
   createRouter,
@@ -26,7 +26,23 @@ async function renderHeader() {
   return render(<RouterProvider router={router} />)
 }
 
+function setScroll(innerHeight: number, scrollY: number) {
+  Object.defineProperty(window, 'innerHeight', {
+    value: innerHeight,
+    configurable: true,
+  })
+  Object.defineProperty(window, 'scrollY', {
+    value: scrollY,
+    configurable: true,
+  })
+}
+
 describe('Header', () => {
+  beforeEach(() => {
+    // Default: scrolled past the hero (1.5x viewport height)
+    // so old tests from Task 1 still pass
+    setScroll(800, 1300)
+  })
   it('links the brand mark to home', async () => {
     await renderHeader()
     const brand = screen.getByRole('link', { name: /thiago souza/i })
@@ -85,5 +101,36 @@ describe('Header', () => {
     expect(screen.getByRole('button', { name: 'en' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'pt' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'es' })).toBeInTheDocument()
+  })
+
+  describe('scroll-gated visibility', () => {
+    it('is not in the document before scrolling past 1.5x the viewport height', async () => {
+      setScroll(800, 0)
+      await renderHeader()
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+    })
+
+    it('is not in the document just short of the threshold', async () => {
+      setScroll(800, 1199)
+      await renderHeader()
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+    })
+
+    it('renders once scrolled at or past 1.5x the viewport height', async () => {
+      setScroll(800, 1200)
+      await renderHeader()
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+    })
+
+    it('appears in response to a scroll event after mounting below the threshold', async () => {
+      setScroll(800, 0)
+      await renderHeader()
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+
+      setScroll(800, 1300)
+      fireEvent.scroll(window)
+
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+    })
   })
 })
