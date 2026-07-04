@@ -30,7 +30,7 @@ export default function ContactSection() {
   ]
 
   return (
-    <section id="contact" className="px-6 py-24">
+    <section id="contact" className="px-6 py-24 scroll-mt-24">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="font-['Bebas_Neue'] text-[clamp(2rem,5vw,4rem)] tracking-wider text-white">
           {t('contact.title')}

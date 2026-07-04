@@ -26,13 +26,21 @@ async function renderHeader() {
   return render(<RouterProvider router={router} />)
 }
 
-function setScroll(innerHeight: number, scrollY: number) {
+function setScroll(
+  innerHeight: number,
+  scrollY: number,
+  scrollHeight: number = innerHeight * 3,
+) {
   Object.defineProperty(window, 'innerHeight', {
     value: innerHeight,
     configurable: true,
   })
   Object.defineProperty(window, 'scrollY', {
     value: scrollY,
+    configurable: true,
+  })
+  Object.defineProperty(document.documentElement, 'scrollHeight', {
+    value: scrollHeight,
     configurable: true,
   })
 }
@@ -143,6 +151,26 @@ describe('Header', () => {
       expect(screen.getByRole('banner')).toBeInTheDocument()
 
       setScroll(800, 0)
+      fireEvent.scroll(window)
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+    })
+
+    it('reveals immediately on a page shorter than the viewport (no scroll possible)', async () => {
+      setScroll(800, 0, 600)
+      await renderHeader()
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+    })
+
+    it('reveals at the bottom of a short page that cannot reach 1.5x the viewport', async () => {
+      setScroll(800, 0, 1000)
+      await renderHeader()
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+
+      setScroll(800, 199, 1000)
+      fireEvent.scroll(window)
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+
+      setScroll(800, 200, 1000)
       fireEvent.scroll(window)
       expect(screen.getByRole('banner')).toBeInTheDocument()
     })

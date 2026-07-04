@@ -16,9 +16,15 @@ function useScrollPastHero(): boolean {
 
   useEffect(() => {
     function check() {
-      setPastHero(
-        (prev) => prev || window.scrollY >= window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
+      const maxScroll = Math.max(
+        document.documentElement.scrollHeight - window.innerHeight,
+        0,
       )
+      const threshold = Math.min(
+        window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
+        maxScroll,
+      )
+      setPastHero((prev) => prev || window.scrollY >= threshold)
     }
     check()
     window.addEventListener('scroll', check, { passive: true })
