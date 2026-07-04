@@ -132,5 +132,19 @@ describe('Header', () => {
 
       expect(screen.getByRole('banner')).toBeInTheDocument()
     })
+
+    it('stays visible after scrolling back above the threshold once revealed', async () => {
+      setScroll(800, 0)
+      await renderHeader()
+      expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+
+      setScroll(800, 1300)
+      fireEvent.scroll(window)
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+
+      setScroll(800, 0)
+      fireEvent.scroll(window)
+      expect(screen.getByRole('banner')).toBeInTheDocument()
+    })
   })
 })

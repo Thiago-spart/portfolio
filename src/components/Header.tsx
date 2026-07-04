@@ -17,7 +17,7 @@ function useScrollPastHero(): boolean {
   useEffect(() => {
     function check() {
       setPastHero(
-        window.scrollY >= window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
+        (prev) => prev || window.scrollY >= window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
       )
     }
     check()
