@@ -17,13 +17,15 @@ function useGlitchRise(ref: React.RefObject<HTMLElement | null>) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const target = entry.target as HTMLElement
+          const index = children.indexOf(target)
           if (entry.isIntersecting) {
-            const index = children.indexOf(entry.target as HTMLElement)
-            const target = entry.target as HTMLElement
             target.style.animationDelay = `${index * 80}ms`
             target.classList.remove('opacity-0')   // remove before adding animation to avoid fill-mode conflict
             target.classList.add('glitch-rise')
-            observer.unobserve(entry.target)
+          } else {
+            target.classList.remove('glitch-rise')
+            target.classList.add('opacity-0')
           }
         })
       },
