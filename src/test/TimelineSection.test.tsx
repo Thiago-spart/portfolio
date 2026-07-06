@@ -66,7 +66,7 @@ describe('TimelineSection glitch-rise replay', () => {
   })
 
   it('adds glitch-rise and removes opacity-0 when a card enters the viewport', () => {
-    const { container } = render(
+    render(
       <LanguageProvider>
         <TimelineSection experiences={mockExperiences} lang="en" />
       </LanguageProvider>,
