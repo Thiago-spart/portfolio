@@ -349,6 +349,15 @@ a {
     #050508;
 }
 
+/* Below-hero sections: fixed cyberpunk background (design-reference.md — not theme-toggled) */
+.experience-bg-transition {
+  background: linear-gradient(180deg, var(--header-bg) 0%, #050508 400px, #050508 100%);
+}
+
+.cyberpunk-surface {
+  background: #050508;
+}
+
 /* Primary button glitch on hover */
 @keyframes glitch-flicker {
   0%, 100% { transform: translateX(0); clip-path: none; }

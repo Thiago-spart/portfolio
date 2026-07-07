@@ -120,3 +120,15 @@ describe('TimelineSection glitch-rise replay', () => {
     expect(observedElements).toContain(card)
   })
 })
+
+describe('TimelineSection background', () => {
+  it('has the experience-bg-transition class for the Hero-to-cyberpunk background', () => {
+    const { container } = render(
+      <LanguageProvider>
+        <TimelineSection experiences={mockExperiences} lang="en" />
+      </LanguageProvider>,
+    )
+    const section = container.querySelector('#experience')
+    expect(section).toHaveClass('experience-bg-transition')
+  })
+})
