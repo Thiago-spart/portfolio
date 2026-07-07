@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Post-implementation correction:** Live visual review showed the `.experience-bg-transition` gradient below was backwards — Hero's background is uniformly dark, so Experience's top edge needs to be dark too, not the (in light theme, near-white) `--header-bg` color this plan originally specified. The gradient and `--header-bg` involvement were dropped; Experience now uses the same flat `.cyberpunk-surface` class as the other three sections. See the spec's "Problem" section for the corrected reasoning. The task/step text below is kept as an execution record of what was actually built first — do not use it as the current design source; the spec doc is current.
+
 **Goal:** Give the Experience, Skills, Q&A, and Contact sections a fixed dark cyberpunk background so the Hero → Experience scroll transition is smooth and the rest of the homepage below the Hero is one continuous dark backdrop instead of clashing with the light "sea" body gradient.
 
 **Architecture:** Two new CSS classes in `src/styles.css` — `.experience-bg-transition` (a gradient from the theme-aware `--header-bg` variable down to the fixed `#050508` cyberpunk color within 400px) and `.cyberpunk-surface` (flat `#050508`) — applied to the four existing `<section>` elements. No JS, no new components, no changes to text/card colors.

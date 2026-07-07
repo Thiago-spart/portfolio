@@ -350,12 +350,6 @@ a {
 }
 
 /* Below-hero sections: fixed cyberpunk background (design-reference.md — not theme-toggled) */
-.experience-bg-transition {
-  /* min() clamps the transition to the section's own height when it's shorter
-     than 400px, so the color always reaches #050508 by the section's end. */
-  background: linear-gradient(180deg, var(--header-bg) 0%, #050508 min(400px, 100%), #050508 100%);
-}
-
 .cyberpunk-surface {
   background: #050508;
 }

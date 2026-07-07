@@ -42,7 +42,7 @@ export default function TimelineSection({ experiences, lang }: Props) {
   useGlitchRise(listRef as React.RefObject<HTMLElement>)
 
   return (
-    <section id="experience" className="experience-bg-transition py-24 px-6">
+    <section id="experience" className="cyberpunk-surface py-24 px-6">
       <div className="mx-auto max-w-4xl">
         {/* Section heading */}
         <h2 className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
