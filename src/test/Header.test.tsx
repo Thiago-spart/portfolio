@@ -57,15 +57,15 @@ describe('Header', () => {
     expect(brand).toHaveAttribute('href', '/')
   })
 
-  it('renders Home, About, and Contact nav links', async () => {
+  it('renders Home, Projects, and Contact nav links', async () => {
     await renderHeader()
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
       'href',
       '/',
     )
-    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute(
       'href',
-      '/about',
+      '/#projects',
     )
     expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',

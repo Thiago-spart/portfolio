@@ -341,11 +341,13 @@ a {
   }
 }
 
-/* Hero background */
+/* Hero background — lagoon teal / palm green glow, matching the site's
+   dark-mode --hero-a/--hero-b tokens (see body background) instead of the
+   old electric-blue/neon-purple "Light That Never Comes" accent. */
 .hero-section-bg {
   background:
-    radial-gradient(600px 600px at 75% 50%, rgba(0, 170, 255, 0.15), transparent 70%),
-    radial-gradient(500px 400px at 20% 50%, rgba(123, 47, 255, 0.12), transparent 70%),
+    radial-gradient(600px 600px at 75% 50%, rgba(96, 215, 207, 0.18), transparent 70%),
+    radial-gradient(500px 400px at 20% 50%, rgba(110, 200, 154, 0.14), transparent 70%),
     #050508;
 }
 

@@ -1,5 +1,5 @@
 // src/components/HeroSection.tsx
-import React, { useRef, useState, useEffect } from 'react'
+import React from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
 import HeroCanvas from './HeroCanvas'
 
@@ -17,26 +17,10 @@ class HeroErrorBoundary extends React.Component<{ children: React.ReactNode }, {
 
 export default function HeroSection() {
   const { t } = useTranslation()
-  const wrapperRef = useRef<HTMLElement>(null)
-  const [scrollProgress, setScrollProgress] = useState(0)
-
-  useEffect(() => {
-    function onScroll() {
-      const el = wrapperRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const scrollable = el.offsetHeight - window.innerHeight
-      if (scrollable <= 0) { setScrollProgress(0); return }
-      const progress = Math.max(0, Math.min(1, -rect.top / scrollable))
-      setScrollProgress(progress)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   return (
-    <section ref={wrapperRef} style={{ height: '250dvh' }}>
-      <div className="hero-section-bg sticky top-0 flex h-[100dvh] items-center overflow-hidden">
+    <section>
+      <div className="hero-section-bg flex h-[100dvh] items-center overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-6 lg:grid-cols-[55fr_45fr] lg:px-12">
           {/* Left column */}
           <div className="flex flex-col justify-center gap-6">
@@ -86,7 +70,7 @@ export default function HeroSection() {
           {/* Right column — 3D canvas */}
           <div className="flex items-center justify-center lg:h-[100dvh]">
             <HeroErrorBoundary>
-              <HeroCanvas scrollProgress={scrollProgress} />
+              <HeroCanvas />
             </HeroErrorBoundary>
           </div>
         </div>
