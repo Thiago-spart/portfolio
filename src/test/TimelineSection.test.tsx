@@ -66,7 +66,7 @@ describe('TimelineSection glitch-rise replay', () => {
   })
 
   it('adds glitch-rise and removes opacity-0 when a card enters the viewport', () => {
-    const { container } = render(
+    render(
       <LanguageProvider>
         <TimelineSection experiences={mockExperiences} lang="en" />
       </LanguageProvider>,
@@ -118,5 +118,17 @@ describe('TimelineSection glitch-rise replay', () => {
     fireIntersection(card, false)
 
     expect(observedElements).toContain(card)
+  })
+})
+
+describe('TimelineSection background', () => {
+  it('has the cyberpunk-surface class so it connects seamlessly with the Hero', () => {
+    const { container } = render(
+      <LanguageProvider>
+        <TimelineSection experiences={mockExperiences} lang="en" />
+      </LanguageProvider>,
+    )
+    const section = container.querySelector('#experience')
+    expect(section).toHaveClass('cyberpunk-surface')
   })
 })

@@ -351,6 +351,11 @@ a {
     #050508;
 }
 
+/* Below-hero sections: fixed cyberpunk background (design-reference.md — not theme-toggled) */
+.cyberpunk-surface {
+  background: #050508;
+}
+
 /* Primary button glitch on hover */
 @keyframes glitch-flicker {
   0%, 100% { transform: translateX(0); clip-path: none; }
