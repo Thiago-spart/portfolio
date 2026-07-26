@@ -27,11 +27,15 @@ export default function ProjectsSection({ projects, lang }: Props) {
     setSnapCount(api.scrollSnapList().length)
     setSelected(api.selectedScrollSnap())
     const onSelect = () => setSelected(api.selectedScrollSnap())
+    const onReInit = () => {
+      setSnapCount(api.scrollSnapList().length)
+      setSelected(api.selectedScrollSnap())
+    }
     api.on('select', onSelect)
-    api.on('reInit', onSelect)
+    api.on('reInit', onReInit)
     return () => {
       api.off('select', onSelect)
-      api.off('reInit', onSelect)
+      api.off('reInit', onReInit)
     }
   }, [api])
 
