@@ -1,18 +1,79 @@
+import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import TanChatAIAssistant from './demo-AIAssistant.tsx'
+import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
+import { useLanguage } from '#/i18n/LanguageContext'
+import { useTranslation } from '#/i18n/useTranslation'
+import type { Lang } from '#/types/sanity'
+
+// The Hero section's wrapper is 250dvh tall with a 100dvh pinned inner
+// section, so it fully releases at 250dvh - 100dvh = 1.5x viewport height.
+// Reusing that threshold everywhere keeps the header's reveal point
+// consistent across pages that don't have a Hero at all.
+const REVEAL_THRESHOLD_VIEWPORTS = 1.5
+
+function useScrollPastHero(): boolean {
+  const [pastHero, setPastHero] = useState(false)
+
+  useEffect(() => {
+    function check() {
+      const maxScroll = Math.max(
+        document.documentElement.scrollHeight - window.innerHeight,
+        0,
+      )
+      const threshold = Math.min(
+        window.innerHeight * REVEAL_THRESHOLD_VIEWPORTS,
+        maxScroll,
+      )
+      setPastHero((prev) => prev || window.scrollY >= threshold)
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [])
+
+  return pastHero
+}
+
+function LangToggle() {
+  const { lang, setLang } = useLanguage()
+  const langs: Lang[] = ['en', 'pt', 'es']
+  return (
+    <div className="flex items-center gap-0.5 rounded-xl border border-[var(--line)] p-0.5">
+      {langs.map((l) => (
+        <button
+          key={l}
+          onClick={() => setLang(l)}
+          className={`rounded-lg px-2 py-1 text-xs font-bold uppercase transition ${
+            lang === l
+              ? 'bg-[var(--electric-blue,#00aaff)] text-[#050508]'
+              : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'
+          }`}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function Header() {
+  const { t } = useTranslation()
+  const pastHero = useScrollPastHero()
+
+  if (!pastHero) {
+    return null
+  }
+
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
+    <header className="fixed top-0 inset-x-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
       <nav className="page-wrap flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-4">
         <h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm text-[var(--sea-ink)] no-underline shadow-[0_8px_24px_rgba(30,90,72,0.08)] sm:px-4 sm:py-2"
+            className="inline-flex items-center rounded-full border border-[var(--electric-blue)]/30 bg-[var(--near-black)] px-3 py-1.5 no-underline shadow-[0_0_18px_rgba(0,170,255,0.18)] sm:px-4 sm:py-2"
           >
-            <span className="h-2 w-2 rounded-full bg-[linear-gradient(90deg,#56c6be,#7ed3bf)]" />
-            TanStack Start
+            <Logo />
           </Link>
         </h2>
 
@@ -22,93 +83,56 @@ export default function Header() {
             className="nav-link"
             activeProps={{ className: 'nav-link is-active' }}
           >
-            Home
+            {t('nav.home')}
           </Link>
-          <Link
-            to="/about"
-            className="nav-link"
-            activeProps={{ className: 'nav-link is-active' }}
-          >
-            About
-          </Link>
-          <a
-            href="https://tanstack.com/start/latest/docs/framework/react/overview"
-            className="nav-link"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Docs
+          <a href="/#projects" className="nav-link">
+            {t('nav.projects')}
           </a>
-          <details className="relative w-full sm:w-auto">
-            <summary className="nav-link list-none cursor-pointer">
-              Demos
-            </summary>
-            <div className="mt-2 min-w-56 rounded-xl border border-[var(--line)] bg-[var(--header-bg)] p-2 shadow-lg sm:absolute sm:right-0">
-              <a
-                href="/demo/ai-chat"
-                className="block rounded-lg px-3 py-2 text-sm text-[var(--sea-ink-soft)] no-underline transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-              >
-                Chat
-              </a>
-              <a
-                href="/demo/ai-image"
-                className="block rounded-lg px-3 py-2 text-sm text-[var(--sea-ink-soft)] no-underline transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-              >
-                Generate Image
-              </a>
-              <a
-                href="/demo/ai-structured"
-                className="block rounded-lg px-3 py-2 text-sm text-[var(--sea-ink-soft)] no-underline transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-              >
-                Structured Output
-              </a>
-              <a
-                href="/demo/store"
-                className="block rounded-lg px-3 py-2 text-sm text-[var(--sea-ink-soft)] no-underline transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-              >
-                Store
-              </a>
-              <a
-                href="/demo/tanstack-query"
-                className="block rounded-lg px-3 py-2 text-sm text-[var(--sea-ink-soft)] no-underline transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
-              >
-                TanStack Query
-              </a>
-            </div>
-          </details>
+          <a href="/#contact" className="nav-link">
+            {t('nav.contact')}
+          </a>
         </div>
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <a
-            href="https://x.com/tan_stack"
+            href="https://www.linkedin.com/in/thiago-moraes-souza/"
             target="_blank"
             rel="noreferrer"
             className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
           >
-            <span className="sr-only">Follow TanStack on X</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M12.6 1h2.2L10 6.48 15.64 15h-4.41L7.78 9.82 3.23 15H1l5.14-5.84L.72 1h4.52l3.12 4.73L12.6 1zm-.77 12.67h1.22L4.57 2.26H3.26l8.57 11.41z"
-              />
+            <span className="sr-only">{t('contact.linkedin')}</span>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              width="20"
+              height="20"
+              fill="currentColor"
+            >
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
             </svg>
           </a>
           <a
-            href="https://github.com/TanStack"
-            target="_blank"
-            rel="noreferrer"
+            href="mailto:thiagomoraes.contact@gmail.com"
             className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
           >
-            <span className="sr-only">Go to TanStack GitHub</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
+            <span className="sr-only">{t('contact.email')}</span>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              width="20"
+              height="20"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              fill="none"
+            >
               <path
-                fill="currentColor"
-                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
               />
             </svg>
           </a>
-          <TanChatAIAssistant />
-
+          <LangToggle />
           <ThemeToggle />
         </div>
       </nav>

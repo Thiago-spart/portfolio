@@ -62,6 +62,12 @@ npx @tanstack/intent@latest list      # listed 41 skills across 10 intent-enable
 
 ---
 
+## Design System
+
+Visual direction for this portfolio is the **"A Light That Never Comes"** aesthetic (Linkin Park x Steve Aoki) — dark, electric, glitch/light-glow driven. Full spec — brand mark, color palette, typography, effects, layout, components, responsiveness, and animation principles — lives in [`design.md`](./design.md). Read it before styling any new UI.
+
+---
+
 ## Environment Variables
 
 Create a `.env` file at the project root (next to `package.json`):
@@ -151,7 +157,7 @@ pnpm generate-routes  # Regenerate routeTree.gen.ts (runs automatically on dev)
 ## Next Steps
 
 - [ ] Replace demo content with real portfolio routes (projects, about, contact)
-- [ ] Apply the "A Light That Never Comes" design system from `../design-reference.md`
+- [ ] Apply the "A Light That Never Comes" design system from `design.md` (see §11 for known gaps: ocean palette still in Header/ThemeToggle, unused Fraunces import, placeholder logo assets)
 - [ ] Set `ANTHROPIC_API_KEY` in `.env` to enable the AI chat demo
 - [ ] Delete `demo-*` files once real content is in place
 - [ ] Configure deployment target (see `pnpm dlx @tanstack/intent@latest load @tanstack/start-client-core#start-core/deployment`)
