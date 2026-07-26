@@ -38,7 +38,7 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(5,5,8,0.9)] via-[rgba(5,5,8,0.3)] to-transparent" />
 
       <div className="relative z-10 flex h-full flex-col justify-end gap-2 p-5">
-        <h3 className="glitch-flicker font-['Bebas_Neue'] text-2xl tracking-wide text-white">
+        <h3 className="glitch-flicker font-['Bebas_Neue'] text-2xl tracking-wide text-white transition-colors group-hover:text-electric-blue">
           {project.title[lang]}
         </h3>
         <p className="line-clamp-3 text-sm text-[rgba(255,255,255,0.75)]">
