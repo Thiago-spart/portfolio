@@ -20,11 +20,19 @@ export default function ProjectsSection({ projects, lang }: Props) {
   const { t } = useTranslation()
   const [api, setApi] = useState<CarouselApi>()
   const [selected, setSelected] = useState(0)
+  const [snapCount, setSnapCount] = useState(0)
 
   useEffect(() => {
     if (!api) return
+    setSnapCount(api.scrollSnapList().length)
     setSelected(api.selectedScrollSnap())
-    api.on('select', () => setSelected(api.selectedScrollSnap()))
+    const onSelect = () => setSelected(api.selectedScrollSnap())
+    api.on('select', onSelect)
+    api.on('reInit', onSelect)
+    return () => {
+      api.off('select', onSelect)
+      api.off('reInit', onSelect)
+    }
   }, [api])
 
   return (
@@ -50,25 +58,27 @@ export default function ProjectsSection({ projects, lang }: Props) {
           </p>
         ) : (
           <>
-            <Carousel setApi={setApi} opts={{ align: 'start' }} className="mt-12">
-              <CarouselContent>
-                {projects.map((project, index) => (
-                  <CarouselItem
-                    key={project._id}
-                    className="basis-full sm:basis-1/2 lg:basis-1/3"
-                  >
-                    <ProjectCard project={project} lang={lang} accentIndex={index} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="border-electric-blue text-electric-blue" />
-              <CarouselNext className="border-electric-blue text-electric-blue" />
-            </Carousel>
+            <div className="px-12">
+              <Carousel setApi={setApi} opts={{ align: 'start' }} className="mt-12">
+                <CarouselContent>
+                  {projects.map((project, index) => (
+                    <CarouselItem
+                      key={project._id}
+                      className="basis-full sm:basis-1/2 lg:basis-1/3"
+                    >
+                      <ProjectCard project={project} lang={lang} accentIndex={index} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="border-electric-blue text-electric-blue" />
+                <CarouselNext className="border-electric-blue text-electric-blue" />
+              </Carousel>
+            </div>
 
             <div className="mt-6 flex justify-center gap-2">
-              {projects.map((project, index) => (
+              {Array.from({ length: snapCount }, (_, index) => (
                 <button
-                  key={project._id}
+                  key={index}
                   type="button"
                   aria-label={`Go to slide ${index + 1}`}
                   onClick={() => api?.scrollTo(index)}
