@@ -52,3 +52,12 @@ class ResizeObserverMock {
   disconnect() {}
 }
 window.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
+
+// Embla also uses IntersectionObserver — mock it for jsdom
+class IntersectionObserverMock {
+  constructor() {}
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver

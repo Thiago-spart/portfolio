@@ -16,5 +16,8 @@
   "contact.title": "Vamos nos conectar",
   "contact.subtitle": "Aberto a novos projetos, oportunidades e conversas.",
   "contact.linkedin": "LinkedIn",
-  "contact.email": "E-mail"
+  "contact.email": "E-mail",
+  "projects.title": "Projetos",
+  "projects.subtitle": "Uma seleção do que já construí.",
+  "projects.empty": "Nenhum projeto ainda — volte em breve."
 }
