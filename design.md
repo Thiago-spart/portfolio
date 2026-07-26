@@ -124,6 +124,7 @@ Fraunces (serif) has been removed from the identity — it was loaded in `styles
 - Semi-transparent dark surface (`rgba(8,13,26,0.85)`)
 - Thin glowing border on one side (left or top)
 - Subtle inner shadow in blue
+- Interactive cards (e.g. Contact section links) use `src/components/ui/glow-card.tsx` — a pointer-tracking spotlight/border glow keyed to the palette in §3 (`blue`/`purple`/`ember` hues), reused wherever a hover-glow card is needed instead of one-off implementations
 
 ### Dividers
 - Single pixel lines with gradient fade (blue → transparent)
