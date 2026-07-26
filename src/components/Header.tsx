@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
@@ -70,10 +71,9 @@ export default function Header() {
         <h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm text-[var(--sea-ink)] no-underline shadow-[0_8px_24px_rgba(30,90,72,0.08)] sm:px-4 sm:py-2"
+            className="inline-flex items-center rounded-full border border-[var(--electric-blue)]/30 bg-[var(--near-black)] px-3 py-1.5 no-underline shadow-[0_0_18px_rgba(0,170,255,0.18)] sm:px-4 sm:py-2"
           >
-            <span className="h-2 w-2 rounded-full bg-[linear-gradient(90deg,#56c6be,#7ed3bf)]" />
-            Thiago Souza
+            <Logo />
           </Link>
         </h2>
 

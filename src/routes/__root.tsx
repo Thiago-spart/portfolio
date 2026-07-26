@@ -119,7 +119,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
         <meta
           name="theme-color"
-          content="#0a1418"
+          content="#050508"
           media="(prefers-color-scheme: dark)"
         />
         <HeadContent />

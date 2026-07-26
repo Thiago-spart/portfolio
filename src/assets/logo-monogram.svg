@@ -1,0 +1,57 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="frame">
+      <rect x="0" y="0" width="512" height="512" rx="72" ry="72" />
+    </clipPath>
+    <clipPath id="sliceBand">
+      <rect x="0" y="266" width="512" height="34" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect x="0" y="0" width="512" height="512" fill="#050508" />
+
+    <!-- deep radial glow behind the letterforms -->
+    <circle cx="256" cy="248" r="230" fill="#00aaff" opacity="0.16" />
+
+    <!-- base letterforms in electric blue -->
+    <text
+      x="256" y="336"
+      text-anchor="middle"
+      font-family="Bebas Neue"
+      font-size="300"
+      letter-spacing="4"
+      fill="#00aaff"
+    >TS</text>
+
+    <!-- cyan-white highlight pass, slightly offset for a bloom feel -->
+    <text
+      x="254" y="334"
+      text-anchor="middle"
+      font-family="Bebas Neue"
+      font-size="300"
+      letter-spacing="4"
+      fill="#c8f0ff"
+      opacity="0.55"
+    >TS</text>
+
+    <!-- signature glitch slice: one horizontal band, letters re-drawn shifted + in neon purple, layered over the base -->
+    <g clip-path="url(#sliceBand)">
+      <text
+        x="264" y="336"
+        text-anchor="middle"
+        font-family="Bebas Neue"
+        font-size="300"
+        letter-spacing="4"
+        fill="#7b2fff"
+      >TS</text>
+    </g>
+
+    <!-- thin scanline accents for texture -->
+    <rect x="0" y="265" width="512" height="1.5" fill="#7b2fff" opacity="0.7" />
+    <rect x="0" y="299.5" width="512" height="1.5" fill="#7b2fff" opacity="0.5" />
+
+    <!-- frame edge glow -->
+    <rect x="4" y="4" width="504" height="504" rx="68" ry="68" fill="none" stroke="#00aaff" stroke-opacity="0.4" stroke-width="4" />
+  </g>
+</svg>
