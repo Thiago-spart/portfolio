@@ -44,3 +44,11 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   drawArrays: vi.fn(),
   drawElements: vi.fn(),
 })) as unknown as typeof HTMLCanvasElement.prototype.getContext
+
+// Embla (shadcn Carousel) uses ResizeObserver internally — mock it for jsdom
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
