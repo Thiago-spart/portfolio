@@ -41,11 +41,11 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
         <h3 className="glitch-flicker font-['Bebas_Neue'] text-2xl tracking-wide text-white">
           {project.title[lang]}
         </h3>
-        <p className="text-sm text-[rgba(255,255,255,0.75)]">
+        <p className="line-clamp-3 text-sm text-[rgba(255,255,255,0.75)]">
           {project.shortDescription[lang]}
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
-          {project.techStack.map((tech) => (
+          {project.techStack.slice(0, 3).map((tech) => (
             <span
               key={tech}
               className="rounded-full border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
