@@ -1,0 +1,23 @@
+{
+  "nav.home": "Início",
+  "nav.projects": "Projetos",
+  "nav.contact": "Contato",
+  "hero.badge": "Disponível para trabalho",
+  "hero.headline.line1": "Construindo coisas",
+  "hero.headline.line2": "para a web",
+  "hero.subtitle": "Desenvolvedor full-stack apaixonado por criar ótimas experiências digitais.",
+  "hero.cta.contact": "Entre em contato",
+  "hero.cta.projects": "Ver meu trabalho",
+  "timeline.title": "Experiência",
+  "timeline.present": "Presente",
+  "skills.title": "Habilidades",
+  "skills.archTitle": "Arquitetura",
+  "qa.title": "Me pergunte algo",
+  "contact.title": "Vamos nos conectar",
+  "contact.subtitle": "Aberto a novos projetos, oportunidades e conversas.",
+  "contact.linkedin": "LinkedIn",
+  "contact.email": "E-mail",
+  "projects.title": "Projetos",
+  "projects.subtitle": "Uma seleção do que já construí.",
+  "projects.empty": "Nenhum projeto ainda — volte em breve."
+}

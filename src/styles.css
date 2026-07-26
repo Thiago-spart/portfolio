@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -60,6 +60,17 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.871 0.006 286.286);
+
+  /* Design reference: "A Light That Never Comes" */
+  --electric-blue: #00aaff;
+  --neon-purple: #7b2fff;
+  --near-black: #050508;
+  --dark-navy: #080d1a;
+  --cyan-white: #c8f0ff;
+  --muted-gray: #5a6a7a;
+  --ember: #ff6a00;
+  --electric-blue-glow: rgba(0, 170, 255, 0.35);
+  --purple-glow: rgba(123, 47, 255, 0.12);
 }
 
 .dark {
@@ -119,6 +130,18 @@
 
 @theme inline {
   --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bebas Neue', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+
+  /* "A Light That Never Comes" — design.md */
+  --color-electric-blue: var(--electric-blue);
+  --color-neon-purple: var(--neon-purple);
+  --color-near-black: var(--near-black);
+  --color-dark-navy: var(--dark-navy);
+  --color-cyan-white: var(--cyan-white);
+  --color-muted-gray: var(--muted-gray);
+  --color-ember: var(--ember);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -245,10 +268,6 @@ pre code {
   margin-inline: auto;
 }
 
-.display-title {
-  font-family: 'Fraunces', Georgia, serif;
-}
-
 .island-shell {
   border: 1px solid var(--line);
   background: linear-gradient(165deg, var(--surface-strong), var(--surface));
@@ -331,9 +350,127 @@ a {
   }
 }
 
+/* Hero background — lagoon teal / palm green glow, matching the site's
+   dark-mode --hero-a/--hero-b tokens (see body background) instead of the
+   old electric-blue/neon-purple "Light That Never Comes" accent. */
+.hero-section-bg {
+  background:
+    radial-gradient(600px 600px at 75% 50%, rgba(96, 215, 207, 0.18), transparent 70%),
+    radial-gradient(500px 400px at 20% 50%, rgba(110, 200, 154, 0.14), transparent 70%),
+    #050508;
+}
+
+/* Below-hero sections: fixed cyberpunk background (design-reference.md — not theme-toggled) */
+.cyberpunk-surface {
+  background: #050508;
+}
+
+/* Primary button glitch on hover */
+@keyframes glitch-flicker {
+  0%, 100% { transform: translateX(0); clip-path: none; }
+  20%       { transform: translateX(-2px); clip-path: inset(20% 0 60% 0); }
+  40%       { transform: translateX(2px);  clip-path: inset(60% 0 20% 0); }
+  60%       { transform: translateX(0);    clip-path: none; }
+}
+
+.glitch-flicker:hover {
+  animation: glitch-flicker 120ms steps(1) 1;
+}
+
+/* Timeline entry entrance */
+@keyframes glitch-rise {
+  0%   { opacity: 0; transform: translateY(16px); }
+  30%  { opacity: 0.6; transform: translateX(-3px) translateY(4px); }
+  60%  { opacity: 0.9; transform: translateX(3px) translateY(0); }
+  100% { opacity: 1;   transform: translateY(0); }
+}
+
+.glitch-rise {
+  animation: glitch-rise 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* QA typing cursor */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '|';
+  margin-left: 2px;
+  animation: cursor-blink 600ms steps(1) infinite;
+}
+
+/* Available badge pulse dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   background: color-mix(in oklab, var(--header-bg) 84%, transparent 16%);
+}
+
+/* GlowCard — pointer-tracking spotlight border, see src/components/ui/glow-card.tsx.
+   Static pseudo-element rules live here (not injected per-instance) since every
+   value they read comes from CSS custom properties set on [data-glow] at runtime. */
+[data-glow]::before,
+[data-glow]::after {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  inset: calc(var(--border-size) * -1);
+  border: var(--border-size) solid transparent;
+  border-radius: calc(var(--radius) * 1px);
+  background-attachment: fixed;
+  background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+}
+
+[data-glow]::before {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
+    calc(var(--x, 0) * 1px)
+    calc(var(--y, 0) * 1px),
+    hsl(var(--hue, 200) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%) / var(--border-spot-opacity, 1)), transparent 100%
+  );
+  filter: brightness(2);
+}
+
+[data-glow]::after {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
+    calc(var(--x, 0) * 1px)
+    calc(var(--y, 0) * 1px),
+    hsl(0 100% 100% / var(--border-light-opacity, 1)), transparent 100%
+  );
+}
+
+[data-glow] [data-glow] {
+  position: absolute;
+  inset: 0;
+  will-change: filter;
+  opacity: var(--outer, 1);
+  border-radius: calc(var(--radius) * 1px);
+  border-width: calc(var(--border-size) * 20);
+  filter: blur(calc(var(--border-size) * 10));
+  background: none;
+  pointer-events: none;
+  border: none;
+}
+
+[data-glow] > [data-glow]::before {
+  inset: -10px;
+  border-width: 10px;
 }
 
 @layer base {

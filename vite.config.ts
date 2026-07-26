@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
+import { configDefaults } from 'vitest/config'
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
@@ -8,7 +8,17 @@ import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [tailwindcss(), tanstackStart(), viteReact()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
+    globals: true,
+    passWithNoTests: true,
+    // Git worktrees can live under .claude/worktrees/** inside this checkout;
+    // each has its own node_modules/React copy, so picking up their test
+    // files here causes cross-contamination ("Invalid hook call").
+    exclude: [...configDefaults.exclude, '.claude/**'],
+  },
 })
 
 export default config
