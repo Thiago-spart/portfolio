@@ -62,7 +62,7 @@ export default function ProjectsSection({ projects, lang }: Props) {
           </p>
         ) : (
           <>
-            <div className="group px-12">
+            <div className="group/carousel px-12">
               <Carousel setApi={setApi} opts={{ align: 'start' }} className="mt-12">
                 <CarouselContent>
                   {projects.map((project, index) => (
@@ -75,10 +75,10 @@ export default function ProjectsSection({ projects, lang }: Props) {
                   ))}
                 </CarouselContent>
                 <CarouselPrevious
-                  className="border-electric-blue text-electric-blue opacity-100 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
+                  className="border-electric-blue text-electric-blue opacity-100 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/carousel:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
                 />
                 <CarouselNext
-                  className="border-electric-blue text-electric-blue opacity-100 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
+                  className="border-electric-blue text-electric-blue opacity-100 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/carousel:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
                 />
               </Carousel>
             </div>
