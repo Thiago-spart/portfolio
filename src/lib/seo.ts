@@ -6,6 +6,8 @@ export const AUTHOR_NAME = 'Thiago Moraes de Souza'
 export const AUTHOR_EMAIL = 'thiagomoraes.contact@gmail.com'
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/thiago-moraes-souza/'
 export const OG_IMAGE_PATH = '/og-image.png'
+export const OG_IMAGE_ALT = 'Thiago Souza — Full-Stack Developer'
+export const SANITY_CDN_ORIGIN = 'https://cdn.sanity.io'
 
 export const DEFAULT_TITLE = 'Thiago Souza — Full-Stack Developer'
 export const DEFAULT_DESCRIPTION =
