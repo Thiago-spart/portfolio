@@ -1,6 +1,5 @@
 import { useTranslation } from '#/i18n/useTranslation'
 import SkillCard from './SkillCard'
-import ArchDiagram from './ArchDiagram'
 import type { SanitySkillCategory, Lang } from '#/types/sanity'
 
 interface Props {
@@ -30,15 +29,6 @@ export default function SkillsSection({ categories, lang }: Props) {
             </div>
           ))}
         </div>
-
-        {/* Divider */}
-        <div
-          className="my-12 h-px w-full"
-          style={{ background: 'linear-gradient(90deg, transparent, #00aaff, transparent)' }}
-        />
-
-        {/* Architecture diagram */}
-        <ArchDiagram />
       </div>
     </section>
   )
