@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { SanitySkillCategory, Lang } from '#/types/sanity'
 
 interface Props {
@@ -5,7 +6,15 @@ interface Props {
   lang: Lang
 }
 
+const VISIBLE_COUNT = 6
+
 export default function SkillCard({ category, lang }: Props) {
+  const [expanded, setExpanded] = useState(false)
+  const hasOverflow = category.skills.length > VISIBLE_COUNT
+  const visibleSkills =
+    expanded || !hasOverflow ? category.skills : category.skills.slice(0, VISIBLE_COUNT)
+  const hiddenCount = category.skills.length - VISIBLE_COUNT
+
   return (
     <div
       className="rounded-2xl border-l-2 bg-[rgba(8,13,26,0.85)] p-5"
@@ -19,7 +28,7 @@ export default function SkillCard({ category, lang }: Props) {
         {category.category[lang]}
       </p>
       <div className="flex flex-wrap gap-2">
-        {category.skills.map((skill) => (
+        {visibleSkills.map((skill) => (
           <span
             key={skill.name}
             className="rounded-full border border-[rgba(0,170,255,0.2)] bg-[rgba(0,170,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
@@ -27,6 +36,15 @@ export default function SkillCard({ category, lang }: Props) {
             {skill.name}
           </span>
         ))}
+        {hasOverflow && (
+          <button
+            type="button"
+            onClick={() => setExpanded((prev) => !prev)}
+            className="rounded-full border border-[rgba(0,170,255,0.4)] bg-transparent px-3 py-1 text-xs font-semibold text-[#00aaff] transition hover:bg-[rgba(0,170,255,0.1)]"
+          >
+            {expanded ? 'Show less' : `+${hiddenCount} more`}
+          </button>
+        )}
       </div>
     </div>
   )
