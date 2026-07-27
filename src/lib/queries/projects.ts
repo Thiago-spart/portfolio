@@ -16,3 +16,26 @@ const query = `*[_type == "project"] | order(startDate desc) {
 export function fetchProjects(): Promise<SanityProject[]> {
   return sanityClient.fetch(query)
 }
+
+const detailQuery = `*[_type == "project" && slug.current == $slug][0]{
+  _id,
+  title,
+  slug,
+  shortDescription,
+  longDescription,
+  "coverImageUrl": coverImage.asset->url,
+  "videoUrl": video.asset->url,
+  "galleryUrls": gallery[].asset->url,
+  techStack,
+  category,
+  liveUrl,
+  githubUrl,
+  startDate,
+  endDate,
+  status,
+  featured
+}`
+
+export function fetchProjectBySlug(slug: string): Promise<SanityProject | null> {
+  return sanityClient.fetch(detailQuery, { slug })
+}

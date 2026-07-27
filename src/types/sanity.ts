@@ -48,9 +48,16 @@ export interface SanityProject {
   title: LocaleString
   slug: { current: string }
   shortDescription: LocaleString
+  longDescription: LocaleString
   coverImageUrl?: string
+  videoUrl?: string
+  galleryUrls?: string[]
   techStack: string[]
   category: 'web' | 'mobile' | 'api' | 'other'
+  liveUrl?: string
+  githubUrl?: string
+  startDate: string
+  endDate: string | null
   status: 'completed' | 'in-progress' | 'archived'
   featured: boolean
 }

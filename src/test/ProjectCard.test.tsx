@@ -12,10 +12,17 @@ const mockProject: SanityProject = {
     pt: 'Um site pessoal.',
     es: 'Un sitio personal.',
   },
+  longDescription: {
+    en: 'A deep dive into building the personal site.',
+    pt: 'Um mergulho profundo na construção do site pessoal.',
+    es: 'Una inmersión profunda en la construcción del sitio personal.',
+  },
   coverImageUrl: 'https://example.com/cover.jpg',
   techStack: ['React', 'TypeScript'],
   category: 'web',
   status: 'completed',
+  startDate: '2024-01-15',
+  endDate: null,
   featured: true,
 }
 

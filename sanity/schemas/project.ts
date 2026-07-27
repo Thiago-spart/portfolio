@@ -9,6 +9,7 @@ export const project = {
     { name: 'longDescription',  title: 'Long Description',  type: 'localeText' },
     { name: 'coverImage',       title: 'Cover Image',       type: 'image' },
     { name: 'gallery',          title: 'Gallery',           type: 'array', of: [{ type: 'image' }] },
+    { name: 'video',            title: 'Video',             type: 'file', options: { accept: 'video/*' } },
     { name: 'techStack',        title: 'Tech Stack',        type: 'array', of: [{ type: 'string' }] },
     {
       name: 'category',
