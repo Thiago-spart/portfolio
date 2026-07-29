@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
+import { formatProjectDate } from '#/lib/formatDate'
 import type { Lang, SanityProject } from '#/types/sanity'
 
 interface ProjectDetailsProps {
@@ -7,15 +8,9 @@ interface ProjectDetailsProps {
   lang: Lang
 }
 
-function formatDate(dateStr: string): string {
-  const [year, month, day] = dateStr.split('-').map(Number)
-  const date = new Date(year, month - 1, day)
-  return date.toLocaleDateString('en', { month: 'short', year: 'numeric' })
-}
-
 export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
   const { t } = useTranslation()
-  const endLabel = project.endDate ? formatDate(project.endDate) : t('timeline.present')
+  const endLabel = project.endDate ? formatProjectDate(project.endDate) : t('timeline.present')
 
   return (
     <div className="mx-auto max-w-3xl text-left">
@@ -25,7 +20,7 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
         <span>{t(`project.status.${project.status}`)}</span>
         <span aria-hidden="true">•</span>
         <span>
-          {formatDate(project.startDate)} — {endLabel}
+          {formatProjectDate(project.startDate)} — {endLabel}
         </span>
       </div>
 

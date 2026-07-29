@@ -3,12 +3,13 @@ import { fetchProjectBySlug } from '#/lib/queries/projects'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
 import { routeHead } from '#/lib/seo'
+import { formatProjectDate } from '#/lib/formatDate'
 import ProjectHero from '#/components/ProjectHero'
 import ProjectDetails from '#/components/ProjectDetails'
 
 function formatHeroDate(startDate: string, endDate: string | null, presentLabel: string): string {
-  const format = (d: string) => new Date(d).toLocaleDateString('en', { month: 'short', year: 'numeric' })
-  return `${format(startDate)} — ${endDate ? format(endDate) : presentLabel}`
+  const end = endDate ? formatProjectDate(endDate) : presentLabel
+  return `${formatProjectDate(startDate)} — ${end}`
 }
 
 export const Route = createFileRoute('/projects/$slug')({
@@ -17,12 +18,17 @@ export const Route = createFileRoute('/projects/$slug')({
     if (!project) throw notFound()
     return { project }
   },
+  // head() still runs for this match when the loader throws notFound(), with
+  // loaderData === undefined — dereferencing it there throws a TypeError that
+  // the router swallows, dropping every meta tag on the page.
   head: ({ loaderData }) =>
-    routeHead({
-      title: `${loaderData!.project.title.en} — Thiago Souza`,
-      description: loaderData!.project.shortDescription.en,
-      path: `/projects/${loaderData!.project.slug.current}`,
-    }),
+    loaderData
+      ? routeHead({
+          title: `${loaderData.project.title.en} — Thiago Souza`,
+          description: loaderData.project.shortDescription.en,
+          path: `/projects/${loaderData.project.slug.current}`,
+        })
+      : { meta: [{ title: 'Project not found — Thiago Souza' }] },
   notFoundComponent: ProjectNotFound,
   component: ProjectPage,
 })
@@ -48,7 +54,7 @@ function ProjectPage() {
       <ProjectHero
         videoSrc={project.videoUrl}
         posterSrc={project.coverImageUrl}
-        bgImageSrc={project.coverImageUrl ?? ''}
+        bgImageSrc={project.coverImageUrl}
         title={project.title[lang]}
         date={formatHeroDate(project.startDate, project.endDate, t('timeline.present'))}
         scrollToExpand={t('project.scrollHint')}

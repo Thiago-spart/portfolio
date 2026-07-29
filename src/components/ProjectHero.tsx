@@ -1,14 +1,26 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
 interface ProjectHeroProps {
   videoSrc?: string
   posterSrc?: string
-  bgImageSrc: string
+  bgImageSrc?: string
   title: string
   date: string
   scrollToExpand: string
   children?: ReactNode
+}
+
+// Wheel deltas are continuous; a key press is discrete. Treat one press as a
+// chunky-but-not-instant wheel notch so ~5 presses fully expand the media.
+const KEYBOARD_DELTA_Y = 250
+const EXPAND_KEYS = [' ', 'Spacebar', 'PageDown', 'ArrowDown']
+const COLLAPSE_KEYS = ['PageUp', 'ArrowUp']
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null
+  if (!el || typeof el.tagName !== 'string') return false
+  return el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
 }
 
 export default function ProjectHero({
@@ -25,24 +37,59 @@ export default function ProjectHero({
   const [mediaFullyExpanded, setMediaFullyExpanded] = useState(false)
   const [touchStartY, setTouchStartY] = useState(0)
   const [isMobileState, setIsMobileState] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const hasStartedPlayback = useRef(false)
+
+  // Users who asked for reduced motion get the expanded end-state immediately
+  // and keep native document scrolling — no scroll-jacking at all.
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    setReducedMotion(true)
+    setScrollProgress(1)
+    setMediaFullyExpanded(true)
+    setShowContent(true)
+  }, [])
 
   useEffect(() => {
+    if (reducedMotion) return
+
+    const advanceProgress = (scrollDelta: number) => {
+      const newProgress = Math.min(Math.max(scrollProgress + scrollDelta, 0), 1)
+      setScrollProgress(newProgress)
+
+      if (newProgress >= 1) {
+        setMediaFullyExpanded(true)
+        setShowContent(true)
+      } else if (newProgress < 0.75) {
+        setShowContent(false)
+      }
+    }
+
     const handleWheel = (e: WheelEvent) => {
       if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
         setMediaFullyExpanded(false)
         e.preventDefault()
       } else if (!mediaFullyExpanded) {
         e.preventDefault()
-        const scrollDelta = e.deltaY * 0.0009
-        const newProgress = Math.min(Math.max(scrollProgress + scrollDelta, 0), 1)
-        setScrollProgress(newProgress)
+        advanceProgress(e.deltaY * 0.0009)
+      }
+    }
 
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true)
-          setShowContent(true)
-        } else if (newProgress < 0.75) {
-          setShowContent(false)
-        }
+    // Keyboard scrolling (Space/PageDown/Arrows) and scrollbar drags only fire
+    // plain `scroll` events, which handleScroll resets to 0 — without this the
+    // hero is a hard keyboard trap and nothing below it is ever reachable.
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
+      if (isTypingTarget(e.target)) return
+
+      if (!mediaFullyExpanded && EXPAND_KEYS.includes(e.key)) {
+        e.preventDefault()
+        advanceProgress(KEYBOARD_DELTA_Y * 0.0009)
+      } else if (mediaFullyExpanded && COLLAPSE_KEYS.includes(e.key) && window.scrollY <= 5) {
+        e.preventDefault()
+        setMediaFullyExpanded(false)
       }
     }
 
@@ -62,17 +109,7 @@ export default function ProjectHero({
       } else if (!mediaFullyExpanded) {
         e.preventDefault()
         const scrollFactor = deltaY < 0 ? 0.008 : 0.005
-        const scrollDelta = deltaY * scrollFactor
-        const newProgress = Math.min(Math.max(scrollProgress + scrollDelta, 0), 1)
-        setScrollProgress(newProgress)
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true)
-          setShowContent(true)
-        } else if (newProgress < 0.75) {
-          setShowContent(false)
-        }
-
+        advanceProgress(deltaY * scrollFactor)
         setTouchStartY(touchY)
       }
     }
@@ -88,6 +125,7 @@ export default function ProjectHero({
     }
 
     window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('touchstart', handleTouchStart, { passive: false })
     window.addEventListener('touchmove', handleTouchMove, { passive: false })
@@ -95,12 +133,21 @@ export default function ProjectHero({
 
     return () => {
       window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [scrollProgress, mediaFullyExpanded, touchStartY])
+  }, [scrollProgress, mediaFullyExpanded, touchStartY, reducedMotion])
+
+  // Don't autoplay: the video is an untranscoded Sanity asset. Only start it
+  // once the user has actually engaged with the hero.
+  useEffect(() => {
+    if (scrollProgress <= 0 || hasStartedPlayback.current || !videoRef.current) return
+    hasStartedPlayback.current = true
+    void Promise.resolve(videoRef.current.play()).catch(() => {})
+  }, [scrollProgress])
 
   useEffect(() => {
     const checkIfMobile = () => setIsMobileState(window.innerWidth < 768)
@@ -126,7 +173,14 @@ export default function ProjectHero({
             animate={{ opacity: 1 - scrollProgress }}
             transition={{ duration: 0.1 }}
           >
-            <img src={bgImageSrc} alt="" className="h-full w-full object-cover" />
+            {bgImageSrc ? (
+              <img src={bgImageSrc} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div
+                data-testid="project-hero-bg-fallback"
+                className="cyberpunk-surface h-full w-full"
+              />
+            )}
             <div className="absolute inset-0 bg-[rgba(5,5,8,0.6)]" />
           </motion.div>
 
@@ -145,10 +199,11 @@ export default function ProjectHero({
               >
                 {videoSrc ? (
                   <video
+                    ref={videoRef}
                     data-testid="project-hero-video"
                     src={videoSrc}
                     poster={posterSrc}
-                    autoPlay
+                    preload="metadata"
                     muted
                     loop
                     playsInline
@@ -157,12 +212,17 @@ export default function ProjectHero({
                     disableRemotePlayback
                     className="h-full w-full object-cover"
                   />
-                ) : (
+                ) : bgImageSrc ? (
                   <img
                     data-testid="project-hero-image"
                     src={bgImageSrc}
                     alt={title}
                     className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    data-testid="project-hero-media-fallback"
+                    className="cyberpunk-surface h-full w-full"
                   />
                 )}
                 <motion.div
@@ -203,6 +263,9 @@ export default function ProjectHero({
 
             <motion.section
               className="flex w-full flex-col px-2 py-10 md:px-8 lg:py-20"
+              // Invisible but still in the DOM — keep its links out of the tab
+              // order until the hero has actually expanded.
+              inert={!showContent}
               initial={{ opacity: 0 }}
               animate={{ opacity: showContent ? 1 : 0 }}
               transition={{ duration: 0.7 }}
