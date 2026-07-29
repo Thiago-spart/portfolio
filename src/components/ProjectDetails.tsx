@@ -75,8 +75,8 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
             {t('project.gallery')}
           </h3>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {project.galleryUrls.map((url) => (
-              <img key={url} src={url} alt="" role="img" className="w-full rounded-xl object-cover" />
+            {project.galleryUrls.map((url, index) => (
+              <img key={url} src={url} alt={`${project.title[lang]} screenshot ${index + 1}`} className="w-full rounded-xl object-cover" />
             ))}
           </div>
         </div>
