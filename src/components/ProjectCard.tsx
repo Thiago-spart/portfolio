@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { Lang, SanityProject } from '#/types/sanity'
 
 interface ProjectCardProps {
@@ -13,8 +14,10 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
   const hasImage = Boolean(project.coverImageUrl)
 
   return (
-    <div
-      className="group relative h-72 w-full overflow-hidden rounded-2xl"
+    <Link
+      to="/projects/$slug"
+      params={{ slug: project.slug.current }}
+      className="group relative block h-72 w-full overflow-hidden rounded-2xl"
       style={
         !hasImage
           ? { border: `2px solid ${accent}`, boxShadow: `0 0 20px ${accent}33 inset` }
@@ -55,6 +58,6 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
           ))}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
