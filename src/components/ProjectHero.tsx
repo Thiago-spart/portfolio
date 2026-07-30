@@ -5,6 +5,7 @@ interface ProjectHeroProps {
   videoSrc?: string
   posterSrc?: string
   bgImageSrc?: string
+  ambientVideoSrc?: string
   title: string
   date: string
   scrollToExpand: string
@@ -27,6 +28,7 @@ export default function ProjectHero({
   videoSrc,
   posterSrc,
   bgImageSrc,
+  ambientVideoSrc,
   title,
   date,
   scrollToExpand,
@@ -173,7 +175,16 @@ export default function ProjectHero({
             animate={{ opacity: 1 - scrollProgress }}
             transition={{ duration: 0.1 }}
           >
-            {bgImageSrc ? (
+            {ambientVideoSrc && !reducedMotion ? (
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                src={ambientVideoSrc}
+                className="h-full w-full object-cover"
+              />
+            ) : bgImageSrc ? (
               <img src={bgImageSrc} alt="" className="h-full w-full object-cover" />
             ) : (
               <div

@@ -124,6 +124,55 @@ describe('ProjectHero', () => {
     expect(container.querySelector('section[inert]')).not.toBeNull()
   })
 
+  it('renders the ambient video in the backdrop when ambientVideoSrc is present', () => {
+    const { container } = render(
+      <ProjectHero
+        ambientVideoSrc="https://example.com/earth-loop.mp4"
+        bgImageSrc="https://example.com/cover.jpg"
+        title="Portfolio Site"
+        date="Jan 2024"
+        scrollToExpand="Scroll to explore"
+      />,
+    )
+    const backdropVideo = container.querySelector('video[src="https://example.com/earth-loop.mp4"]')
+    expect(backdropVideo).toBeInTheDocument()
+    expect(backdropVideo).toHaveAttribute('autoplay')
+    expect(backdropVideo).toHaveAttribute('loop')
+  })
+
+  describe('with prefers-reduced-motion and ambientVideoSrc', () => {
+    afterEach(() => vi.restoreAllMocks())
+
+    it('falls back to bgImageSrc instead of playing the ambient video', () => {
+      vi.spyOn(window, 'matchMedia').mockImplementation(
+        (query: string) =>
+          ({
+            matches: query.includes('prefers-reduced-motion'),
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          }) as unknown as MediaQueryList,
+      )
+
+      const { container } = render(
+        <ProjectHero
+          ambientVideoSrc="https://example.com/earth-loop.mp4"
+          bgImageSrc="https://example.com/cover.jpg"
+          title="Portfolio Site"
+          date="Jan 2024"
+          scrollToExpand="Scroll to explore"
+        />,
+      )
+
+      expect(container.querySelector('video[src="https://example.com/earth-loop.mp4"]')).not.toBeInTheDocument()
+      expect(container.querySelector('img[src="https://example.com/cover.jpg"]')).toBeInTheDocument()
+    })
+  })
+
   describe('with prefers-reduced-motion', () => {
     afterEach(() => vi.restoreAllMocks())
 
