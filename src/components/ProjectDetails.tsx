@@ -14,7 +14,7 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
 
   return (
     <div className="mx-auto max-w-3xl text-left">
-      {project.longDescription[lang]
+      {(project.longDescription[lang] ?? '')
         .split(/\n\s*\n/)
         .map((paragraph) => paragraph.trim())
         .filter(Boolean)
@@ -30,9 +30,11 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
             {t('project.highlights')}
           </h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {project.highlights.map((highlight, index) => (
-              <li key={index}>{highlight[lang]}</li>
-            ))}
+            {project.highlights
+              .filter((highlight) => highlight[lang])
+              .map((highlight, index) => (
+                <li key={index}>{highlight[lang]}</li>
+              ))}
           </ul>
         </div>
       )}
@@ -43,9 +45,11 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
             {t('project.challenges')}
           </h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {project.challenges.map((challenge, index) => (
-              <li key={index}>{challenge[lang]}</li>
-            ))}
+            {project.challenges
+              .filter((challenge) => challenge[lang])
+              .map((challenge, index) => (
+                <li key={index}>{challenge[lang]}</li>
+              ))}
           </ul>
         </div>
       )}

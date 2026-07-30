@@ -119,6 +119,12 @@ describe('ProjectDetails', () => {
     expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
   })
 
+  it('does not render a highlights section when highlights is an empty array', () => {
+    renderDetails({ ...baseProject, highlights: [] })
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  })
+
   it('renders a highlights list when highlights is present', () => {
     renderDetails({
       ...baseProject,
@@ -135,6 +141,12 @@ describe('ProjectDetails', () => {
   it('does not render a challenges section when challenges is absent', () => {
     renderDetails(baseProject)
     expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
+  })
+
+  it('does not render a challenges section when challenges is an empty array', () => {
+    renderDetails({ ...baseProject, challenges: [] })
+    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })
 
   it('renders a challenges list when challenges is present', () => {
