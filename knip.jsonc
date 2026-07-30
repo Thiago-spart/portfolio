@@ -19,10 +19,12 @@
       // src/routes/ is auto-discovered by the router, not manually imported.
       // (vite.config.ts / vitest.setup.ts are already picked up by knip's
       // built-in Vite/Vitest plugins — no need to list them here.)
-      "entry": ["src/router.tsx", "src/routes/**/*.tsx"],
+      // api/ssr.ts is the Vercel Function entry wrapping the SSR build —
+      // see api/ssr.ts's own comment for why it exists.
+      "entry": ["src/router.tsx", "src/routes/**/*.tsx", "api/ssr.ts"],
       // Include .css so knip follows styles.css's @import/@plugin directives
       // instead of flagging tailwindcss/tw-animate-css as unused.
-      "project": ["src/**/*.{ts,tsx,css}"]
+      "project": ["src/**/*.{ts,tsx,css}", "api/**/*.ts"]
     },
     "sanity": {}
   }

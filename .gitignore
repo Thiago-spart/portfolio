@@ -14,3 +14,5 @@ todos.json
 .worktrees
 .superpowers
 .claude/worktrees/
+.vercel
+.env*
