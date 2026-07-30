@@ -18,5 +18,13 @@
   "contact.email": "E-mail",
   "projects.title": "Projetos",
   "projects.subtitle": "Uma seleção do que já construí.",
-  "projects.empty": "Nenhum projeto ainda — volte em breve."
+  "projects.empty": "Nenhum projeto ainda — volte em breve.",
+  "project.back": "Voltar aos projetos",
+  "project.liveUrl": "Site ao vivo",
+  "project.sourceCode": "Código-fonte",
+  "project.gallery": "Galeria",
+  "project.scrollHint": "Role para explorar",
+  "project.status.completed": "Concluído",
+  "project.status.in-progress": "Em andamento",
+  "project.status.archived": "Arquivado"
 }

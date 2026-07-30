@@ -18,5 +18,13 @@
   "contact.email": "Email",
   "projects.title": "Projects",
   "projects.subtitle": "A selection of things I've built.",
-  "projects.empty": "No projects yet — check back soon."
+  "projects.empty": "No projects yet — check back soon.",
+  "project.back": "Back to projects",
+  "project.liveUrl": "Live site",
+  "project.sourceCode": "Source code",
+  "project.gallery": "Gallery",
+  "project.scrollHint": "Scroll to explore",
+  "project.status.completed": "Completed",
+  "project.status.in-progress": "In progress",
+  "project.status.archived": "Archived"
 }
