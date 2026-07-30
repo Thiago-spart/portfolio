@@ -16,7 +16,7 @@ function formatHeroDate(startDate: string, endDate: string | null, presentLabel:
 
 export const Route = createFileRoute('/projects/$slug')({
   loader: async ({ params }) => {
-    const project = await fetchProjectBySlug(params.slug)
+    const project = await fetchProjectBySlug({ data: params.slug })
     if (!project) throw notFound()
     return { project }
   },
