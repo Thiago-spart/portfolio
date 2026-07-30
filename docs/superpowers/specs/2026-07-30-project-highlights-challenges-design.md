@@ -39,14 +39,12 @@ codebase convention of arrays-of-primitives for list-shaped content (e.g.
 
 ## Schema changes
 
-Both schema copies must be updated identically (existing duplication in the
-codebase — a legacy standalone Studio at `studio-personal-portfolio/` and a
-second Studio embedded at `my-tanstack-app/sanity/`, both pointing at the same
-Sanity project/dataset; not addressed by this change, just kept in sync as the
-current pattern already requires):
-
-- `studio-personal-portfolio/schemaTypes/project.ts`
-- `my-tanstack-app/sanity/schemas/project.ts`
+Only `my-tanstack-app/sanity/schemas/project.ts` is updated. `studio-personal-portfolio/`
+is a separate, standalone Studio repo that was bootstrapped once (single commit,
+2026-06-30) and never touched again — it's already missing the `video` field and
+validation rules present in `my-tanstack-app/sanity`'s copy, confirming it's stale
+and not the actively maintained Studio. Editing it too would only add to existing
+drift, not fix anything; left untouched, out of scope for this change.
 
 Add, after the existing `longDescription` field:
 
@@ -176,9 +174,9 @@ the Studio schema is updated so the fields are editable/visible there afterward)
 
 ## Out of scope
 
-- Not fixing the pre-existing duplicated Studio setup (`studio-personal-portfolio/`
-  vs. `my-tanstack-app/sanity/`) — both get the same schema edit, matching how
-  the codebase already keeps them in sync.
+- Not fixing the pre-existing stale/duplicated Studio setup
+  (`studio-personal-portfolio/` vs. `my-tanstack-app/sanity/`) — only the latter
+  is edited; the former is left as-is (already stale, not addressed here).
 - Not writing highlights/challenges content for any project other than Lovefy.
 - No Portable Text migration for `longDescription` — out of scope per the design
   decision above.
