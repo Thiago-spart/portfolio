@@ -23,6 +23,8 @@
   "project.liveUrl": "Site ao vivo",
   "project.sourceCode": "Código-fonte",
   "project.gallery": "Galeria",
+  "project.highlights": "Destaques",
+  "project.challenges": "Desafios",
   "project.scrollHint": "Role para explorar",
   "project.status.completed": "Concluído",
   "project.status.in-progress": "Em andamento",

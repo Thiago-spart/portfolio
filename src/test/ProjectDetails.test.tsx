@@ -97,4 +97,66 @@ describe('ProjectDetails', () => {
     expect(screen.getByText('Gallery')).toBeInTheDocument()
     expect(screen.getAllByRole('img')).toHaveLength(2)
   })
+
+  it('renders each blank-line-separated chunk of longDescription as its own paragraph', () => {
+    renderDetails({
+      ...baseProject,
+      longDescription: {
+        en: 'First paragraph.\n\nSecond paragraph.',
+        pt: 'Primeiro parágrafo.\n\nSegundo parágrafo.',
+        es: 'Primer párrafo.\n\nSegundo párrafo.',
+      },
+    })
+    const first = screen.getByText('First paragraph.')
+    const second = screen.getByText('Second paragraph.')
+    expect(first.tagName).toBe('P')
+    expect(second.tagName).toBe('P')
+    expect(first).not.toBe(second)
+  })
+
+  it('does not render a highlights section when highlights is absent', () => {
+    renderDetails(baseProject)
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+  })
+
+  it('does not render a highlights section when highlights is an empty array', () => {
+    renderDetails({ ...baseProject, highlights: [] })
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  })
+
+  it('renders a highlights list when highlights is present', () => {
+    renderDetails({
+      ...baseProject,
+      highlights: [
+        { en: 'Shipped feature A', pt: 'Lançou a funcionalidade A', es: 'Lanzó la funcionalidad A' },
+        { en: 'Shipped feature B', pt: 'Lançou a funcionalidade B', es: 'Lanzó la funcionalidad B' },
+      ],
+    })
+    expect(screen.getByText('Highlights')).toBeInTheDocument()
+    expect(screen.getByText('Shipped feature A')).toBeInTheDocument()
+    expect(screen.getByText('Shipped feature B')).toBeInTheDocument()
+  })
+
+  it('does not render a challenges section when challenges is absent', () => {
+    renderDetails(baseProject)
+    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
+  })
+
+  it('does not render a challenges section when challenges is an empty array', () => {
+    renderDetails({ ...baseProject, challenges: [] })
+    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  })
+
+  it('renders a challenges list when challenges is present', () => {
+    renderDetails({
+      ...baseProject,
+      challenges: [
+        { en: 'Handled tricky edge case', pt: 'Tratou um caso extremo complicado', es: 'Manejó un caso extremo complicado' },
+      ],
+    })
+    expect(screen.getByText('Challenges')).toBeInTheDocument()
+    expect(screen.getByText('Handled tricky edge case')).toBeInTheDocument()
+  })
 })

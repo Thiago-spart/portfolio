@@ -14,7 +14,45 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
 
   return (
     <div className="mx-auto max-w-3xl text-left">
-      <p className="text-sm text-[rgba(255,255,255,0.75)]">{project.longDescription[lang]}</p>
+      {(project.longDescription[lang] ?? '')
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
+        .map((paragraph, index) => (
+          <p key={index} className="mt-4 text-sm text-[rgba(255,255,255,0.75)] first:mt-0">
+            {paragraph}
+          </p>
+        ))}
+
+      {project.highlights && project.highlights.length > 0 && (
+        <div className="mt-6">
+          <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
+            {t('project.highlights')}
+          </h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
+            {project.highlights
+              .filter((highlight) => highlight[lang])
+              .map((highlight, index) => (
+                <li key={index}>{highlight[lang]}</li>
+              ))}
+          </ul>
+        </div>
+      )}
+
+      {project.challenges && project.challenges.length > 0 && (
+        <div className="mt-6">
+          <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
+            {t('project.challenges')}
+          </h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
+            {project.challenges
+              .filter((challenge) => challenge[lang])
+              .map((challenge, index) => (
+                <li key={index}>{challenge[lang]}</li>
+              ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold tracking-widest text-[var(--electric-blue,#00aaff)] uppercase">
         <span>{t(`project.status.${project.status}`)}</span>

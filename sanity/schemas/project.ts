@@ -14,6 +14,18 @@ export const project = {
       type: 'localeText',
       validation: (Rule: Rule) => Rule.required(),
     },
+    {
+      name: 'highlights',
+      title: 'Highlights',
+      type: 'array',
+      of: [{ type: 'localeString' }],
+    },
+    {
+      name: 'challenges',
+      title: 'Challenges',
+      type: 'array',
+      of: [{ type: 'localeString' }],
+    },
     { name: 'coverImage',       title: 'Cover Image',       type: 'image' },
     { name: 'gallery',          title: 'Gallery',           type: 'array', of: [{ type: 'image' }] },
     { name: 'video',            title: 'Video',             type: 'file', options: { accept: 'video/*' } },

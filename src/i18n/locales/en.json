@@ -23,6 +23,8 @@
   "project.liveUrl": "Live site",
   "project.sourceCode": "Source code",
   "project.gallery": "Gallery",
+  "project.highlights": "Highlights",
+  "project.challenges": "Challenges",
   "project.scrollHint": "Scroll to explore",
   "project.status.completed": "Completed",
   "project.status.in-progress": "In progress",

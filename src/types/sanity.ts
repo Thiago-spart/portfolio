@@ -49,6 +49,8 @@ export interface SanityProject {
   slug: { current: string }
   shortDescription: LocaleString
   longDescription: LocaleString
+  highlights?: LocaleString[]
+  challenges?: LocaleString[]
   coverImageUrl?: string
   videoUrl?: string
   galleryUrls?: string[]

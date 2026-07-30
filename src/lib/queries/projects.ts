@@ -23,6 +23,8 @@ const detailQuery = `*[_type == "project" && slug.current == $slug][0]{
   slug,
   shortDescription,
   longDescription,
+  highlights,
+  challenges,
   "coverImageUrl": coverImage.asset->url,
   "videoUrl": video.asset->url,
   "galleryUrls": gallery[].asset->url,
