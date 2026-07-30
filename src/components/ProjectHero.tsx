@@ -40,8 +40,17 @@ export default function ProjectHero({
   const [touchStartY, setTouchStartY] = useState(0)
   const [isMobileState, setIsMobileState] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const hasStartedPlayback = useRef(false)
+
+  // The ambient backdrop video must never be part of the SSR/first-paint
+  // output: gating it behind a post-hydration effect guarantees the server
+  // HTML (and initial browser fetch) always ships the lightweight poster
+  // image first, with the video swapping in only after mount on the client.
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Users who asked for reduced motion get the expanded end-state immediately
   // and keep native document scrolling — no scroll-jacking at all.
@@ -175,12 +184,14 @@ export default function ProjectHero({
             animate={{ opacity: 1 - scrollProgress }}
             transition={{ duration: 0.1 }}
           >
-            {ambientVideoSrc && !reducedMotion ? (
+            {ambientVideoSrc && mounted && !reducedMotion ? (
               <video
                 autoPlay
                 loop
                 muted
                 playsInline
+                aria-hidden="true"
+                poster={bgImageSrc}
                 src={ambientVideoSrc}
                 className="h-full w-full object-cover"
               />

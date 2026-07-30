@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import ProjectHero from '../components/ProjectHero'
 
@@ -138,6 +139,27 @@ describe('ProjectHero', () => {
     expect(backdropVideo).toBeInTheDocument()
     expect(backdropVideo).toHaveAttribute('autoplay')
     expect(backdropVideo).toHaveAttribute('loop')
+    expect(backdropVideo).toHaveProperty('muted', true)
+    expect(backdropVideo).toHaveAttribute('playsinline')
+  })
+
+  it('server-renders the bgImageSrc fallback (not the autoplaying video) before hydration', () => {
+    // jsdom's render() flushes effects synchronously, so it can't catch a
+    // regression that only exists in the SSR/first-paint output (the exact
+    // gap this backdrop's `mounted` gate exists to close). renderToString
+    // never runs effects, so it reflects exactly what the server sends.
+    const html = renderToString(
+      <ProjectHero
+        ambientVideoSrc="https://example.com/earth-loop.mp4"
+        bgImageSrc="https://example.com/cover.jpg"
+        title="Portfolio Site"
+        date="Jan 2024"
+        scrollToExpand="Scroll to explore"
+      />,
+    )
+
+    expect(html).toContain('<img src="https://example.com/cover.jpg"')
+    expect(html).not.toContain('<video')
   })
 
   describe('with prefers-reduced-motion and ambientVideoSrc', () => {
