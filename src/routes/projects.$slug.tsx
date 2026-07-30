@@ -7,6 +7,8 @@ import { formatProjectDate } from '#/lib/formatDate'
 import ProjectHero from '#/components/ProjectHero'
 import ProjectDetails from '#/components/ProjectDetails'
 
+const EARTH_LOOP_SRC = '/media/earth-loop.mp4'
+
 function formatHeroDate(startDate: string, endDate: string | null, presentLabel: string): string {
   const end = endDate ? formatProjectDate(endDate) : presentLabel
   return `${formatProjectDate(startDate)} — ${end}`
@@ -55,6 +57,7 @@ function ProjectPage() {
         videoSrc={project.videoUrl}
         posterSrc={project.coverImageUrl}
         bgImageSrc={project.coverImageUrl}
+        ambientVideoSrc={EARTH_LOOP_SRC}
         title={project.title[lang]}
         date={formatHeroDate(project.startDate, project.endDate, t('timeline.present'))}
         scrollToExpand={t('project.scrollHint')}
