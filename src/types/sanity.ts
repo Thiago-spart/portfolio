@@ -1,12 +1,12 @@
 export type Lang = 'en' | 'pt' | 'es'
 
-export interface LocaleString {
+interface LocaleString {
   en: string
   pt: string
   es: string
 }
 
-export interface SanityHighlight {
+interface SanityHighlight {
   value: string
   label: LocaleString
 }
@@ -31,7 +31,7 @@ export interface SanityQA {
   order: number
 }
 
-export interface SanitySkill {
+interface SanitySkill {
   name: string
   icon?: string
 }
