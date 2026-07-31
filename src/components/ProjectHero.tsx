@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
+// Not yet in TypeScript's DOM lib; supported by Chromium/Firefox behind
+// navigator.connection.
+interface NetworkInformation extends EventTarget {
+  saveData?: boolean
+}
+
 interface ProjectHeroProps {
   videoSrc?: string
   posterSrc?: string
@@ -39,6 +45,7 @@ export default function ProjectHero({
   const [mediaFullyExpanded, setMediaFullyExpanded] = useState(false)
   const [touchStartY, setTouchStartY] = useState(0)
   const [isMobileState, setIsMobileState] = useState(false)
+  const [saveData, setSaveData] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [mounted, setMounted] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -167,12 +174,24 @@ export default function ProjectHero({
     return () => window.removeEventListener('resize', checkIfMobile)
   }, [])
 
+  // Respect the browser's Save-Data hint: skip the heavy ambient backdrop
+  // video for users who've asked their browser to conserve bandwidth.
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection
+    if (!connection) return
+    const updateSaveData = () => setSaveData(Boolean(connection.saveData))
+    updateSaveData()
+    connection.addEventListener?.('change', updateSaveData)
+    return () => connection.removeEventListener?.('change', updateSaveData)
+  }, [])
+
   const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250)
   const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400)
   const textTranslateX = scrollProgress * (isMobileState ? 180 : 150)
 
   const firstWord = title.split(' ')[0]
   const restOfTitle = title.split(' ').slice(1).join(' ')
+  const showAmbientVideo = Boolean(ambientVideoSrc) && mounted && !reducedMotion && !isMobileState && !saveData
 
   return (
     <div className="overflow-x-hidden">
@@ -184,7 +203,7 @@ export default function ProjectHero({
             animate={{ opacity: 1 - scrollProgress }}
             transition={{ duration: 0.1 }}
           >
-            {ambientVideoSrc && mounted && !reducedMotion ? (
+            {showAmbientVideo ? (
               <video
                 autoPlay
                 loop
