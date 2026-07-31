@@ -195,6 +195,90 @@ describe('ProjectHero', () => {
     })
   })
 
+  describe('on a mobile-sized viewport with ambientVideoSrc', () => {
+    const originalInnerWidth = window.innerWidth
+    afterEach(() => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: originalInnerWidth })
+      vi.restoreAllMocks()
+    })
+
+    it('falls back to bgImageSrc instead of loading the ambient video', () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 })
+      vi.spyOn(window, 'matchMedia').mockImplementation(
+        (query: string) =>
+          ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          }) as unknown as MediaQueryList,
+      )
+
+      const { container } = render(
+        <ProjectHero
+          ambientVideoSrc="https://example.com/earth-loop.mp4"
+          bgImageSrc="https://example.com/cover.jpg"
+          title="Portfolio Site"
+          date="Jan 2024"
+          scrollToExpand="Scroll to explore"
+        />,
+      )
+
+      expect(container.querySelector('video[src="https://example.com/earth-loop.mp4"]')).not.toBeInTheDocument()
+      expect(container.querySelector('img[src="https://example.com/cover.jpg"]')).toBeInTheDocument()
+    })
+  })
+
+  describe('with Save-Data enabled and ambientVideoSrc', () => {
+    const originalConnection = (navigator as { connection?: unknown }).connection
+    afterEach(() => {
+      Object.defineProperty(navigator, 'connection', {
+        writable: true,
+        configurable: true,
+        value: originalConnection,
+      })
+      vi.restoreAllMocks()
+    })
+
+    it('falls back to bgImageSrc instead of loading the ambient video', () => {
+      Object.defineProperty(navigator, 'connection', {
+        writable: true,
+        configurable: true,
+        value: { saveData: true },
+      })
+      vi.spyOn(window, 'matchMedia').mockImplementation(
+        (query: string) =>
+          ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          }) as unknown as MediaQueryList,
+      )
+
+      const { container } = render(
+        <ProjectHero
+          ambientVideoSrc="https://example.com/earth-loop.mp4"
+          bgImageSrc="https://example.com/cover.jpg"
+          title="Portfolio Site"
+          date="Jan 2024"
+          scrollToExpand="Scroll to explore"
+        />,
+      )
+
+      expect(container.querySelector('video[src="https://example.com/earth-loop.mp4"]')).not.toBeInTheDocument()
+      expect(container.querySelector('img[src="https://example.com/cover.jpg"]')).toBeInTheDocument()
+    })
+  })
+
   describe('with prefers-reduced-motion', () => {
     afterEach(() => vi.restoreAllMocks())
 
