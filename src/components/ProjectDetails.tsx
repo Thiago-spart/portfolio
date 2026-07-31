@@ -11,6 +11,8 @@ interface ProjectDetailsProps {
 export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
   const { t } = useTranslation()
   const endLabel = project.endDate ? formatProjectDate(project.endDate) : t('timeline.present')
+  const highlights = (project.highlights ?? []).filter((highlight) => highlight[lang])
+  const challenges = (project.challenges ?? []).filter((challenge) => challenge[lang])
 
   return (
     <div className="mx-auto max-w-3xl text-left">
@@ -24,32 +26,28 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
           </p>
         ))}
 
-      {project.highlights && project.highlights.length > 0 && (
+      {highlights.length > 0 && (
         <div className="mt-6">
           <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
             {t('project.highlights')}
           </h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {project.highlights
-              .filter((highlight) => highlight[lang])
-              .map((highlight, index) => (
-                <li key={index}>{highlight[lang]}</li>
-              ))}
+            {highlights.map((highlight, index) => (
+              <li key={index}>{highlight[lang]}</li>
+            ))}
           </ul>
         </div>
       )}
 
-      {project.challenges && project.challenges.length > 0 && (
+      {challenges.length > 0 && (
         <div className="mt-6">
           <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
             {t('project.challenges')}
           </h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {project.challenges
-              .filter((challenge) => challenge[lang])
-              .map((challenge, index) => (
-                <li key={index}>{challenge[lang]}</li>
-              ))}
+            {challenges.map((challenge, index) => (
+              <li key={index}>{challenge[lang]}</li>
+            ))}
           </ul>
         </div>
       )}

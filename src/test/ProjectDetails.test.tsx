@@ -138,6 +138,17 @@ describe('ProjectDetails', () => {
     expect(screen.getByText('Shipped feature B')).toBeInTheDocument()
   })
 
+  it('does not render a highlights heading when every item lacks the active-language translation', () => {
+    renderDetails({
+      ...baseProject,
+      highlights: [
+        { en: '', pt: 'Lançou a funcionalidade A', es: 'Lanzó la funcionalidad A' },
+      ],
+    })
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  })
+
   it('does not render a challenges section when challenges is absent', () => {
     renderDetails(baseProject)
     expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
@@ -158,5 +169,16 @@ describe('ProjectDetails', () => {
     })
     expect(screen.getByText('Challenges')).toBeInTheDocument()
     expect(screen.getByText('Handled tricky edge case')).toBeInTheDocument()
+  })
+
+  it('does not render a challenges heading when every item lacks the active-language translation', () => {
+    renderDetails({
+      ...baseProject,
+      challenges: [
+        { en: '', pt: 'Tratou um caso extremo complicado', es: 'Manejó un caso extremo complicado' },
+      ],
+    })
+    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })
 })
