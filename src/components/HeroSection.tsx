@@ -1,7 +1,17 @@
 // src/components/HeroSection.tsx
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
-import HeroCanvas from './HeroCanvas'
+
+// three/@react-three/fiber/@react-three/drei/postprocessing are heavy
+// (1.14MB) and only needed on the home page — lazy-load them out of the
+// shared route bundle (issue #11).
+const HeroCanvas = lazy(() => import('./HeroCanvas'))
+
+// Matches HeroCanvas's own container sizing so swapping in the resolved
+// canvas doesn't shift the layout.
+function HeroCanvasFallback() {
+  return <div className="relative h-[50dvh] w-full lg:h-[70dvh]" />
+}
 
 class HeroErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: boolean }> {
   constructor(props: { children: React.ReactNode }) {
@@ -70,7 +80,9 @@ export default function HeroSection() {
           {/* Right column — 3D canvas */}
           <div className="flex items-center justify-center lg:h-[100dvh]">
             <HeroErrorBoundary>
-              <HeroCanvas />
+              <Suspense fallback={<HeroCanvasFallback />}>
+                <HeroCanvas />
+              </Suspense>
             </HeroErrorBoundary>
           </div>
         </div>
