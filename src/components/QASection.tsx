@@ -37,7 +37,7 @@ export default function QASection({ items, lang }: Props) {
             <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
             <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
             <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-            <span className="ml-3 text-xs text-[#5a6a7a]">ask_thiago.sh</span>
+            <span className="ml-3 text-xs text-muted-gray">ask_thiago.sh</span>
           </div>
 
           {/* Messages */}
