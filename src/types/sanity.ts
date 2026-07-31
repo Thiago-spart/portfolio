@@ -15,7 +15,6 @@ export interface SanityExperience {
   _id: string
   company: string
   companyUrl?: string
-  companyLogoUrl?: string
   role: LocaleString
   description: LocaleString
   startDate: string       // ISO date string "YYYY-MM-DD"
