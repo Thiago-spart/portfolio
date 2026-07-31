@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Lang } from '#/types/sanity'
 
 interface LanguageContextValue {
@@ -21,9 +21,17 @@ function detectLang(): Lang {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() =>
-    typeof window !== 'undefined' ? detectLang() : 'en'
-  )
+  // Always starts as 'en' to match the server's render (which has no window
+  // to detect from). Detecting synchronously on the client here would make
+  // the very first client render diverge from the server-rendered HTML,
+  // causing a hydration mismatch (React error #418) for any visitor whose
+  // browser language or stored preference isn't English. Detection instead
+  // runs in an effect below, after hydration has already completed.
+  const [lang, setLangState] = useState<Lang>('en')
+
+  useEffect(() => {
+    setLangState(detectLang())
+  }, [])
 
   function setLang(l: Lang) {
     localStorage.setItem('lang', l)
