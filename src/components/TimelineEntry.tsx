@@ -1,6 +1,7 @@
 // src/components/TimelineEntry.tsx
 import { useState } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
+import { formatProjectDate } from '#/lib/formatDate'
 import type { SanityExperience, Lang } from '#/types/sanity'
 
 interface Props {
@@ -8,15 +9,11 @@ interface Props {
   lang: Lang
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en', { month: 'short', year: 'numeric' })
-}
-
 export default function TimelineEntry({ entry, lang }: Props) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const endLabel = entry.endDate ? formatDate(entry.endDate) : t('timeline.present')
+  const endLabel = entry.endDate ? formatProjectDate(entry.endDate) : t('timeline.present')
 
   return (
     <button
@@ -28,7 +25,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-[#00aaff]">
-            {formatDate(entry.startDate)} — {endLabel}
+            {formatProjectDate(entry.startDate)} — {endLabel}
           </p>
           <h3 className="mt-0.5 text-base font-bold text-white">{entry.company}</h3>
           <p className="text-sm text-[#00aaff]">{entry.role[lang]}</p>

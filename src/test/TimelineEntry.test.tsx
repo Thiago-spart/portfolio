@@ -52,4 +52,26 @@ describe('TimelineEntry', () => {
     render(<LanguageProvider><TimelineEntry entry={mockEntry} lang="en" /></LanguageProvider>)
     expect(screen.getByText(/present/i)).toBeInTheDocument()
   })
+
+  it('renders the same month for a 1st-of-month date regardless of the runtime timezone', () => {
+    // Sanity's date-only "YYYY-MM-DD" strings get parsed by `new Date()` as
+    // UTC midnight. Formatting that Date with toLocaleDateString() converts
+    // it to the *runtime's local* timezone first — so a negative UTC offset
+    // (e.g. server in UTC, visitor in Brazil/GMT-3) rolls a 1st-of-month date
+    // back into the previous month. SSR (server, UTC) and hydration (visitor,
+    // GMT-3) would then render different text for the same entry, which is
+    // exactly what caused the reported React #418 hydration mismatch.
+    const entryOnMonthBoundary: SanityExperience = {
+      ...mockEntry,
+      startDate: '2021-08-01',
+    }
+    const originalTz = process.env.TZ
+    process.env.TZ = 'America/Sao_Paulo' // UTC-3
+    try {
+      render(<LanguageProvider><TimelineEntry entry={entryOnMonthBoundary} lang="en" /></LanguageProvider>)
+      expect(screen.getByText(/Aug 2021/)).toBeInTheDocument()
+    } finally {
+      process.env.TZ = originalTz
+    }
+  })
 })
