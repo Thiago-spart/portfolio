@@ -5,7 +5,6 @@ const query = `*[_type == "experience"] | order(startDate desc) {
   _id,
   company,
   companyUrl,
-  "companyLogoUrl": companyLogo.asset->url,
   role,
   description,
   startDate,
