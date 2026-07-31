@@ -10,7 +10,9 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "knip": "knip",
+    "knip:fix": "knip --fix"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -21,9 +23,11 @@
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/router-plugin": "^1.132.0",
+    "@whatwg-node/server": "^0.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.42.2",
     "lucide-react": "^1.27.0",
     "postprocessing": "^6.39.2",
     "radix-ui": "^1.6.7",
@@ -46,6 +50,7 @@
     "@types/three": "^0.185.0",
     "@vitejs/plugin-react": "^6.0.1",
     "jsdom": "^28.1.0",
+    "knip": "^6.29.0",
     "sanity": "^6.3.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",

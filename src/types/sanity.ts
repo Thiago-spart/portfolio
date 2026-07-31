@@ -1,12 +1,12 @@
 export type Lang = 'en' | 'pt' | 'es'
 
-export interface LocaleString {
+interface LocaleString {
   en: string
   pt: string
   es: string
 }
 
-export interface SanityHighlight {
+interface SanityHighlight {
   value: string
   label: LocaleString
 }
@@ -15,7 +15,6 @@ export interface SanityExperience {
   _id: string
   company: string
   companyUrl?: string
-  companyLogoUrl?: string
   role: LocaleString
   description: LocaleString
   startDate: string       // ISO date string "YYYY-MM-DD"
@@ -31,7 +30,7 @@ export interface SanityQA {
   order: number
 }
 
-export interface SanitySkill {
+interface SanitySkill {
   name: string
   icon?: string
 }
@@ -48,9 +47,18 @@ export interface SanityProject {
   title: LocaleString
   slug: { current: string }
   shortDescription: LocaleString
+  longDescription: LocaleString
+  highlights?: LocaleString[]
+  challenges?: LocaleString[]
   coverImageUrl?: string
+  videoUrl?: string
+  galleryUrls?: string[]
   techStack: string[]
   category: 'web' | 'mobile' | 'api' | 'other'
+  liveUrl?: string
+  githubUrl?: string
+  startDate: string
+  endDate: string | null
   status: 'completed' | 'in-progress' | 'archived'
   featured: boolean
 }

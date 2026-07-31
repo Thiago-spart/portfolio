@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* Bebas Neue is only used for large display headlines (up to 96px,
+   leading-none). Its fallback stack renders a ~50% taller line box at that
+   size, so `display=swap` causes a large, real layout shift once the
+   webfont arrives (issue #10: CLS ~1.0 on the home page). `display=optional`
+   avoids the swap entirely instead of just reserving space for one. */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=optional');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -67,7 +73,10 @@
   --near-black: #050508;
   --dark-navy: #080d1a;
   --cyan-white: #c8f0ff;
-  --muted-gray: #5a6a7a;
+  /* Lightened from #5a6a7a (issue #12): the original failed WCAG AA
+     (3.51-3.66:1) against the site's dark backgrounds; this clears 4.5:1
+     against both #050508 and #080c18 while keeping the same blue-gray hue. */
+  --muted-gray: #708397;
   --ember: #ff6a00;
   --electric-blue-glow: rgba(0, 170, 255, 0.35);
   --purple-glow: rgba(123, 47, 255, 0.12);

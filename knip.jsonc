@@ -1,0 +1,31 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreDependencies": [
+    // Peer dependency of @tanstack/react-start's Vite plugin — required at
+    // build time but never imported directly from source.
+    "@tanstack/router-plugin",
+    // Peer dependency of @react-three/postprocessing — same story.
+    "postprocessing",
+    // Root tsconfig's `**/*.ts` include picks up sanity/schemas/*.ts (which
+    // do `import type { Rule } from 'sanity'`), so root `tsc --noEmit` needs
+    // its own copy of the package even though no root src file imports it.
+    // The sanity/ workspace below has its own separate `sanity` dependency
+    // for actually running Studio.
+    "sanity"
+  ],
+  "workspaces": {
+    ".": {
+      // TanStack Router's file-based routing means every file under
+      // src/routes/ is auto-discovered by the router, not manually imported.
+      // (vite.config.ts / vitest.setup.ts are already picked up by knip's
+      // built-in Vite/Vitest plugins — no need to list them here.)
+      // api/ssr.ts is the Vercel Function entry wrapping the SSR build —
+      // see api/ssr.ts's own comment for why it exists.
+      "entry": ["src/router.tsx", "src/routes/**/*.tsx", "api/ssr.ts"],
+      // Include .css so knip follows styles.css's @import/@plugin directives
+      // instead of flagging tailwindcss/tw-animate-css as unused.
+      "project": ["src/**/*.{ts,tsx,css}", "api/**/*.ts"]
+    },
+    "sanity": {}
+  }
+}
