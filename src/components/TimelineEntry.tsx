@@ -33,7 +33,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
           <h3 className="mt-0.5 text-base font-bold text-white">{entry.company}</h3>
           <p className="text-sm text-[#00aaff]">{entry.role[lang]}</p>
         </div>
-        <span className="mt-1 text-[#5a6a7a] transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
+        <span className="mt-1 text-muted-gray transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
           ▾
         </span>
       </div>
@@ -63,7 +63,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
               style={{ boxShadow: '0 0 12px rgba(0,170,255,0.1) inset' }}
             >
               <p className="text-xl font-bold text-white">{h.value}</p>
-              <p className="mt-0.5 text-[11px] text-[#5a6a7a]">{h.label[lang]}</p>
+              <p className="mt-0.5 text-[11px] text-muted-gray">{h.label[lang]}</p>
             </div>
           ))}
         </div>

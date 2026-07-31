@@ -83,17 +83,24 @@ export default function ProjectsSection({ projects, lang }: Props) {
               </Carousel>
             </div>
 
-            <div className="mt-6 flex justify-center gap-2">
+            {/* Buttons are 24x24 (WCAG 2.5.8 tap-target minimum, issue #12),
+                placed edge-to-edge so hit areas don't overlap; the visible
+                dot inside stays small to keep the current compact look. */}
+            <div className="mt-6 flex justify-center">
               {Array.from({ length: snapCount }, (_, index) => (
                 <button
                   key={index}
                   type="button"
                   aria-label={`Go to slide ${index + 1}`}
                   onClick={() => api?.scrollTo(index)}
-                  className={`h-2 w-2 rounded-full transition ${
-                    index === selected ? 'bg-electric-blue' : 'bg-[rgba(255,255,255,0.2)]'
-                  }`}
-                />
+                  className="flex h-6 w-6 items-center justify-center"
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full transition ${
+                      index === selected ? 'bg-electric-blue' : 'bg-[rgba(255,255,255,0.2)]'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           </>

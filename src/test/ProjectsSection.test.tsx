@@ -123,7 +123,7 @@ describe('ProjectsSection', () => {
     // the snapCount === 0 path — Array.from({ length: 0 }) — confirming the
     // component renders gracefully (no dots) instead of throwing.
     const { container } = await renderSection(mockProjects)
-    const dotsContainer = container.querySelector('.mt-6.flex.justify-center.gap-2')
+    const dotsContainer = container.querySelector('.mt-6.flex.justify-center')
     expect(dotsContainer).toBeInTheDocument()
     expect(dotsContainer).toBeEmptyDOMElement()
   })
