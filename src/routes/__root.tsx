@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { Analytics } from '@vercel/analytics/react'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import { LanguageProvider } from '../i18n/LanguageContext'
@@ -159,6 +160,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           {children}
           <Footer />
         </LanguageProvider>
+        <Analytics />
         <Scripts />
       </body>
     </html>
