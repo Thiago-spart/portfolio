@@ -42,6 +42,6 @@ describe('HeroSection', () => {
     const contactBtn = screen.getByRole('link', { name: /get in touch/i })
     expect(contactBtn).toHaveAttribute('href', '#contact')
     const projectsBtn = screen.getByRole('link', { name: /see my work/i })
-    expect(projectsBtn).toHaveAttribute('href', '/projects')
+    expect(projectsBtn).toHaveAttribute('href', '/#projects')
   })
 })
