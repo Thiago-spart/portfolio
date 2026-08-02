@@ -1,5 +1,6 @@
 // Single source of truth for site-wide SEO values. Update SITE_URL here
-// (and in public/robots.txt + public/sitemap.xml) once a real domain exists.
+// (and in public/robots.txt) once a real domain exists — sitemap.xml and
+// llms.txt are generated dynamically from this value at request time.
 export const SITE_URL = 'https://thiago-souza-developer.vercel.app'
 export const SITE_NAME = 'Thiago Souza'
 export const AUTHOR_NAME = 'Thiago Moraes de Souza'
