@@ -68,7 +68,7 @@ export default function HeroSection() {
                 {t('hero.cta.contact')}
               </a>
               <a
-                href="/projects"
+                href="/#projects"
                 className="group flex items-center gap-2 text-sm font-semibold text-[rgba(255,255,255,0.6)] no-underline transition hover:text-white"
               >
                 {t('hero.cta.projects')}
