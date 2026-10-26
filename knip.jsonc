@@ -13,6 +13,11 @@
     // for actually running Studio.
     "sanity"
   ],
+  // Written by `pnpm typegen` (Sanity TypeGen): it exports every schema and
+  // query type, whether or not the app imports it.
+  "ignoreIssues": {
+    "src/types/sanity.generated.ts": ["exports", "types"]
+  },
   "workspaces": {
     ".": {
       // TanStack Router's file-based routing means every file under
@@ -24,10 +29,7 @@
       "entry": ["src/router.tsx", "src/routes/**/*.tsx", "api/ssr.ts"],
       // Include .css so knip follows styles.css's @import/@plugin directives
       // instead of flagging tailwindcss/tw-animate-css as unused.
-      "project": ["src/**/*.{ts,tsx,css}", "api/**/*.ts"],
-      // Written by `pnpm typegen` (Sanity TypeGen). Not imported yet: the app
-      // switches from the hand-written src/types/sanity.ts in #47.
-      "ignoreFiles": ["src/types/sanity.generated.ts"]
+      "project": ["src/**/*.{ts,tsx,css}", "api/**/*.ts"]
     },
     "sanity": {}
   }
