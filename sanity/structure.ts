@@ -1,6 +1,6 @@
 import { ArchiveIcon } from '@sanity/icons/Archive'
 import type { StructureResolver } from 'sanity/structure'
-import { LEGACY_TYPES } from './schemas'
+import { CONTENT_TYPES, LEGACY_TYPES } from './schemas'
 
 // Order: singletons pinned at the top, then the new content types, then the
 // pre-migration types the live site still reads (removed in #47).
@@ -8,6 +8,8 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
+      ...CONTENT_TYPES.map((type) => S.documentTypeListItem(type)),
+      S.divider(),
       S.listItem()
         .title('Legacy (pre-migration)')
         .icon(ArchiveIcon)

@@ -168,6 +168,25 @@ export type Experience = {
   }>;
 };
 
+export type Tech = {
+  _id: string;
+  _type: "tech";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  category:
+    | "frontend"
+    | "mobile"
+    | "backend"
+    | "data"
+    | "testing"
+    | "tooling"
+    | "ai"
+    | "practice";
+  url?: string;
+};
+
 export type ImageWithAlt = {
   _type: "imageWithAlt";
   asset?: SanityImageAssetReference;
@@ -353,6 +372,7 @@ export type AllSanitySchemaTypes =
   | SkillCategory
   | Qa
   | Experience
+  | Tech
   | ImageWithAlt
   | Metric
   | LocaleBlock
