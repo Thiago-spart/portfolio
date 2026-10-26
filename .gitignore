@@ -16,3 +16,6 @@ todos.json
 .claude/worktrees/
 .vercel
 .env*
+
+# Sanity schema extract (input to typegen; the generated types are committed)
+sanity/schema.json
