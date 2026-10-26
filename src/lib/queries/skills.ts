@@ -1,3 +1,4 @@
+import { createServerFn } from '@tanstack/react-start'
 import { sanityClient } from '#/lib/sanity'
 import type { SanitySkillCategory } from '#/types/sanity'
 
@@ -8,6 +9,7 @@ const query = `*[_type == "skillCategory"] | order(order asc) {
   order
 }`
 
-export function fetchSkills(): Promise<SanitySkillCategory[]> {
-  return sanityClient.fetch(query)
-}
+// Server function — see fetchExperiences.
+export const fetchSkills = createServerFn({ method: 'GET' }).handler(
+  (): Promise<SanitySkillCategory[]> => sanityClient.fetch(query),
+)
