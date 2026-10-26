@@ -41,3 +41,10 @@ export function formatMetric({ before, after, unit }: { before?: number; after?:
   const value = (n?: number) => (n == null ? '?' : `${n}${unit ?? ''}`)
   return before == null ? value(after) : `${value(before)} → ${value(after)}`
 }
+
+// A case study's results as picker options (see heroResult). Reads the
+// published document: the site only renders published data.
+export type ResultOption = { _key: string; before?: number; after?: number; unit?: string; label?: string }
+
+export const CASE_STUDY_RESULTS_QUERY =
+  '*[_id == $id][0].results[]{ _key, before, after, unit, "label": label.en }'

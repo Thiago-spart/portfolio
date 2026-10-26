@@ -187,6 +187,55 @@ export type Tech = {
   url?: string;
 };
 
+export type SiteSettings = {
+  _id: string;
+  _type: "siteSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  availability?: LocaleString;
+  heroResults: Array<
+    {
+      _key: string;
+    } & HeroResult
+  >;
+  email?: string;
+  linkedin?: string;
+  github?: string;
+  cv?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  seo?: {
+    title?: LocaleString;
+    description?: LocaleText;
+    ogImage?: ImageWithAlt;
+  };
+};
+
+export type ImageWithAlt = {
+  _type: "imageWithAlt";
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt: LocaleString;
+};
+
+export type CaseStudyReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "caseStudy";
+};
+
+export type HeroResult = {
+  _type: "heroResult";
+  caseStudy: CaseStudyReference;
+  resultKey?: string;
+};
+
 export type RoleReference = {
   _ref: string;
   _type: "reference";
@@ -240,15 +289,6 @@ export type CaseStudy = {
   githubUrl?: string;
   startDate?: string;
   endDate?: string;
-};
-
-export type ImageWithAlt = {
-  _type: "imageWithAlt";
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt: LocaleString;
 };
 
 export type LocaleBlock = {
@@ -447,10 +487,13 @@ export type AllSanitySchemaTypes =
   | Qa
   | Experience
   | Tech
+  | SiteSettings
+  | ImageWithAlt
+  | CaseStudyReference
+  | HeroResult
   | RoleReference
   | TechReference
   | CaseStudy
-  | ImageWithAlt
   | LocaleBlock
   | Role
   | Metric

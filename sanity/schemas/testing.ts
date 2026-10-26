@@ -4,7 +4,7 @@ type Call = { method: string; args: unknown[] }
 
 type Validatable = { name: string; validation?: unknown }
 
-function ruleCalls(validation: unknown): Call[] {
+export function ruleCalls(validation: unknown): Call[] {
   const calls: Call[] = []
   const rule: object = new Proxy({}, {
     get: (_, method) => (...args: unknown[]) => {
