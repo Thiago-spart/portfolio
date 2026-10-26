@@ -9,6 +9,7 @@ const DEFAULT_ORDERING: Record<string, Ordering[]> = {
   caseStudy: [{ field: 'tier', direction: 'desc' }, { field: 'order', direction: 'asc' }],
   role:      [{ field: 'startDate', direction: 'desc' }],
   tech:      [{ field: 'name', direction: 'asc' }],
+  faq:       [{ field: 'order', direction: 'asc' }],
 }
 
 // Singletons open straight into the one document whose id is the type name.
