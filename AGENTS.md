@@ -128,7 +128,18 @@ pnpm build            # Production build
 pnpm preview          # Preview production build
 pnpm test             # Run Vitest test suite
 pnpm generate-routes  # Regenerate routeTree.gen.ts (runs automatically on dev)
+
+pnpm --dir sanity install  # Install Studio deps (separate lockfile in sanity/)
+pnpm --dir sanity dev      # Run Sanity Studio on http://localhost:3333
+pnpm --dir sanity build    # Build Studio into sanity/dist
 ```
+
+### Sanity Studio
+
+- `sanity/` is the only Studio. It is a standalone pnpm project (own `package.json` + `pnpm-lock.yaml`), not a workspace of the app. Current Sanity 6 + React 19, with `structureTool` and `visionTool`.
+- Project ID / dataset come from `sanity/env.ts`: `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET`, falling back to `wbbntp0o` / `production`. Only `SANITY_STUDIO_*` vars reach the Studio bundle.
+- Schemas live in `sanity/schemas/`. The root tsconfig and `pnpm test` cover them, which is why the root `package.json` also has `sanity` as a devDependency.
+- Do not run `sanity deploy` or dataset-writing commands without the owner's go-ahead.
 
 ---
 
