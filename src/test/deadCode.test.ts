@@ -4,17 +4,12 @@ import { describe, expect, it } from 'vitest'
 
 // issue #13: dead-code audit. companyLogoUrl was fetched from Sanity on
 // every request but never rendered anywhere — removed rather than wired up,
-// since rendering it would be new feature work, not cleanup. The Sanity
-// schema field itself is a content-modeling decision and stays untouched.
+// since rendering it would be new feature work, not cleanup. The role type
+// (#44) dropped the field; the timeline query must not bring it back.
 describe('companyLogoUrl removal (issue #13)', () => {
-  it('is no longer projected in the experiences GROQ query', () => {
-    const query = readFileSync(resolve(__dirname, '../lib/queries/experiences.ts'), 'utf-8')
+  it('is not projected in the roles GROQ query', () => {
+    const query = readFileSync(resolve(__dirname, '../lib/queries/roles.ts'), 'utf-8')
     expect(query).not.toMatch(/companyLogo/)
-  })
-
-  it('is no longer declared on SanityExperience', () => {
-    const types = readFileSync(resolve(__dirname, '../types/sanity.ts'), 'utf-8')
-    expect(types).not.toMatch(/companyLogoUrl/)
   })
 })
 

@@ -1,53 +1,15 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import {
-  RouterProvider,
-  createRouter,
-  createRootRoute,
-  createRoute,
-  createMemoryHistory,
-} from '@tanstack/react-router'
 import ProjectCard from '../components/ProjectCard'
-import type { Lang, SanityProject } from '../types/sanity'
+import { renderWithRouter } from './renderWithRouter'
+import { caseStudyCard } from './fixtures'
+import type { Lang } from '../i18n/LanguageContext'
+import type { CASE_STUDIES_QUERY_RESULT } from '../types/sanity.generated'
 
-const mockProject: SanityProject = {
-  _id: 'proj-1',
-  title: { en: 'Portfolio Site', pt: 'Site Portfólio', es: 'Sitio Portafolio' },
-  slug: { current: 'portfolio-site' },
-  shortDescription: {
-    en: 'A personal site.',
-    pt: 'Um site pessoal.',
-    es: 'Un sitio personal.',
-  },
-  longDescription: {
-    en: 'A deep dive into building the personal site.',
-    pt: 'Um mergulho profundo na construção do site pessoal.',
-    es: 'Una inmersión profunda en la construcción del sitio personal.',
-  },
-  coverImageUrl: 'https://example.com/cover.jpg',
-  techStack: ['React', 'TypeScript'],
-  category: 'web',
-  status: 'completed',
-  startDate: '2024-01-15',
-  endDate: null,
-  featured: true,
-}
+const mockProject = caseStudyCard()
 
-async function renderCard(project: SanityProject, lang: Lang, accentIndex: number) {
-  const rootRoute = createRootRoute({
-    component: () => <ProjectCard project={project} lang={lang} accentIndex={accentIndex} />,
-  })
-  const projectRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/projects/$slug',
-    component: () => null,
-  })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([projectRoute]),
-    history: createMemoryHistory({ initialEntries: ['/'] }),
-  })
-  await router.load()
-  return render(<RouterProvider router={router} />)
+function renderCard(project: CASE_STUDIES_QUERY_RESULT[number], lang: Lang, accentIndex: number) {
+  return renderWithRouter(<ProjectCard project={project} lang={lang} accentIndex={accentIndex} />)
 }
 
 describe('ProjectCard', () => {
@@ -56,15 +18,25 @@ describe('ProjectCard', () => {
     expect(screen.getByText('Portfolio Site')).toBeInTheDocument()
   })
 
-  it('renders the short description for the active language', async () => {
+  it('renders the summary for the active language', async () => {
     await renderCard(mockProject, 'pt', 0)
     expect(screen.getByText('Um site pessoal.')).toBeInTheDocument()
   })
 
-  it('renders a tech chip for each techStack entry', async () => {
+  it('renders a tech chip for each stack entry', async () => {
     await renderCard(mockProject, 'en', 0)
     expect(screen.getByText('React')).toBeInTheDocument()
     expect(screen.getByText('TypeScript')).toBeInTheDocument()
+  })
+
+  it('renders the headline result as "before → after · label"', async () => {
+    await renderCard(mockProject, 'en', 0)
+    expect(screen.getByText('40 → 95 · Lighthouse score')).toHaveAttribute('data-direction', 'up')
+  })
+
+  it('leaves the result line out when the case study has no results', async () => {
+    await renderCard(caseStudyCard({ headlineResult: null }), 'en', 0)
+    expect(screen.queryByText(/→/)).not.toBeInTheDocument()
   })
 
   it('applies glitch-flicker to the title', async () => {
@@ -72,14 +44,16 @@ describe('ProjectCard', () => {
     expect(screen.getByText('Portfolio Site')).toHaveClass('glitch-flicker')
   })
 
-  it('renders the image layer when coverImageUrl is present', async () => {
+  it('renders the cover with its localized alt text', async () => {
     await renderCard(mockProject, 'en', 0)
-    expect(screen.getByTestId('project-card-image')).toBeInTheDocument()
+    const image = screen.getByTestId('project-card-image')
+    expect(image).toHaveAttribute('role', 'img')
+    expect(image).toHaveAttribute('aria-label', 'Home page on a laptop')
+    expect(image.style.backgroundImage).toContain('https://example.com/cover.jpg')
   })
 
-  it('falls back to the cyberpunk-surface background when coverImageUrl is missing', async () => {
-    const projectWithoutImage: SanityProject = { ...mockProject, coverImageUrl: undefined }
-    await renderCard(projectWithoutImage, 'en', 1)
+  it('falls back to the cyberpunk-surface background when there is no cover', async () => {
+    await renderCard(caseStudyCard({ cover: null }), 'en', 1)
     expect(screen.getByTestId('project-card-fallback')).toBeInTheDocument()
   })
 

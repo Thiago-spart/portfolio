@@ -9,10 +9,11 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '#/components/ui/carousel'
-import type { Lang, SanityProject } from '#/types/sanity'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { CASE_STUDIES_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface Props {
-  projects: SanityProject[]
+  projects: CASE_STUDIES_QUERY_RESULT
   lang: Lang
 }
 

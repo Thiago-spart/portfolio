@@ -11,6 +11,8 @@ interface ProjectHeroProps {
   videoSrc?: string
   posterSrc?: string
   bgImageSrc?: string
+  /** Alt text for bgImageSrc when it is shown as the media; defaults to the title. */
+  imageAlt?: string
   ambientVideoSrc?: string
   title: string
   date: string
@@ -34,6 +36,7 @@ export default function ProjectHero({
   videoSrc,
   posterSrc,
   bgImageSrc,
+  imageAlt,
   ambientVideoSrc,
   title,
   date,
@@ -257,7 +260,7 @@ export default function ProjectHero({
                   <img
                     data-testid="project-hero-image"
                     src={bgImageSrc}
-                    alt={title}
+                    alt={imageAlt ?? title}
                     className="h-full w-full object-cover"
                   />
                 ) : (

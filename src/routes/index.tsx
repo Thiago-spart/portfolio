@@ -1,49 +1,72 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { fetchExperiences } from '#/lib/queries/experiences'
-import { fetchProjects }    from '#/lib/queries/projects'
-import { fetchQA }          from '#/lib/queries/qa'
-import { fetchSkills }      from '#/lib/queries/skills'
-import { useLanguage }      from '#/i18n/LanguageContext'
-import { routeHead }        from '#/lib/seo'
-import HeroSection          from '#/components/HeroSection'
-import TimelineSection      from '#/components/TimelineSection'
-import ProjectsSection      from '#/components/ProjectsSection'
-import SkillsSection        from '#/components/SkillsSection'
-import QASection            from '#/components/QASection'
-import ContactSection       from '#/components/ContactSection'
+import { fetchRoles }        from '#/lib/queries/roles'
+import { fetchCaseStudies }  from '#/lib/queries/caseStudies'
+import { fetchFaq }          from '#/lib/queries/faq'
+import { fetchStack }        from '#/lib/queries/stack'
+import { fetchSiteSettings } from '#/lib/queries/siteSettings'
+import { groupStack }        from '#/lib/stack'
+import { useLanguage }       from '#/i18n/LanguageContext'
+import { routeHead }         from '#/lib/seo'
+import HeroSection           from '#/components/HeroSection'
+import TimelineSection       from '#/components/TimelineSection'
+import ProjectsSection       from '#/components/ProjectsSection'
+import SkillsSection         from '#/components/SkillsSection'
+import QASection             from '#/components/QASection'
+import ContactSection        from '#/components/ContactSection'
+
+const HOME_TITLE = 'Thiago Souza — Full-Stack Developer'
+const HOME_DESCRIPTION =
+  'Full-stack developer building fast, thoughtful web experiences — explore Thiago Souza\'s projects, experience, and skills.'
 
 export const Route = createFileRoute('/')({
-  head: () =>
-    routeHead({
-      title: 'Thiago Souza — Full-Stack Developer',
-      description:
-        'Full-stack developer building fast, thoughtful web experiences — explore Thiago Souza\'s projects, experience, and skills.',
+  // siteSettings.seo, when published, overrides the copy in code (and the
+  // root route's og:image); otherwise the constants above stay in place.
+  head: ({ loaderData }) => {
+    const seo  = loaderData?.settings?.seo
+    const head = routeHead({
+      title: seo?.title?.en ?? HOME_TITLE,
+      description: seo?.description?.en ?? HOME_DESCRIPTION,
       path: '/',
-    }),
+    })
+    const og = seo?.ogImage
+    if (!og?.url) return head
+    return {
+      ...head,
+      meta: [
+        ...head.meta,
+        { property: 'og:image', content: og.url },
+        { property: 'og:image:type', content: 'image/jpeg' },
+        { property: 'og:image:alt', content: og.alt.en },
+        { name: 'twitter:image', content: og.url },
+        { name: 'twitter:image:alt', content: og.alt.en },
+      ],
+    }
+  },
   loader: async () => {
-    const [experiences, projects, qa, skills] = await Promise.all([
-      fetchExperiences(),
-      fetchProjects(),
-      fetchQA(),
-      fetchSkills(),
+    const [roles, caseStudies, faq, stack, settings] = await Promise.all([
+      fetchRoles(),
+      fetchCaseStudies(),
+      fetchFaq(),
+      fetchStack(),
+      fetchSiteSettings(),
     ])
-    return { experiences, projects, qa, skills }
+    return { roles, caseStudies, faq, stack: groupStack(stack), settings }
   },
   component: HomePage,
 })
 
 function HomePage() {
-  const { experiences, projects, qa, skills } = Route.useLoaderData()
+  const { roles, caseStudies, faq, stack, settings } = Route.useLoaderData()
   const { lang } = useLanguage()
 
   return (
     <main>
       <HeroSection />
-      <TimelineSection experiences={experiences} lang={lang} />
-      <ProjectsSection projects={projects} lang={lang} />
-      <SkillsSection categories={skills} lang={lang} />
-      <QASection items={qa} lang={lang} />
-      <ContactSection />
+      <TimelineSection roles={roles} lang={lang} />
+      <ProjectsSection projects={caseStudies} lang={lang} />
+      <SkillsSection groups={stack} lang={lang} />
+      <QASection items={faq} lang={lang} />
+      <ContactSection settings={settings} />
     </main>
   )
 }

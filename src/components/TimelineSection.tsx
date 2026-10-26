@@ -2,10 +2,11 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
 import TimelineEntry from './TimelineEntry'
-import type { SanityExperience, Lang } from '#/types/sanity'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { ROLES_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface Props {
-  experiences: SanityExperience[]
+  roles: ROLES_QUERY_RESULT
   lang: Lang
 }
 
@@ -36,7 +37,7 @@ function useGlitchRise(ref: React.RefObject<HTMLElement | null>) {
   }, [ref])
 }
 
-export default function TimelineSection({ experiences, lang }: Props) {
+export default function TimelineSection({ roles, lang }: Props) {
   const { t } = useTranslation()
   const listRef = useRef<HTMLDivElement>(null)
   useGlitchRise(listRef as React.RefObject<HTMLElement>)
@@ -58,7 +59,7 @@ export default function TimelineSection({ experiences, lang }: Props) {
           />
 
           <div ref={listRef} className="flex flex-col gap-8 pl-10 md:pl-0">
-            {experiences.map((entry, i) => (
+            {roles.map((entry, i) => (
               <div
                 key={entry._id}
                 className={`relative opacity-0 md:w-[calc(50%-2rem)] ${

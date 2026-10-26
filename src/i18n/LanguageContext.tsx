@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { Lang } from '#/types/sanity'
+
+// The site's content languages: localeString/localeText/localeBlock in Sanity
+// carry one field per language, picked with `field[lang]`.
+export type Lang = 'en' | 'pt' | 'es'
 
 interface LanguageContextValue {
   lang: Lang

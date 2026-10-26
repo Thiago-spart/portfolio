@@ -1,103 +1,34 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import {
-  RouterProvider,
-  createRouter,
-  createRootRoute,
-  createRoute,
-  createMemoryHistory,
-} from '@tanstack/react-router'
-import { LanguageProvider } from '../i18n/LanguageContext'
 import ProjectsSection from '../components/ProjectsSection'
-import type { SanityProject } from '../types/sanity'
+import { renderWithRouter } from './renderWithRouter'
+import { caseStudyCard, localeString } from './fixtures'
+import type { CASE_STUDIES_QUERY_RESULT } from '../types/sanity.generated'
 
-const mockProjects: SanityProject[] = [
-  {
-    _id: 'proj-1',
-    title: { en: 'Portfolio Site', pt: 'Site Portfólio', es: 'Sitio Portafolio' },
-    slug: { current: 'portfolio-site' },
-    shortDescription: {
-      en: 'A personal site.',
-      pt: 'Um site pessoal.',
-      es: 'Un sitio personal.',
-    },
-    longDescription: {
-      en: 'A deep dive into building the personal site.',
-      pt: 'Um mergulho profundo na construção do site pessoal.',
-      es: 'Una inmersión profunda en la construcción del sitio personal.',
-    },
-    coverImageUrl: 'https://example.com/cover.jpg',
-    techStack: ['React'],
-    category: 'web',
-    status: 'completed',
-    startDate: '2024-01-15',
-    endDate: null,
-    featured: true,
-  },
-  {
-    _id: 'proj-2',
-    title: { en: 'API Service', pt: 'Serviço API', es: 'Servicio API' },
-    slug: { current: 'api-service' },
-    shortDescription: {
-      en: 'A backend service.',
-      pt: 'Um serviço de backend.',
-      es: 'Un servicio backend.',
-    },
-    longDescription: {
-      en: 'Notes on building the backend service.',
-      pt: 'Notas sobre a construção do serviço de backend.',
-      es: 'Notas sobre la construcción del servicio backend.',
-    },
-    techStack: ['Node.js'],
-    category: 'api',
-    status: 'in-progress',
-    startDate: '2024-03-01',
-    endDate: null,
-    featured: false,
-  },
-  {
-    _id: 'proj-3',
-    title: { en: 'Sparse Project', pt: 'Projeto Simples', es: 'Proyecto Simple' },
-    slug: { current: 'sparse-project' },
-    shortDescription: {
-      en: 'A project with no tech chips.',
-      pt: 'Um projeto sem chips de tecnologia.',
-      es: 'Un proyecto sin chips de tecnología.',
-    },
-    longDescription: {
-      en: 'A minimal project used to exercise the empty-state paths.',
-      pt: 'Um projeto mínimo usado para testar os estados vazios.',
-      es: 'Un proyecto mínimo usado para probar los estados vacíos.',
-    },
-    techStack: [],
-    category: 'web',
-    status: 'completed',
-    startDate: '2023-11-01',
-    endDate: '2023-12-01',
-    featured: false,
-  },
+const mockProjects: CASE_STUDIES_QUERY_RESULT = [
+  caseStudyCard(),
+  caseStudyCard({
+    _id: 'cs-2',
+    title: localeString({ en: 'API Service' }),
+    slug: 'api-service',
+    tier: 'archive',
+    stack: ['Node.js'],
+    cover: null,
+  }),
+  caseStudyCard({
+    _id: 'cs-3',
+    title: localeString({ en: 'Sparse Project' }),
+    slug: 'sparse-project',
+    tier: 'archive',
+    summary: null,
+    cover: null,
+    stack: null,
+    headlineResult: null,
+  }),
 ]
 
-async function renderSection(projects: SanityProject[]) {
-  const rootRoute = createRootRoute({
-    component: () => (
-      <LanguageProvider>
-        <ProjectsSection projects={projects} lang="en" />
-      </LanguageProvider>
-    ),
-  })
-  const projectRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/projects/$slug',
-    component: () => null,
-  })
-  const router = createRouter({
-    routeTree: rootRoute.addChildren([projectRoute]),
-    history: createMemoryHistory({ initialEntries: ['/'] }),
-  })
-  await router.load()
-  return render(<RouterProvider router={router} />)
-}
+const renderSection = (projects: CASE_STUDIES_QUERY_RESULT) =>
+  renderWithRouter(<ProjectsSection projects={projects} lang="en" />)
 
 describe('ProjectsSection', () => {
   it('has the #projects anchor with the cyberpunk-surface background class', async () => {

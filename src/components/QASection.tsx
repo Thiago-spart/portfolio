@@ -1,10 +1,12 @@
 // src/components/QASection.tsx
 import { useState } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
-import type { SanityQA, Lang } from '#/types/sanity'
+import RichText from './RichText'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { FAQ_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface Props {
-  items: SanityQA[]
+  items: FAQ_QUERY_RESULT
   lang: Lang
 }
 
@@ -60,7 +62,7 @@ export default function QASection({ items, lang }: Props) {
                       className="cursor-blink self-end rounded-2xl rounded-tr-sm border border-[rgba(0,170,255,0.25)] bg-[rgba(0,170,255,0.08)] px-4 py-2.5 text-sm text-[rgba(255,255,255,0.8)]"
                       style={{ maxWidth: '85%' }}
                     >
-                      {item.answer[lang]}
+                      <RichText value={item.answer[lang]} />
                     </div>
                   )}
                 </div>

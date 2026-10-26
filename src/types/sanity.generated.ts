@@ -517,3 +517,215 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
+
+// Source: ../src/lib/queries/caseStudies.ts
+// Variable: CASE_STUDIES_QUERY
+// Query: *[_type == "caseStudy" && defined(slug.current)]  | order(tier desc, order asc, startDate desc) {  _id,  title,  "slug": slug.current,  tier,  summary,  "cover": cover{    "url": asset->url + "?w=700&h=500&fit=crop&auto=format&q=75",    alt  },  "stack": stack[]->name,  "headlineResult": results[0]{ _key, before, after, unit, label, direction }}
+export type CASE_STUDIES_QUERY_RESULT = Array<{
+  _id: string;
+  title: LocaleString;
+  slug: string;
+  tier: "archive" | "featured";
+  summary: LocaleString | null;
+  cover: {
+    url: string | null;
+    alt: LocaleString;
+  } | null;
+  stack: Array<string> | null;
+  headlineResult: {
+    _key: string;
+    before: number | null;
+    after: number;
+    unit: string | null;
+    label: LocaleString;
+    direction: "down" | "up";
+  } | null;
+}>;
+
+// Source: ../src/lib/queries/caseStudies.ts
+// Variable: CASE_STUDY_DETAIL_QUERY
+// Query: *[_type == "caseStudy" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  summary,  problem,  approach,  "results": results[]{ _key, before, after, unit, label, direction },  "stack": stack[]->name,  "role": role->{ company, companyUrl, title },  "cover": cover{    "url": asset->url + "?w=1600&auto=format&q=75",    alt  },  "gallery": gallery[]{    _key,    "url": asset->url + "?w=1000&auto=format&q=75",    alt  },  "videoUrl": video.asset->url,  liveUrl,  githubUrl,  startDate,  endDate}
+export type CASE_STUDY_DETAIL_QUERY_RESULT = {
+  _id: string;
+  title: LocaleString;
+  slug: string;
+  summary: LocaleString | null;
+  problem: LocaleBlock | null;
+  approach: LocaleBlock | null;
+  results: Array<{
+    _key: string;
+    before: number | null;
+    after: number;
+    unit: string | null;
+    label: LocaleString;
+    direction: "down" | "up";
+  }> | null;
+  stack: Array<string> | null;
+  role: {
+    company: string;
+    companyUrl: string | null;
+    title: LocaleString;
+  } | null;
+  cover: {
+    url: string | null;
+    alt: LocaleString;
+  } | null;
+  gallery: Array<{
+    _key: string;
+    url: string | null;
+    alt: LocaleString;
+  }> | null;
+  videoUrl: string | null;
+  liveUrl: string | null;
+  githubUrl: string | null;
+  startDate: string | null;
+  endDate: string | null;
+} | null;
+
+// Source: ../src/lib/queries/faq.ts
+// Variable: FAQ_QUERY
+// Query: *[_type == "faq"] | order(order asc) {  _id,  question,  answer}
+export type FAQ_QUERY_RESULT = Array<{
+  _id: string;
+  question: LocaleString;
+  answer: LocaleBlock;
+}>;
+
+// Source: ../src/lib/queries/roles.ts
+// Variable: ROLES_QUERY
+// Query: *[_type == "role"] | order(startDate desc) {  _id,  company,  companyUrl,  title,  summary,  startDate,  endDate,  "stack": stack[]->name,  "caseStudies": *[_type == "caseStudy" && references(^._id) && defined(slug.current)]    | order(tier desc, order asc, startDate desc) {    _id,    title,    "slug": slug.current,    "results": results[]{ _key, before, after, unit, label, direction }  }}
+export type ROLES_QUERY_RESULT = Array<{
+  _id: string;
+  company: string;
+  companyUrl: string | null;
+  title: LocaleString;
+  summary: LocaleText | null;
+  startDate: string;
+  endDate: string | null;
+  stack: Array<string> | null;
+  caseStudies: Array<{
+    _id: string;
+    title: LocaleString;
+    slug: string;
+    results: Array<{
+      _key: string;
+      before: number | null;
+      after: number;
+      unit: string | null;
+      label: LocaleString;
+      direction: "down" | "up";
+    }> | null;
+  }>;
+}>;
+
+// Source: ../src/lib/queries/siteSettings.ts
+// Variable: SITE_SETTINGS_QUERY
+// Query: *[_id == "siteSettings"][0]{  email,  linkedin,  github,  "seo": seo{    title,    description,    "ogImage": ogImage{      "url": asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",      alt    }  }}
+export type SITE_SETTINGS_QUERY_RESULT =
+  | {
+      email: null;
+      linkedin: null;
+      github: null;
+      seo: null;
+    }
+  | {
+      email: string | null;
+      linkedin: string | null;
+      github: string | null;
+      seo: {
+        title: LocaleString | null;
+        description: LocaleText | null;
+        ogImage: {
+          url: string | null;
+          alt: LocaleString;
+        } | null;
+      } | null;
+    }
+  | null;
+
+// Source: ../src/lib/queries/siteSettings.ts
+// Variable: HERO_RESULTS_QUERY
+// Query: *[_id == "siteSettings"][0].heroResults[]{  _key,  "caseStudy": caseStudy->{ title, "slug": slug.current },  "result": caseStudy->results[_key == ^.resultKey][0]{ _key, before, after, unit, label, direction }}
+export type HERO_RESULTS_QUERY_RESULT = Array<{
+  _key: string;
+  caseStudy: {
+    title: LocaleString;
+    slug: string;
+  };
+  result: {
+    _key: string;
+    before: number | null;
+    after: number;
+    unit: string | null;
+    label: LocaleString;
+    direction: "down" | "up";
+  } | null;
+}> | null;
+
+// Source: ../src/lib/queries/stack.ts
+// Variable: STACK_QUERY
+// Query: *[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]  | order(name asc) {  _id,  name,  category}
+export type STACK_QUERY_RESULT = Array<{
+  _id: string;
+  name: string;
+  category:
+    | "ai"
+    | "backend"
+    | "data"
+    | "frontend"
+    | "mobile"
+    | "practice"
+    | "testing"
+    | "tooling";
+}>;
+
+// Source: ../src/routes/llms[.]txt.ts
+// Variable: LLMS_CASE_STUDIES_QUERY
+// Query: *[_type == "caseStudy" && defined(slug.current)]  | order(tier desc, order asc, startDate desc) {  "title": title.en,  "slug": slug.current,  "summary": summary.en,  "results": results[]{ before, after, unit, "label": label.en }}
+export type LLMS_CASE_STUDIES_QUERY_RESULT = Array<{
+  title: string;
+  slug: string;
+  summary: string | null;
+  results: Array<{
+    before: number | null;
+    after: number;
+    unit: string | null;
+    label: string;
+  }> | null;
+}>;
+
+// Source: ../src/routes/llms[.]txt.ts
+// Variable: LLMS_FAQ_QUERY
+// Query: *[_type == "faq"] | order(order asc) {  "question": question.en,  "answer": pt::text(answer.en)}
+export type LLMS_FAQ_QUERY_RESULT = Array<{
+  question: string;
+  answer: string;
+}>;
+
+// Source: ../src/routes/sitemap[.]xml.ts
+// Variable: SITEMAP_CASE_STUDIES_QUERY
+// Query: *[_type == "caseStudy" && defined(slug.current)]{  "slug": slug.current,  "updatedAt": _updatedAt}
+export type SITEMAP_CASE_STUDIES_QUERY_RESULT = Array<{
+  slug: string;
+  updatedAt: string;
+}>;
+
+// Query TypeMap
+declare global {
+  interface SanityQueries {
+    '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  tier,\n  summary,\n  "cover": cover{\n    "url": asset->url + "?w=700&h=500&fit=crop&auto=format&q=75",\n    alt\n  },\n  "stack": stack[]->name,\n  "headlineResult": results[0]{ _key, before, after, unit, label, direction }\n}': CASE_STUDIES_QUERY_RESULT;
+    '*[_type == "caseStudy" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  summary,\n  problem,\n  approach,\n  "results": results[]{ _key, before, after, unit, label, direction },\n  "stack": stack[]->name,\n  "role": role->{ company, companyUrl, title },\n  "cover": cover{\n    "url": asset->url + "?w=1600&auto=format&q=75",\n    alt\n  },\n  "gallery": gallery[]{\n    _key,\n    "url": asset->url + "?w=1000&auto=format&q=75",\n    alt\n  },\n  "videoUrl": video.asset->url,\n  liveUrl,\n  githubUrl,\n  startDate,\n  endDate\n}': CASE_STUDY_DETAIL_QUERY_RESULT;
+    '*[_type == "faq"] | order(order asc) {\n  _id,\n  question,\n  answer\n}': FAQ_QUERY_RESULT;
+    '*[_type == "role"] | order(startDate desc) {\n  _id,\n  company,\n  companyUrl,\n  title,\n  summary,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "caseStudies": *[_type == "caseStudy" && references(^._id) && defined(slug.current)]\n    | order(tier desc, order asc, startDate desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    "results": results[]{ _key, before, after, unit, label, direction }\n  }\n}': ROLES_QUERY_RESULT;
+    '*[_id == "siteSettings"][0]{\n  email,\n  linkedin,\n  github,\n  "seo": seo{\n    title,\n    description,\n    "ogImage": ogImage{\n      "url": asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",\n      alt\n    }\n  }\n}': SITE_SETTINGS_QUERY_RESULT;
+    '*[_id == "siteSettings"][0].heroResults[]{\n  _key,\n  "caseStudy": caseStudy->{ title, "slug": slug.current },\n  "result": caseStudy->results[_key == ^.resultKey][0]{ _key, before, after, unit, label, direction }\n}': HERO_RESULTS_QUERY_RESULT;
+    '*[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]\n  | order(name asc) {\n  _id,\n  name,\n  category\n}': STACK_QUERY_RESULT;
+    '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  "title": title.en,\n  "slug": slug.current,\n  "summary": summary.en,\n  "results": results[]{ before, after, unit, "label": label.en }\n}': LLMS_CASE_STUDIES_QUERY_RESULT;
+    '*[_type == "faq"] | order(order asc) {\n  "question": question.en,\n  "answer": pt::text(answer.en)\n}': LLMS_FAQ_QUERY_RESULT;
+    '*[_type == "caseStudy" && defined(slug.current)]{\n  "slug": slug.current,\n  "updatedAt": _updatedAt\n}': SITEMAP_CASE_STUDIES_QUERY_RESULT;
+  }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module "@sanity/client" {
+  interface SanityQueries extends globalThis.SanityQueries {}
+}

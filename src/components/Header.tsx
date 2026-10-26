@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
-import { useLanguage } from '#/i18n/LanguageContext'
+import { useLanguage, type Lang } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
-import type { Lang } from '#/types/sanity'
 
 // The Hero section's wrapper is 250dvh tall with a 100dvh pinned inner
 // section, so it fully releases at 250dvh - 100dvh = 1.5x viewport height.
