@@ -3,6 +3,8 @@ import { localeText }    from './locale/localeText'
 import { localeBlock }   from './locale/localeBlock'
 import { metric }        from './objects/metric'
 import { imageWithAlt }  from './objects/imageWithAlt'
+import { caseStudy }     from './caseStudy'
+import { role }          from './role'
 import { tech }          from './tech'
 import { experience }    from './experience'
 import { qa }            from './qa'
@@ -10,7 +12,7 @@ import { skillCategory } from './skillCategory'
 import { project }       from './project'
 
 // New content types, in Studio order.
-export const CONTENT_TYPES = ['tech']
+export const CONTENT_TYPES = ['caseStudy', 'role', 'tech']
 
 // Legacy document types: the live site still queries these until #47.
 export const LEGACY_TYPES = ['experience', 'project', 'qa', 'skillCategory']
@@ -23,6 +25,8 @@ export const schemaTypes = [
   metric,
   imageWithAlt,
   // documents
+  caseStudy,
+  role,
   tech,
   // legacy documents
   experience,

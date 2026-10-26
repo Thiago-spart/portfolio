@@ -187,6 +187,61 @@ export type Tech = {
   url?: string;
 };
 
+export type RoleReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "role";
+};
+
+export type TechReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "tech";
+};
+
+export type CaseStudy = {
+  _id: string;
+  _type: "caseStudy";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: LocaleString;
+  slug: Slug;
+  role?: RoleReference;
+  tier: "featured" | "archive";
+  order?: number;
+  summary?: LocaleString;
+  problem?: LocaleBlock;
+  approach?: LocaleBlock;
+  results?: Array<
+    {
+      _key: string;
+    } & Metric
+  >;
+  stack?: Array<
+    {
+      _key: string;
+    } & TechReference
+  >;
+  cover?: ImageWithAlt;
+  gallery?: Array<
+    {
+      _key: string;
+    } & ImageWithAlt
+  >;
+  video?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  liveUrl?: string;
+  githubUrl?: string;
+  startDate?: string;
+  endDate?: string;
+};
+
 export type ImageWithAlt = {
   _type: "imageWithAlt";
   asset?: SanityImageAssetReference;
@@ -194,15 +249,6 @@ export type ImageWithAlt = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt: LocaleString;
-};
-
-export type Metric = {
-  _type: "metric";
-  before?: number;
-  after: number;
-  unit?: string;
-  label: LocaleString;
-  direction: "up" | "down";
 };
 
 export type LocaleBlock = {
@@ -261,6 +307,34 @@ export type LocaleBlock = {
     _type: "block";
     _key: string;
   }>;
+};
+
+export type Role = {
+  _id: string;
+  _type: "role";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  company: string;
+  companyUrl?: string;
+  title: LocaleString;
+  startDate: string;
+  endDate?: string;
+  summary?: LocaleText;
+  stack?: Array<
+    {
+      _key: string;
+    } & TechReference
+  >;
+};
+
+export type Metric = {
+  _type: "metric";
+  before?: number;
+  after: number;
+  unit?: string;
+  label: LocaleString;
+  direction: "up" | "down";
 };
 
 export type SanityImagePaletteSwatch = {
@@ -373,9 +447,13 @@ export type AllSanitySchemaTypes =
   | Qa
   | Experience
   | Tech
+  | RoleReference
+  | TechReference
+  | CaseStudy
   | ImageWithAlt
-  | Metric
   | LocaleBlock
+  | Role
+  | Metric
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
