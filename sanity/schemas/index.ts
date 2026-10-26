@@ -1,5 +1,8 @@
 import { localeString }  from './locale/localeString'
 import { localeText }    from './locale/localeText'
+import { localeBlock }   from './locale/localeBlock'
+import { metric }        from './objects/metric'
+import { imageWithAlt }  from './objects/imageWithAlt'
 import { experience }    from './experience'
 import { qa }            from './qa'
 import { skillCategory } from './skillCategory'
@@ -12,6 +15,9 @@ export const schemaTypes = [
   // objects
   localeString,
   localeText,
+  localeBlock,
+  metric,
+  imageWithAlt,
   // legacy documents
   experience,
   qa,
