@@ -3,12 +3,11 @@ import { defineQuery }    from 'groq'
 import { sanityClient }   from '#/lib/sanity'
 import { METRIC_FIELDS }  from '#/lib/queryFragments'
 
-// Sanity's asset CDN accepts image transform params directly on the asset
-// URL (no @sanity/image-url needed) — cover.asset->url alone serves the
-// original upload at full resolution, which was routinely 3-4MB per image
-// here for a 288px-tall card thumbnail.
-//
 // Featured case studies first (by `order`), then the archive, newest first.
+// One row feeds both the Case card (featured) and the Archive row: the role
+// title and dates for the card head, the stack names, and the first two
+// results (the first is the archive row's headline result). This order is
+// also the reading order behind "Next case study".
 export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined(slug.current)]
   | order(tier desc, order asc, startDate desc) {
   _id,
@@ -16,12 +15,11 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined
   "slug": slug.current,
   tier,
   summary,
-  "cover": cover{
-    "url": asset->url + "?w=700&h=500&fit=crop&auto=format&q=75",
-    alt
-  },
+  "roleTitle": role->title,
+  startDate,
+  endDate,
   "stack": stack[]->name,
-  "headlineResult": results[0]{ ${METRIC_FIELDS} }
+  "results": results[0...2]{ ${METRIC_FIELDS} }
 }`)
 
 // Sanity's CORS allowlist rejects browser-origin requests, so this must run
@@ -31,6 +29,10 @@ export const fetchCaseStudies = createServerFn({ method: 'GET' }).handler(() =>
   sanityClient.fetch(CASE_STUDIES_QUERY),
 )
 
+// Sanity's asset CDN accepts image transform params directly on the asset
+// URL (no @sanity/image-url needed); asset->url alone serves the original
+// upload at full resolution (routinely 3-4MB here). The cover is cropped to
+// the 2:1 frame it is drawn in, at 2x the 1120px column.
 export const CASE_STUDY_DETAIL_QUERY = defineQuery(`*[_type == "caseStudy" && slug.current == $slug][0]{
   _id,
   title,
@@ -42,7 +44,7 @@ export const CASE_STUDY_DETAIL_QUERY = defineQuery(`*[_type == "caseStudy" && sl
   "stack": stack[]->name,
   "role": role->{ company, companyUrl, title },
   "cover": cover{
-    "url": asset->url + "?w=1600&auto=format&q=75",
+    "url": asset->url + "?w=2240&h=1120&fit=crop&auto=format&q=75",
     alt
   },
   "gallery": gallery[]{

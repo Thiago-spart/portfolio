@@ -14,7 +14,7 @@ describe('companyLogoUrl removal (issue #13)', () => {
 })
 
 // issue #13: public/models/living_things.glb (15MB) had zero references in
-// src/ — only looking_glass_hologram_concept_3.glb (HeroModel.tsx) is used.
+// src/. (The Mangrove hero later dropped the last model, the R3F hologram.)
 describe('unreferenced asset removal (issue #13)', () => {
   it('living_things.glb no longer exists in public/models', () => {
     expect(existsSync(resolve(__dirname, '../../public/models/living_things.glb'))).toBe(false)

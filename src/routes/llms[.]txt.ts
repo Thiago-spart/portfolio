@@ -35,7 +35,7 @@ export const Route = createFileRoute('/llms.txt')({
   server: {
     handlers: {
       GET: async () => {
-        const [caseStudies, techs, faqs, settings] = await Promise.all([
+        const [caseStudies, stack, faqs, settings] = await Promise.all([
           sanityClient.fetch(LLMS_CASE_STUDIES_QUERY),
           sanityClient.fetch(STACK_QUERY),
           sanityClient.fetch(LLMS_FAQ_QUERY),
@@ -50,8 +50,8 @@ export const Route = createFileRoute('/llms.txt')({
           })
           .join('\n')
 
-        const stackLines = groupStack(techs)
-          .map((group) => `- ${group.label.en}: ${group.techs.join(', ')}`)
+        const stackLines = groupStack(stack.techs)
+          .map((group) => `- ${group.label.en}: ${group.techs.map((tech) => tech.name).join(', ')}`)
           .join('\n')
 
         const qaLines = faqs.map((qa) => `- Q: ${qa.question}\n  A: ${qa.answer}`).join('\n')
@@ -60,11 +60,11 @@ export const Route = createFileRoute('/llms.txt')({
         const linkedin = settings?.linkedin ?? LINKEDIN_URL
         const github   = settings?.github ? `\n- GitHub: ${settings.github}` : ''
 
-        const body = `# ${SITE_NAME} — Full-Stack Developer
+        const body = `# ${SITE_NAME} — Senior Mobile & Web Engineer
 
 > ${DEFAULT_DESCRIPTION}
 
-${AUTHOR_NAME} is a full-stack developer working across React, Next.js, TypeScript, Node.js, and React Native, with production experience in micro-frontend architecture, performance/accessibility engineering, and AI-driven development workflows.
+${AUTHOR_NAME} is a senior mobile and web engineer based in Brazil, building React, React Native and TypeScript products for fintech, edtech and health companies. As Lead Frontend Engineer at Redação Online he took Lighthouse from 40 to 95 and cut checkout drop-off from 23% to 9%; at Capitual, a testing pipeline at 80% coverage reduced production bugs by 96%. He works in English, Portuguese and Spanish.
 
 ## Contact
 - Email: mailto:${email}

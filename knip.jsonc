@@ -4,14 +4,16 @@
     // Peer dependency of @tanstack/react-start's Vite plugin — required at
     // build time but never imported directly from source.
     "@tanstack/router-plugin",
-    // Peer dependency of @react-three/postprocessing — same story.
-    "postprocessing",
     // Root tsconfig's `**/*.ts` include picks up sanity/schemas/*.ts (which
     // do `import type { Rule } from 'sanity'`), so root `tsc --noEmit` needs
     // its own copy of the package even though no root src file imports it.
     // The sanity/ workspace below has its own separate `sanity` dependency
     // for actually running Studio.
-    "sanity"
+    "sanity",
+    // Referenced only from url() in src/styles/fonts.css, which knip doesn't
+    // follow. (newsreader is also imported from __root.tsx for the preload.)
+    "@fontsource-variable/jetbrains-mono",
+    "@fontsource-variable/public-sans"
   ],
   // Written by `pnpm typegen` (Sanity TypeGen): it exports every schema and
   // query type, whether or not the app imports it.

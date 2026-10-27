@@ -1,137 +1,52 @@
 // src/test/TimelineSection.test.tsx
-import { render } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import TimelineSection from '../components/TimelineSection'
 import { localeString } from './fixtures'
 import type { ROLES_QUERY_RESULT } from '../types/sanity.generated'
 
 // No case studies, so no <Link>s and no router needed.
+const role = (id: string, company: string, startDate: string, endDate: string | null): ROLES_QUERY_RESULT[number] => ({
+  _id: id,
+  company,
+  companyUrl: null,
+  title: localeString({ en: `${company} role` }),
+  summary: null,
+  startDate,
+  endDate,
+  stack: ['React'],
+  caseStudies: [],
+})
+
 const mockRoles: ROLES_QUERY_RESULT = [
-  {
-    _id: '1',
-    company: 'Acme Corp',
-    companyUrl: null,
-    title: localeString({ en: 'Senior Developer' }),
-    summary: null,
-    startDate: '2022-01-01',
-    endDate: null,
-    stack: ['React'],
-    caseStudies: [],
-  },
+  role('1', 'Acme Corp', '2022-01-01', null),
+  role('2', 'Old Co', '2019-09-10', '2021-12-31'),
 ]
 
-type ObserverCallback = (entries: Array<{ target: Element; isIntersecting: boolean }>) => void
-
-let observedElements: Element[]
-let capturedCallback: ObserverCallback | null
-
-beforeEach(() => {
-  observedElements = []
-  capturedCallback = null
-
-  class FakeIntersectionObserver {
-    constructor(callback: ObserverCallback) {
-      capturedCallback = callback
-    }
-    observe(el: Element) {
-      observedElements.push(el)
-    }
-    unobserve(el: Element) {
-      observedElements = observedElements.filter((e) => e !== el)
-    }
-    disconnect() {
-      observedElements = []
-    }
-  }
-
-  vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver)
-})
-
-afterEach(() => {
-  vi.unstubAllGlobals()
-})
-
-function fireIntersection(target: Element, isIntersecting: boolean) {
-  capturedCallback?.([{ target, isIntersecting }])
-}
-
-describe('TimelineSection glitch-rise replay', () => {
-  it('starts with cards hidden (opacity-0, no glitch-rise)', () => {
-    const { container } = render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const card = container.querySelector('.relative.opacity-0') as HTMLElement
-    expect(card).toBeTruthy()
-    expect(card.classList.contains('glitch-rise')).toBe(false)
+describe('TimelineSection', () => {
+  it('is the #experience section, labelled by its heading', () => {
+    render(<LanguageProvider><TimelineSection roles={mockRoles} lang="en" /></LanguageProvider>)
+    expect(screen.getByRole('region', { name: 'Experience' })).toHaveAttribute('id', 'experience')
   })
 
-  it('adds glitch-rise and removes opacity-0 when a card enters the viewport', () => {
-    render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const card = observedElements[0] as HTMLElement
-    fireIntersection(card, true)
-
-    expect(card.classList.contains('opacity-0')).toBe(false)
-    expect(card.classList.contains('glitch-rise')).toBe(true)
+  it('counts the roles and the first year in the lede', () => {
+    render(<LanguageProvider><TimelineSection roles={mockRoles} lang="en" /></LanguageProvider>)
+    expect(screen.getByText('Two roles since 2019, newest first. Each links to the case studies it produced.')).toBeInTheDocument()
   })
 
-  it('removes glitch-rise and restores opacity-0 when a card leaves the viewport', () => {
-    render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const card = observedElements[0] as HTMLElement
-    fireIntersection(card, true)
-    fireIntersection(card, false)
-
-    expect(card.classList.contains('glitch-rise')).toBe(false)
-    expect(card.classList.contains('opacity-0')).toBe(true)
+  it('renders each role in order, visible without waiting for a scroll reveal', () => {
+    render(<LanguageProvider><TimelineSection roles={mockRoles} lang="en" /></LanguageProvider>)
+    const titles = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
+    expect(titles).toEqual(['Acme Corp role', 'Old Co role'])
+    expect(screen.getByText('Acme Corp').closest('.opacity-0')).toBeNull()
   })
 
-  it('replays glitch-rise when a card re-enters the viewport after leaving', () => {
-    render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const card = observedElements[0] as HTMLElement
-    fireIntersection(card, true)
-    fireIntersection(card, false)
-    fireIntersection(card, true)
-
-    expect(card.classList.contains('opacity-0')).toBe(false)
-    expect(card.classList.contains('glitch-rise')).toBe(true)
-  })
-
-  it('never unobserves a card (stays observed across enter/exit cycles)', () => {
-    render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const card = observedElements[0] as HTMLElement
-    fireIntersection(card, true)
-    fireIntersection(card, false)
-
-    expect(observedElements).toContain(card)
-  })
-})
-
-describe('TimelineSection background', () => {
-  it('has the cyberpunk-surface class so it connects seamlessly with the Hero', () => {
-    const { container } = render(
-      <LanguageProvider>
-        <TimelineSection roles={mockRoles} lang="en" />
-      </LanguageProvider>,
-    )
-    const section = container.querySelector('#experience')
-    expect(section).toHaveClass('cyberpunk-surface')
+  it('fills only the current role marker and ends the rail at the last role', () => {
+    render(<LanguageProvider><TimelineSection roles={mockRoles} lang="en" /></LanguageProvider>)
+    const [current, past] = screen.getAllByTestId('marker')
+    expect(current).toHaveClass('fill-mangrove')
+    expect(past).toHaveClass('fill-ground')
+    expect(screen.getAllByTestId('rail-line')).toHaveLength(1)
   })
 })

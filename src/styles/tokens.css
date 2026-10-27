@@ -1,0 +1,104 @@
+/* Brand tokens: ~/Work/personal/brand/project/tokens.json for values, the
+   Figma variables (file "Thiago Souza — Portfolio") for names. Every name
+   here is the Figma variable's CSS code syntax, so `var(--ink)` in a Figma
+   inspect panel is `var(--ink)` in code.
+
+   Light is the default. Dark applies when the system asks for it, unless
+   the visitor picked light with the theme toggle (data-theme="light"), or
+   when they picked dark (data-theme="dark"). The dark block is repeated
+   because a media query and an attribute selector can't share one rule. */
+
+:root {
+  color-scheme: light;
+
+  /* Color */
+  --ground: #f3f5f0;
+  --surface-raised: #ffffff;
+  --surface-sunken: #e7ebe2;
+  --line: #d2d9cb;
+  --line-strong: #7a8771;
+  --ink: #15201a;
+  --ink-muted: #4f5c52;
+  --mangrove: #1f5a3f;
+  --mangrove-soft: #dbeadf;
+  --on-mangrove: #f3f5f0;
+  --mango: #a84d05;
+  --mango-soft: #fbe8cf;
+  --on-mango: #ffffff;
+  --score-good: #0b6e6e;
+  --score-average: #7a6400;
+  --score-poor: #c0262d;
+  /* The monogram cursor: the dark-theme mango on the deep light-theme tile,
+     a burnt mango on the light dark-theme tile. Exempt from "mango once". */
+  --logo-cursor: #f4a340;
+  /* Primary button hover: mangrove mixed toward ink. */
+  --mangrove-hover: color-mix(in oklab, var(--mangrove) 86%, var(--ink));
+
+  /* Shadow colors, composed into --shadow-float (see styles.css @theme). */
+  --shadow-near: rgb(21 32 26 / 0.06);
+  --shadow-far: rgb(21 32 26 / 0.08);
+
+  /* Space: a 4px grid. Interfaces step by 4; layouts step by 8. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Layout */
+  --content-max: 1120px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --ground: #0d1510;
+    --surface-raised: #141f18;
+    --surface-sunken: #080e0a;
+    --line: #26352b;
+    --line-strong: #617564;
+    --ink: #e6eee7;
+    --ink-muted: #9fb0a3;
+    --mangrove: #6fcf9a;
+    --mangrove-soft: #173526;
+    --on-mangrove: #0d1510;
+    --mango: #f4a340;
+    --mango-soft: #3a2810;
+    --on-mango: #0d1510;
+    --score-good: #62c3ea;
+    --score-average: #e3c443;
+    --score-poor: #ff6b6b;
+    --logo-cursor: #874004;
+    --shadow-near: rgb(0 0 0 / 0.4);
+    --shadow-far: rgb(0 0 0 / 0.35);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --ground: #0d1510;
+  --surface-raised: #141f18;
+  --surface-sunken: #080e0a;
+  --line: #26352b;
+  --line-strong: #617564;
+  --ink: #e6eee7;
+  --ink-muted: #9fb0a3;
+  --mangrove: #6fcf9a;
+  --mangrove-soft: #173526;
+  --on-mangrove: #0d1510;
+  --mango: #f4a340;
+  --mango-soft: #3a2810;
+  --on-mango: #0d1510;
+  --score-good: #62c3ea;
+  --score-average: #e3c443;
+  --score-poor: #ff6b6b;
+  --logo-cursor: #874004;
+  --shadow-near: rgb(0 0 0 / 0.4);
+  --shadow-far: rgb(0 0 0 / 0.35);
+}

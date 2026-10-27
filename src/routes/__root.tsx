@@ -17,9 +17,13 @@ import {
   SITE_URL,
 } from '../lib/seo'
 
+import { THEME_INIT_SCRIPT } from '../lib/theme'
 import appCss from '../styles.css?url'
+// The hero headline (Newsreader 600) is the LCP element: preload its latin
+// file. Same module as the @font-face src in src/styles/fonts.css, so Vite
+// emits one hashed asset for both.
+import headlineFontUrl from '@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url'
 
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
 // Mirrors THEME_INIT_SCRIPT: sets the real <html lang> before hydration so it
 // matches the visitor's actual language instead of always reading "en" —
@@ -99,13 +103,20 @@ export const Route = createRootRoute({
           name: AUTHOR_NAME,
           alternateName: SITE_NAME,
           url: SITE_URL,
-          jobTitle: 'Full-Stack Developer',
+          jobTitle: 'Senior Mobile & Web Engineer',
           email: `mailto:${AUTHOR_EMAIL}`,
           sameAs: [LINKEDIN_URL],
         },
       },
     ],
     links: [
+      {
+        rel: 'preload',
+        href: headlineFontUrl,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous',
+      },
       {
         rel: 'stylesheet',
         href: appCss,
@@ -141,12 +152,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             meta tags by name, and both of these share name="theme-color". */}
         <meta
           name="theme-color"
-          content="#e7f3ec"
+          content="#f3f5f0"
           media="(prefers-color-scheme: light)"
         />
         <meta
           name="theme-color"
-          content="#050508"
+          content="#0d1510"
           media="(prefers-color-scheme: dark)"
         />
         {/* Rendered directly for the same reason: the router dedupes by
@@ -155,7 +166,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <meta property="og:locale:alternate" content="es_ES" />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
+      <body>
         <LanguageProvider>
           <Header />
           {children}

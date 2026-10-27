@@ -109,14 +109,12 @@ describe('CASE_STUDIES_QUERY', () => {
     expect(rows.map((r) => r.slug)).toEqual(['first', 'second', 'solo', 'archive'])
   })
 
-  it('projects the card fields: CDN-sized cover with alt, stack names, first result', async () => {
+  it('projects the card and row fields: role title, dates, stack names, first two results', async () => {
     const [first] = await run<any[]>(CASE_STUDIES_QUERY)
-    expect(first.cover).toEqual({
-      url: 'https://cdn.sanity.io/images/p/d/cover-1.jpg?w=700&h=500&fit=crop&auto=format&q=75',
-      alt: localeString({ en: 'The new home page' }),
-    })
+    expect(first.roleTitle).toEqual(localeString({ en: 'Lead' }))
     expect(first.stack).toEqual(['React', 'Vitest'])
-    expect(first.headlineResult).toMatchObject({ _key: 'lh', before: 40, after: 95 })
+    expect(first.results.map((r: { _key: string }) => r._key)).toEqual(['lh', 'bugs'])
+    expect(first.results[0]).toMatchObject({ before: 40, after: 95 })
   })
 })
 
@@ -126,6 +124,10 @@ describe('CASE_STUDY_DETAIL_QUERY', () => {
     expect(study.role).toEqual({ company: 'New Co', companyUrl: null, title: localeString({ en: 'Lead' }) })
     expect(study.problem.en[0].children[0].text).toBe('It was slow.')
     expect(study.results.map((r: { _key: string }) => r._key)).toEqual(['lh', 'bugs'])
+    expect(study.cover).toEqual({
+      url: 'https://cdn.sanity.io/images/p/d/cover-1.jpg?w=2240&h=1120&fit=crop&auto=format&q=75',
+      alt: localeString({ en: 'The new home page' }),
+    })
     expect(study.gallery).toEqual([{
       _key: 'g1',
       url: 'https://cdn.sanity.io/images/p/d/shot-1.png?w=1000&auto=format&q=75',
@@ -160,9 +162,21 @@ describe('ROLES_QUERY', () => {
 
 describe('STACK_QUERY', () => {
   it('derives the stack from techs referenced by a case study or a role', async () => {
-    const techs = await run<{ name: string }[]>(STACK_QUERY)
+    const { techs } = await run<{ techs: { name: string }[] }>(STACK_QUERY)
     // Node.js is only on a role; COBOL is on nothing.
     expect(techs.map((t) => t.name)).toEqual(['Node.js', 'React', 'Vitest'])
+  })
+
+  it('counts the case studies using each tech, and the case studies with a slug', async () => {
+    const stack = await run<{ caseStudyCount: number; techs: { name: string; caseStudies: number }[] }>(STACK_QUERY)
+    // React: cs-feat-1 only (roles don't count); Node.js: on a role only.
+    expect(stack.techs.map((t) => [t.name, t.caseStudies])).toEqual([
+      ['Node.js', 0],
+      ['React', 1],
+      ['Vitest', 1],
+    ])
+    // cs-draft has no slug, so the site never shows it.
+    expect(stack.caseStudyCount).toBe(4)
   })
 })
 

@@ -20,7 +20,7 @@ const components: PortableTextComponents = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded bg-[rgba(255,255,255,0.08)] px-1 py-0.5 text-[0.9em]">{children}</code>
+      <code className="rounded bg-surface-raised px-1 py-0.5 text-[0.9em]">{children}</code>
     ),
     link: ({ value, children }) => {
       const href     = (value as { href?: string } | undefined)?.href
@@ -28,7 +28,7 @@ const components: PortableTextComponents = {
       return (
         <a
           href={href}
-          className="font-semibold text-[var(--electric-blue,#00aaff)] underline underline-offset-2"
+          className="font-semibold text-mangrove underline underline-offset-2"
           {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
         >
           {children}
