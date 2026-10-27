@@ -4,8 +4,6 @@
     // Peer dependency of @tanstack/react-start's Vite plugin — required at
     // build time but never imported directly from source.
     "@tanstack/router-plugin",
-    // Peer dependency of @react-three/postprocessing — same story.
-    "postprocessing",
     // Root tsconfig's `**/*.ts` include picks up sanity/schemas/*.ts (which
     // do `import type { Rule } from 'sanity'`), so root `tsc --noEmit` needs
     // its own copy of the package even though no root src file imports it.
