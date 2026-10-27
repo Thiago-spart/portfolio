@@ -55,8 +55,8 @@ describe('ProjectsSection', () => {
   it('gives the accent to the first featured card only', async () => {
     const { container } = await renderSection(mockProjects)
     expect(container.querySelectorAll('[data-emphasis="accent"]')).toHaveLength(1)
-    const firstCard = screen.getByRole('link', { name: 'Portfolio Site' })
-    expect(firstCard.querySelector('[data-emphasis="accent"]')).toBeInTheDocument()
+    const firstCard = screen.getByRole('link', { name: 'Portfolio Site' }).closest('article')
+    expect(firstCard?.querySelector('[data-emphasis="accent"]')).toBeInTheDocument()
   })
 
   it('leaves "More work" out without archive case studies', async () => {

@@ -14,10 +14,11 @@ interface ArchiveRowProps {
 // (and "Next case study"). Wide from 640px: year, title, two techs, the
 // headline result, arrow. Compact below: year and techs, then title and
 // arrow, then the result. The result column keeps its width when there is
-// no result, so the rows stay aligned. The whole row is one link, named by
-// its title. Hover: sunken surface, title and arrow in mangrove.
+// no result, so the rows stay aligned. The title is the link and its ::after
+// covers the row, so the whole row is clickable while the link's name stays
+// its visible text (WCAG 2.5.3). Hover: sunken surface, title and arrow in
+// mangrove; the row carries the focus ring while the link is focused.
 export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
-  const titleId = useId()
   const contextId = useId()
   const resultId = useId()
   const year = startYear(caseStudy.startDate)
@@ -26,25 +27,23 @@ export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
   const result = headline ? formatResultPhrase(headline, lang) : ''
 
   return (
-    <Link
-      to="/projects/$slug"
-      params={{ slug: caseStudy.slug }}
-      aria-labelledby={titleId}
-      aria-describedby={result ? `${contextId} ${resultId}` : contextId}
+    <div
       className={cn(
-        'group grid grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-2 border-b border-line px-3 py-4 text-ink no-underline',
-        'transition-colors duration-150 ease-out hover:bg-surface-sunken focus-visible:rounded-sm',
+        'group relative grid grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-2 border-b border-line px-3 py-4 text-ink no-underline',
+        'transition-colors duration-150 ease-out hover:bg-surface-sunken has-[a:focus-visible]:rounded-sm has-[a:focus-visible]:focus-ring',
         'sm:grid-cols-[--spacing(14)_1fr_--spacing(40)_--spacing(40)_auto] sm:gap-x-6',
         'lg:grid-cols-[--spacing(14)_1fr_--spacing(60)_--spacing(60)_auto]',
       )}
     >
       <span className="col-start-1 row-start-1 type-code text-ink-muted">{year}</span>
-      <span
-        id={titleId}
-        className="col-span-2 col-start-1 row-start-2 type-body-strong text-ink group-hover:text-mangrove sm:col-span-1 sm:col-start-2 sm:row-start-1"
+      <Link
+        to="/projects/$slug"
+        params={{ slug: caseStudy.slug }}
+        aria-describedby={result ? `${contextId} ${resultId}` : contextId}
+        className="col-span-2 col-start-1 row-start-2 type-body-strong text-ink no-underline outline-none group-hover:text-mangrove after:absolute after:inset-0 after:content-[''] sm:col-span-1 sm:col-start-2 sm:row-start-1"
       >
         {caseStudy.title[lang]}
-      </span>
+      </Link>
       <span
         id={contextId}
         className="col-span-2 col-start-2 row-start-1 type-small text-ink-muted sm:col-span-1 sm:col-start-3"
@@ -66,6 +65,6 @@ export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
         strokeWidth={1.5}
         className="col-start-3 row-start-2 justify-self-end text-ink group-hover:text-mangrove sm:col-start-5 sm:row-start-1"
       />
-    </Link>
+    </div>
   )
 }

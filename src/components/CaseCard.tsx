@@ -19,11 +19,12 @@ interface CaseCardProps {
 
 // Figma: Components / Case card (10:173). Result first: role and years,
 // title, the summary as one sentence of method, up to four Tags and two
-// Metrics. The whole card is one link, named by its title. Hover draws the
-// border in mangrove; focus uses the global ring.
+// Metrics. The title is the link and its ::after stretches over the card, so
+// the whole card is clickable while the link's name stays its visible text
+// (WCAG 2.5.3). Hover draws the border in mangrove; the card carries the
+// focus ring while the link is focused.
 export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const { t } = useTranslation()
-  const titleId = useId()
   const summaryId = useId()
   const years = formatYearRange(caseStudy.startDate, caseStudy.endDate, t('work.present'))
   const role = caseStudy.roleTitle?.[lang]
@@ -32,21 +33,22 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const results = (caseStudy.results ?? []).slice(0, MAX_METRICS)
 
   return (
-    <Link
-      to="/projects/$slug"
-      params={{ slug: caseStudy.slug }}
-      aria-labelledby={titleId}
-      aria-describedby={summary ? summaryId : undefined}
-      className="flex h-full flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink no-underline transition-colors duration-150 ease-out hover:border-mangrove"
-    >
+    <article className="relative flex h-full flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink transition-colors duration-150 ease-out has-[a:hover]:border-mangrove has-[a:focus-visible]:focus-ring">
       {(role || years) && (
         <div className="flex w-full items-baseline justify-between gap-4 text-ink-muted">
           <span className="type-label">{role}</span>
           <span className="shrink-0 whitespace-nowrap type-small">{years}</span>
         </div>
       )}
-      <h3 id={titleId} className="m-0 type-title text-ink">
-        {caseStudy.title[lang]}
+      <h3 className="m-0 type-title text-ink">
+        <Link
+          to="/projects/$slug"
+          params={{ slug: caseStudy.slug }}
+          aria-describedby={summary ? summaryId : undefined}
+          className="text-ink no-underline outline-none after:absolute after:inset-0 after:rounded-md after:content-['']"
+        >
+          {caseStudy.title[lang]}
+        </Link>
       </h3>
       {summary && (
         <p id={summaryId} className="m-0 type-body text-ink-muted">
@@ -73,6 +75,6 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
           ))}
         </div>
       )}
-    </Link>
+    </article>
   )
 }
