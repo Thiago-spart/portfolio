@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T19:38:43+00:00",
+  "title": "Design System: Thiago Souza — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Drafting Ground",
+        "canonical": "#f3f5f0",
+        "tonalRamp": [
+          "#0a0c09",
+          "#21221f",
+          "#3c3e3a",
+          "#5a5b57",
+          "#797b77",
+          "#9d9f9b",
+          "#c3c5c0",
+          "#edefea"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#222222",
+          "#3d3d3d",
+          "#5b5b5b",
+          "#7a7a7a",
+          "#9e9e9e",
+          "#c4c4c4",
+          "#eeeeee"
+        ]
+      },
+      "surface-sunken": {
+        "role": "neutral",
+        "displayName": "Sunken Ground",
+        "canonical": "#e7ebe2",
+        "tonalRamp": [
+          "#0a0c07",
+          "#20231c",
+          "#3b3e37",
+          "#595c55",
+          "#787c74",
+          "#9ca098",
+          "#c2c6bd",
+          "#ecf0e7"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#d2d9cb",
+        "tonalRamp": [
+          "#090d05",
+          "#1f2419",
+          "#3a3f34",
+          "#575d51",
+          "#777d70",
+          "#9aa194",
+          "#c0c7b9",
+          "#eaf1e3"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "canonical": "#7a8771",
+        "tonalRamp": [
+          "#060e01",
+          "#1b2513",
+          "#36412e",
+          "#535f4b",
+          "#727f69",
+          "#96a48d",
+          "#bbc9b2",
+          "#e5f4dc"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#15201a",
+        "tonalRamp": [
+          "#050e08",
+          "#19251e",
+          "#34403a",
+          "#525e57",
+          "#717e76",
+          "#95a29a",
+          "#bac8c0",
+          "#e4f3ea"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#4f5c52",
+        "tonalRamp": [
+          "#040e07",
+          "#19251c",
+          "#344137",
+          "#525f55",
+          "#717e74",
+          "#94a398",
+          "#bac9bd",
+          "#e4f3e7"
+        ]
+      },
+      "mangrove": {
+        "role": "primary",
+        "displayName": "Mangrove Green",
+        "canonical": "#1f5a3f",
+        "tonalRamp": [
+          "#001302",
+          "#002c14",
+          "#08492f",
+          "#2e684c",
+          "#4f886b",
+          "#73ad8e",
+          "#98d4b4",
+          "#c2ffdd"
+        ]
+      },
+      "mangrove-soft": {
+        "role": "primary",
+        "displayName": "Mangrove Soft",
+        "canonical": "#dbeadf",
+        "tonalRamp": [
+          "#050e07",
+          "#1a251d",
+          "#354138",
+          "#525f55",
+          "#717e75",
+          "#95a398",
+          "#bac8be",
+          "#e4f3e8"
+        ]
+      },
+      "mango": {
+        "role": "tertiary",
+        "displayName": "Mango",
+        "canonical": "#a84d05",
+        "tonalRamp": [
+          "#300000",
+          "#4f0000",
+          "#721900",
+          "#953c00",
+          "#b95d20",
+          "#e28249",
+          "#ffa86f",
+          "#ffd299"
+        ]
+      },
+      "mango-soft": {
+        "role": "tertiary",
+        "displayName": "Mango Soft",
+        "canonical": "#fbe8cf",
+        "tonalRamp": [
+          "#140800",
+          "#2d1f0a",
+          "#493a26",
+          "#685842",
+          "#887761",
+          "#ad9b84",
+          "#d3c1a9",
+          "#feebd2"
+        ]
+      },
+      "score-good": {
+        "role": "score",
+        "displayName": "Score Good",
+        "canonical": "#0b6e6e",
+        "tonalRamp": [
+          "#001315",
+          "#002c2d",
+          "#00494a",
+          "#006969",
+          "#348989",
+          "#5caeae",
+          "#82d5d4",
+          "#adffff"
+        ]
+      },
+      "score-average": {
+        "role": "score",
+        "displayName": "Score Average",
+        "canonical": "#7a6400",
+        "tonalRamp": [
+          "#1a0500",
+          "#321d00",
+          "#4f3a00",
+          "#6e5900",
+          "#8f7924",
+          "#b49d4c",
+          "#dac372",
+          "#ffee9c"
+        ]
+      },
+      "score-poor": {
+        "role": "score",
+        "displayName": "Score Poor",
+        "canonical": "#c0262d",
+        "tonalRamp": [
+          "#320000",
+          "#520000",
+          "#760712",
+          "#9a3130",
+          "#bf534f",
+          "#e97872",
+          "#ff9e96",
+          "#ffc8bf"
+        ]
+      },
+      "logo-cursor": {
+        "role": "tertiary",
+        "displayName": "Logo Cursor",
+        "canonical": "#f4a340",
+        "tonalRamp": [
+          "#2b0000",
+          "#480100",
+          "#6a2600",
+          "#8c4600",
+          "#af6700",
+          "#d78b29",
+          "#ffb156",
+          "#ffdc82"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display-xl": {
+        "displayName": "Display XL",
+        "purpose": "Hero headline only; one per page; the LCP element."
+      },
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "Section titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card, role and question titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text, 65–75ch."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Measured results, mono."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Mono uppercase roles, metric labels, callouts."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float",
+        "value": "0 1px 2px var(--shadow-near), 0 8px 24px var(--shadow-far)",
+        "purpose": "Only for content floating above the page; never cards or buttons."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "150ms ease-out",
+        "purpose": "Hover and focus color, border and underline changes."
+      },
+      {
+        "name": "poster-crossfade",
+        "value": "400ms ease-out",
+        "purpose": "Hero SVG poster to 3D scene."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Under prefers-reduced-motion the hero shows its final grown state and idle motion is off."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "hero",
+        "value": "900px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "focusRing": {
+      "value": "2px solid var(--mango); outline-offset: 2px",
+      "purpose": "Global :focus-visible on every surface."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action per view.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Get in touch</a>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:var(--radius-md,8px);border:1px solid transparent;font:600 15px/1 'Public Sans',system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:background-color .15s ease-out,border-color .15s ease-out,box-shadow .15s ease-out;background:var(--mangrove,#1f5a3f);color:var(--on-mangrove,#f3f5f0);}.ds-btn-primary:hover{background:var(--mangrove-hover,#1c4f38);}.ds-btn-primary:focus-visible{outline:2px solid var(--mango,#a84d05);outline-offset:2px;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Supporting actions.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">See my work</a>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:var(--radius-md,8px);border:1px solid transparent;font:600 15px/1 'Public Sans',system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:background-color .15s ease-out,border-color .15s ease-out,box-shadow .15s ease-out;background:transparent;border-color:var(--line-strong,#7a8771);color:var(--ink,#15201a);}.ds-btn-secondary:hover{background:var(--mangrove-soft,#dbeadf);}.ds-btn-secondary:focus-visible{outline:2px solid var(--mango,#a84d05);outline-offset:2px;}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Inline navigation such as \"All projects\".",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">All projects</a>",
+      "css": ".ds-btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:var(--radius-md,8px);border:1px solid transparent;font:600 15px/1 'Public Sans',system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:background-color .15s ease-out,border-color .15s ease-out,box-shadow .15s ease-out;padding:0 8px;background:transparent;color:var(--mangrove,#1f5a3f);}.ds-btn-ghost:hover{box-shadow:inset 0 -1px 0 var(--mangrove,#1f5a3f);}.ds-btn-ghost:focus-visible{outline:2px solid var(--mango,#a84d05);outline-offset:2px;}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "One technology; Core marks the main stack; optional usage count.",
+      "html": "<span class=\"ds-tag ds-tag-core\">TypeScript <span class=\"ds-tag-count\">10</span></span> <span class=\"ds-tag\">Tailwind CSS <span class=\"ds-tag-count\">7</span></span>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;gap:8px;height:26px;padding:0 8px;border:1px solid var(--line-strong,#7a8771);border-radius:var(--radius-sm,4px);color:var(--ink,#15201a);font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;}.ds-tag-core{background:var(--mangrove-soft,#dbeadf);border-color:var(--mangrove-soft,#dbeadf);color:var(--mangrove,#1f5a3f);}.ds-tag-count{color:var(--ink-muted,#4f5c52);}"
+    },
+    {
+      "name": "Metric",
+      "kind": "custom",
+      "refersTo": "metric",
+      "description": "One measured result: before struck through, arrow, after; accent once per view.",
+      "html": "<div class=\"ds-metric\"><span class=\"ds-metric-label\">Lighthouse</span><span class=\"ds-metric-values\"><s class=\"ds-metric-before\">40</s><span class=\"ds-metric-arrow\">→</span><span class=\"ds-metric-after\">95</span></span></div>",
+      "css": ".ds-metric{display:flex;flex-direction:column;gap:8px;}.ds-metric-label{font:500 11px/16px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted,#4f5c52);}.ds-metric-values{display:flex;align-items:baseline;gap:12px;font-family:'JetBrains Mono',ui-monospace,monospace;}.ds-metric-before{font-size:24px;color:var(--ink-muted,#4f5c52);}.ds-metric-arrow{color:var(--ink-muted,#4f5c52);}.ds-metric-after{font-size:48px;font-weight:500;line-height:1;letter-spacing:-.03em;color:var(--mango,#a84d05);}"
+    },
+    {
+      "name": "Case Card",
+      "kind": "card",
+      "refersTo": "case-card",
+      "description": "A featured case study, result first; the whole card is clickable via its title link.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-head\"><span class=\"ds-card-role\">Lead Frontend Engineer</span><span class=\"ds-card-years\">2023–2025</span></div><h3 class=\"ds-card-title\"><a href=\"#\">Redação Online, from PHP to Next.js</a></h3><p class=\"ds-card-body\">I moved the landing page from PHP and WordPress to static Next.js, with WordPress kept as a headless CMS behind a BFF.</p></article>",
+      "css": ".ds-card{position:relative;display:flex;flex-direction:column;gap:16px;padding:24px;background:var(--surface-raised,#fff);border:1px solid var(--line,#d2d9cb);border-radius:var(--radius-md,8px);transition:border-color .15s ease-out;}.ds-card:hover{border-color:var(--mangrove,#1f5a3f);}.ds-card:has(a:focus-visible){outline:2px solid var(--mango,#a84d05);outline-offset:2px;}.ds-card-head{display:flex;justify-content:space-between;gap:16px;color:var(--ink-muted,#4f5c52);}.ds-card-role{font:500 11px/16px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;}.ds-card-years{font:400 14px/20px 'Public Sans',system-ui,sans-serif;}.ds-card-title{margin:0;font:600 22px/28px Newsreader,Georgia,serif;}.ds-card-title a{color:var(--ink,#15201a);text-decoration:none;outline:none;}.ds-card-title a::after{content:'';position:absolute;inset:0;}.ds-card-body{margin:0;font:400 16px/26px 'Public Sans',system-ui,sans-serif;color:var(--ink-muted,#4f5c52);}"
+    },
+    {
+      "name": "Archive Row",
+      "kind": "custom",
+      "refersTo": "archive-row",
+      "description": "A case study in \"More work\": year, title, techs, headline result, arrow.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-row-year\">2026</span><a class=\"ds-row-title\" href=\"#\">Lovefy, AI dating platform</a><span class=\"ds-row-ctx\">Next.js · NestJS</span><span class=\"ds-row-res\">14d → 4d feature delivery</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></div>",
+      "css": ".ds-row{position:relative;display:grid;grid-template-columns:56px 1fr 160px 160px auto;align-items:center;gap:24px;padding:16px 12px;border-bottom:1px solid var(--line,#d2d9cb);color:var(--ink,#15201a);transition:background-color .15s ease-out;}.ds-row:hover{background:var(--surface-sunken,#e7ebe2);}.ds-row:hover .ds-row-title,.ds-row:hover svg{color:var(--mangrove,#1f5a3f);}.ds-row:has(a:focus-visible){outline:2px solid var(--mango,#a84d05);outline-offset:2px;border-radius:4px;}.ds-row-year,.ds-row-res{font:400 13px/22px 'JetBrains Mono',ui-monospace,monospace;}.ds-row-year{color:var(--ink-muted,#4f5c52);}.ds-row-res{text-align:right;}.ds-row-title{font:600 16px/26px 'Public Sans',system-ui,sans-serif;color:var(--ink,#15201a);text-decoration:none;outline:none;}.ds-row-title::after{content:'';position:absolute;inset:0;}.ds-row-ctx{font:400 14px/20px 'Public Sans',system-ui,sans-serif;color:var(--ink-muted,#4f5c52);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Engineering Sheet",
+    "overview": "The site reads like a drawing sheet from an engineering office: a pale drafting ground, hairline rules, dimension lines, numbered callouts, mono labels and a title block. Nothing is decorative for its own sake; every mark either carries information or frames it. The hero's mangrove is drawn as technical line art by day and as glowing points by night, and the same sheet logic runs through the case studies (numbered parts) and the experience timeline (a rail with markers).\n\nThe personality is precise and quiet. Surfaces are flat, lines are thin, color is rare, and the measured results are the loudest thing on any screen. A serif with editorial weight (Newsreader) gives headlines a human voice; a plain sans (Public Sans) carries the reading; a mono (JetBrains Mono) is reserved for numbers, labels and anything that is measured. Light is the day sheet at low tide, dark is the night sheet at high tide: the same tokens, never two designs.\n\nThe old dark, electric, glitch identity (\"A Light That Never Comes\") is retired: no glows, no chromatic distortion, no Bebas Neue.",
+    "keyCharacteristics": [
+      "Flat, pale green-grey ground with hairline structure.",
+      "One accent, mango, used once per view.",
+      "Numbers in mono, before → after, with a real minus sign.",
+      "Serif headlines, sans reading, mono measurement.",
+      "Drafting vocabulary: grid, rails, dimension lines, numbered callouts, title block."
+    ],
+    "rules": [
+      {
+        "name": "The Mango Once Rule",
+        "body": "Mango appears once per view in content: one headline metric or the hero mango, never both on one screen. The focus ring and the monogram cursor don't count.",
+        "section": "Colors"
+      },
+      {
+        "name": "The Earned Color Rule",
+        "body": "Color carries meaning (brand action, the one accent, a score band) or it isn't there. Decoration is done with line and type, not color.",
+        "section": "Colors"
+      },
+      {
+        "name": "The Same Sheet Rule",
+        "body": "Light and dark come from the same token names; a component never branches its markup by theme.",
+        "section": "Colors"
+      },
+      {
+        "name": "The Mono Measures Rule",
+        "body": "Every number, date, label and tick is mono. Prose is never mono.",
+        "section": "Typography"
+      },
+      {
+        "name": "The One Display Rule",
+        "body": "Display XL appears once per page. Section titles use Heading, never a second display size.",
+        "section": "Typography"
+      },
+      {
+        "name": "The Flat Sheet Rule",
+        "body": "Nothing casts a shadow at rest. If a surface needs separation, give it a hairline or a tone step.",
+        "section": "Elevation & Depth"
+      }
+    ],
+    "dos": [
+      "**Do** lead every surface with a measured result, set in mono, before → after.",
+      "**Do** keep Mango to one use per view (the focus ring and logo cursor excepted).",
+      "**Do** use hairlines (1px Hairline) and tone steps for structure instead of shadows.",
+      "**Do** pair score colors with their glyph (● ■ ▲).",
+      "**Do** use the drafting vocabulary (numbered callouts, rails, dimension lines) for structure that has an order."
+    ],
+    "donts": [
+      "**Don't** bring back the retired identity: no near-black electric palette, glows, glitch slices or Bebas Neue.",
+      "**Don't** put shadows on cards or buttons, or use pills and large rounded blobs.",
+      "**Don't** fill a button with Mango or use Mango as decoration.",
+      "**Don't** set prose in mono or numbers in the serif.",
+      "**Don't** add raster images or effects to the hero that paint before the headline."
+    ]
+  }
+}
