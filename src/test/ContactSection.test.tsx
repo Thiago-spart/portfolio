@@ -23,11 +23,6 @@ describe('ContactSection', () => {
     expect(link).toHaveAttribute('href', 'mailto:thiagomoraes.contact@gmail.com')
   })
 
-  it('has the cyberpunk-surface background class', () => {
-    const { container } = render(<LanguageProvider><ContactSection /></LanguageProvider>)
-    expect(container.querySelector('#contact')).toHaveClass('cyberpunk-surface')
-  })
-
   it('has no GitHub card until siteSettings sets one', () => {
     render(<LanguageProvider><ContactSection settings={null} /></LanguageProvider>)
     expect(screen.queryByRole('link', { name: /github/i })).not.toBeInTheDocument()

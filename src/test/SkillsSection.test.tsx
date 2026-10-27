@@ -6,15 +6,6 @@ import SkillsSection from '../components/SkillsSection'
 import { groupStack } from '../lib/stack'
 
 describe('SkillsSection', () => {
-  it('has the cyberpunk-surface background class', () => {
-    const { container } = render(
-      <LanguageProvider>
-        <SkillsSection groups={[]} lang="en" />
-      </LanguageProvider>,
-    )
-    expect(container.querySelector('#skills')).toHaveClass('cyberpunk-surface')
-  })
-
   it('renders one card per category in use', () => {
     const groups = groupStack([
       { _id: 't1', name: 'React',  category: 'frontend' },

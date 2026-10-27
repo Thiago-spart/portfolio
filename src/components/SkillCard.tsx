@@ -18,21 +18,19 @@ export default function SkillCard({ group, lang }: Props) {
 
   return (
     <div
-      className="rounded-2xl border-l-2 bg-[rgba(8,13,26,0.85)] p-5"
+      className="rounded-2xl border-l-2 bg-surface-raised p-5"
       style={{
-        borderColor: '#00aaff',
-        boxShadow: '0 0 20px rgba(0,170,255,0.06) inset',
-        backdropFilter: 'blur(4px)',
+        borderColor: 'var(--mangrove)',
       }}
     >
-      <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
+      <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-mangrove">
         {group.label[lang]}
       </p>
       <div className="flex flex-wrap gap-2">
         {visibleTechs.map((tech) => (
           <span
             key={tech}
-            className="rounded-full border border-[rgba(0,170,255,0.2)] bg-[rgba(0,170,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
+            className="rounded-full border border-line bg-surface-raised px-3 py-1 text-xs text-ink-muted"
           >
             {tech}
           </span>
@@ -41,7 +39,7 @@ export default function SkillCard({ group, lang }: Props) {
           <button
             type="button"
             onClick={() => setExpanded((prev) => !prev)}
-            className="rounded-full border border-[rgba(0,170,255,0.4)] bg-transparent px-3 py-1 text-xs font-semibold text-[#00aaff] transition hover:bg-[rgba(0,170,255,0.1)]"
+            className="rounded-full border border-line bg-transparent px-3 py-1 text-xs font-semibold text-mangrove transition hover:bg-surface-raised"
           >
             {expanded ? 'Show less' : `+${hiddenCount} more`}
           </button>

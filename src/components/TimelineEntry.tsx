@@ -28,14 +28,14 @@ export default function TimelineEntry({ entry, lang }: Props) {
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#00aaff]">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-mangrove">
             {formatDateRange(entry.startDate, entry.endDate, t('timeline.present'))}
           </p>
-          <h3 className="mt-0.5 text-base font-bold text-white">{entry.company}</h3>
-          <p className="text-sm text-[#00aaff]">{entry.title[lang]}</p>
+          <h3 className="mt-0.5 text-base font-bold text-ink">{entry.company}</h3>
+          <p className="text-sm text-mangrove">{entry.title[lang]}</p>
         </div>
         {expandable && (
-          <span aria-hidden="true" className="mt-1 text-muted-gray transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
+          <span aria-hidden="true" className="mt-1 text-ink-muted transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
             ▾
           </span>
         )}
@@ -43,7 +43,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
 
       {/* Summary */}
       {entry.summary?.[lang] && (
-        <p className="mt-3 text-sm text-[rgba(255,255,255,0.7)]">{entry.summary[lang]}</p>
+        <p className="mt-3 text-sm text-ink-muted">{entry.summary[lang]}</p>
       )}
 
       {/* Tech stack */}
@@ -52,7 +52,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
           {entry.stack.map((tech) => (
             <span
               key={tech}
-              className="rounded-full border border-[rgba(0,170,255,0.3)] bg-[rgba(0,170,255,0.06)] px-2.5 py-0.5 text-[11px] text-[rgba(255,255,255,0.7)]"
+              className="rounded-full border border-line bg-surface-raised px-2.5 py-0.5 text-[11px] text-ink-muted"
             >
               {tech}
             </span>
@@ -64,7 +64,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
 
   return (
     <div
-      className="w-full rounded-2xl border border-[rgba(0,170,255,0.2)] bg-[rgba(8,13,26,0.85)] p-5 text-left transition hover:border-[rgba(0,170,255,0.5)]"
+      className="w-full rounded-2xl border border-line bg-surface-raised p-5 text-left transition hover:border-line"
       style={{ backdropFilter: 'blur(4px)' }}
     >
       {expandable ? (
@@ -88,7 +88,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
               <Link
                 to="/projects/$slug"
                 params={{ slug: study.slug }}
-                className="text-xs font-semibold text-[#00aaff] hover:underline"
+                className="text-xs font-semibold text-mangrove hover:underline"
               >
                 <span aria-hidden="true">→ </span>
                 {study.title[lang]}
@@ -100,7 +100,7 @@ export default function TimelineEntry({ entry, lang }: Props) {
 
       {/* Results — expanded */}
       {open && expandable && (
-        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-[rgba(0,170,255,0.15)] pt-4 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-line pt-4 sm:grid-cols-3">
           {results.map((result) => (
             <MetricTile key={result.key} metric={result} label={result.label[lang]} />
           ))}

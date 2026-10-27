@@ -52,7 +52,7 @@ export default function HeroCanvas() {
         </EffectComposer>
       </Canvas>
 
-      <p className="absolute bottom-2 right-3 text-[10px] text-muted-gray">
+      <p className="absolute bottom-2 right-3 text-[10px] text-ink-muted">
         <a
           href="https://skfb.ly/6WXIs"
           target="_blank"

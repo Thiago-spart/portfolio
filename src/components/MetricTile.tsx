@@ -12,11 +12,10 @@ export default function MetricTile({ metric, label }: Props) {
   return (
     <div
       data-direction={metric.direction ?? undefined}
-      className="rounded-xl border border-[rgba(0,170,255,0.3)] bg-[rgba(0,170,255,0.06)] p-3 text-center"
-      style={{ boxShadow: '0 0 12px rgba(0,170,255,0.1) inset' }}
+      className="rounded-xl border border-line bg-surface-raised p-3 text-center"
     >
-      <p className="text-xl font-bold text-white">{formatMetric(metric)}</p>
-      <p className="mt-0.5 text-[11px] text-muted-gray">{label}</p>
+      <p className="text-xl font-bold text-ink">{formatMetric(metric)}</p>
+      <p className="mt-0.5 text-[11px] text-ink-muted">{label}</p>
     </div>
   )
 }

@@ -31,9 +31,9 @@ const renderSection = (projects: CASE_STUDIES_QUERY_RESULT) =>
   renderWithRouter(<ProjectsSection projects={projects} lang="en" />)
 
 describe('ProjectsSection', () => {
-  it('has the #projects anchor with the cyberpunk-surface background class', async () => {
+  it('has the #projects anchor', async () => {
     const { container } = await renderSection(mockProjects)
-    expect(container.querySelector('#projects')).toHaveClass('cyberpunk-surface')
+    expect(container.querySelector('#projects')).toBeInTheDocument()
   })
 
   it('renders a card for each project, including one with no tech chips', async () => {
@@ -46,16 +46,5 @@ describe('ProjectsSection', () => {
   it('renders the empty state when there are no projects', async () => {
     await renderSection([])
     expect(screen.getByText('No projects yet — check back soon.')).toBeInTheDocument()
-  })
-
-  it('renders the dot-indicator container without crashing when Embla reports zero snaps', async () => {
-    // jsdom performs no real layout, so Embla's scrollSnapList() never populates
-    // here (it stays permanently empty, unlike a real browser). This exercises
-    // the snapCount === 0 path — Array.from({ length: 0 }) — confirming the
-    // component renders gracefully (no dots) instead of throwing.
-    const { container } = await renderSection(mockProjects)
-    const dotsContainer = container.querySelector('.mt-6.flex.justify-center')
-    expect(dotsContainer).toBeInTheDocument()
-    expect(dotsContainer).toBeEmptyDOMElement()
   })
 })

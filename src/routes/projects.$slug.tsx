@@ -32,9 +32,9 @@ export const Route = createFileRoute('/projects/$slug')({
 
 function ProjectNotFound() {
   return (
-    <main className="cyberpunk-surface flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
-      <p className="font-['Bebas_Neue'] text-3xl tracking-wider text-white">Project not found</p>
-      <a href="/#projects" className="text-sm font-semibold text-[var(--electric-blue,#00aaff)]">
+    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
+      <p className="font-display text-3xl tracking-wider text-ink">Project not found</p>
+      <a href="/#projects" className="text-sm font-semibold text-mangrove">
         ← Back to projects
       </a>
     </main>
@@ -61,7 +61,7 @@ function ProjectPage() {
         <ProjectDetails project={project} lang={lang} />
       </ProjectHero>
       <div className="px-6 pb-16 text-center">
-        <a href="/#projects" className="text-sm font-semibold text-[var(--electric-blue,#00aaff)]">
+        <a href="/#projects" className="text-sm font-semibold text-mangrove">
           ← {t('project.back')}
         </a>
       </div>

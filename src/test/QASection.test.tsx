@@ -66,9 +66,4 @@ describe('QASection', () => {
     render(<LanguageProvider><QASection items={mockItems} lang="pt" /></LanguageProvider>)
     expect(screen.getByText('Está disponível?')).toBeInTheDocument()
   })
-
-  it('has the cyberpunk-surface background class', () => {
-    const { container } = render(<LanguageProvider><QASection items={mockItems} lang="en" /></LanguageProvider>)
-    expect(container.querySelector('#qa')).toHaveClass('cyberpunk-surface')
-  })
 })

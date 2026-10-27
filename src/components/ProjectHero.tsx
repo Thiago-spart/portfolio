@@ -222,10 +222,10 @@ export default function ProjectHero({
             ) : (
               <div
                 data-testid="project-hero-bg-fallback"
-                className="cyberpunk-surface h-full w-full"
+                className="h-full w-full"
               />
             )}
-            <div className="absolute inset-0 bg-[rgba(5,5,8,0.6)]" />
+            <div className="absolute inset-0 bg-ground/60" />
           </motion.div>
 
           <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center justify-start px-6">
@@ -238,7 +238,6 @@ export default function ProjectHero({
                   height: `${mediaHeight}px`,
                   maxWidth: '95vw',
                   maxHeight: '85vh',
-                  boxShadow: '0 0 50px rgba(0,170,255,0.25)',
                 }}
               >
                 {videoSrc ? (
@@ -266,11 +265,11 @@ export default function ProjectHero({
                 ) : (
                   <div
                     data-testid="project-hero-media-fallback"
-                    className="cyberpunk-surface h-full w-full"
+                    className="h-full w-full"
                   />
                 )}
                 <motion.div
-                  className="absolute inset-0 bg-[rgba(5,5,8,0.3)]"
+                  className="absolute inset-0 bg-ground/30"
                   initial={{ opacity: 0.5 }}
                   animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
                   transition={{ duration: 0.2 }}
@@ -279,25 +278,25 @@ export default function ProjectHero({
 
               <div className="relative z-10 flex w-full flex-col items-center justify-center gap-4 text-center">
                 <motion.h2
-                  className="font-['Bebas_Neue'] text-4xl tracking-wider text-white md:text-5xl lg:text-6xl"
+                  className="font-display text-4xl tracking-wider text-ink md:text-5xl lg:text-6xl"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className="text-center font-['Bebas_Neue'] text-4xl tracking-wider text-white md:text-5xl lg:text-6xl"
+                  className="text-center font-display text-4xl tracking-wider text-ink md:text-5xl lg:text-6xl"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}
                 </motion.h2>
                 <p
-                  className="text-sm text-[var(--electric-blue,#00aaff)]"
+                  className="text-sm text-mangrove"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {date}
                 </p>
                 <p
-                  className="text-sm font-medium text-[var(--electric-blue,#00aaff)]"
+                  className="text-sm font-medium text-mangrove"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {scrollToExpand}

@@ -6,13 +6,9 @@ import type { CASE_STUDIES_QUERY_RESULT } from '#/types/sanity.generated'
 interface ProjectCardProps {
   project: CASE_STUDIES_QUERY_RESULT[number]
   lang: Lang
-  accentIndex: number
 }
 
-const ACCENT_COLORS = ['#00aaff', '#7b2fff', '#ff6a00']
-
-export default function ProjectCard({ project, lang, accentIndex }: ProjectCardProps) {
-  const accent = ACCENT_COLORS[accentIndex % ACCENT_COLORS.length]
+export default function ProjectCard({ project, lang }: ProjectCardProps) {
   const coverUrl = project.cover?.url
   const hasImage = Boolean(coverUrl)
   const result   = project.headlineResult
@@ -21,12 +17,7 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
     <Link
       to="/projects/$slug"
       params={{ slug: project.slug }}
-      className="group relative block h-72 w-full overflow-hidden rounded-2xl"
-      style={
-        !hasImage
-          ? { border: `2px solid ${accent}`, boxShadow: `0 0 20px ${accent}33 inset` }
-          : undefined
-      }
+      className="group relative block h-72 w-full overflow-hidden rounded-md border border-line bg-surface-raised"
     >
       {hasImage ? (
         <div
@@ -41,22 +32,22 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
           }}
         />
       ) : (
-        <div data-testid="project-card-fallback" className="cyberpunk-surface absolute inset-0" />
+        <div data-testid="project-card-fallback" className="absolute inset-0" />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(5,5,8,0.9)] via-[rgba(5,5,8,0.3)] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ground via-transparent to-transparent" />
 
       <div className="relative z-10 flex h-full flex-col justify-end gap-2 p-5">
-        <h3 className="glitch-flicker font-['Bebas_Neue'] text-2xl tracking-wide text-white transition-colors group-hover:text-electric-blue">
+        <h3 className="font-display text-2xl tracking-wide text-ink transition-colors group-hover:text-mangrove">
           {project.title[lang]}
         </h3>
         {project.summary?.[lang] && (
-          <p className="line-clamp-3 text-sm text-[rgba(255,255,255,0.75)]">
+          <p className="line-clamp-3 text-sm text-ink-muted">
             {project.summary[lang]}
           </p>
         )}
         {result && (
-          <p data-direction={result.direction} className="text-xs font-semibold text-electric-blue">
+          <p data-direction={result.direction} className="text-xs font-semibold text-mangrove">
             {formatMetric(result)} · {result.label[lang]}
           </p>
         )}
@@ -64,7 +55,7 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
           {(project.stack ?? []).slice(0, 3).map((tech) => (
             <span
               key={tech}
-              className="rounded-full border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
+              className="rounded-full border border-line bg-surface-raised px-3 py-1 text-xs text-ink-muted"
             >
               {tech}
             </span>
