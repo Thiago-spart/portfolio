@@ -1,19 +1,22 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { fetchCaseStudyBySlug } from '#/lib/queries/caseStudies'
+import { fetchCaseStudies, fetchCaseStudyBySlug } from '#/lib/queries/caseStudies'
+import { nextCaseStudy } from '#/lib/caseStudy'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
 import { DEFAULT_DESCRIPTION, routeHead } from '#/lib/seo'
-import { formatDateRange } from '#/lib/formatDate'
-import ProjectHero from '#/components/ProjectHero'
-import ProjectDetails from '#/components/ProjectDetails'
-
-const EARTH_LOOP_SRC = '/media/earth-loop.mp4'
+import CaseStudyPage from '#/components/CaseStudyPage'
+import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/projects/$slug')({
+  // The list query is the reading order (featured, then archive); only the
+  // next row goes into the loader data.
   loader: async ({ params }) => {
-    const project = await fetchCaseStudyBySlug({ data: params.slug })
+    const [project, all] = await Promise.all([
+      fetchCaseStudyBySlug({ data: params.slug }),
+      fetchCaseStudies(),
+    ])
     if (!project) throw notFound()
-    return { project }
+    return { project, next: nextCaseStudy(all, project.slug) }
   },
   // head() still runs for this match when the loader throws notFound(), with
   // loaderData === undefined — dereferencing it there throws a TypeError that
@@ -31,40 +34,24 @@ export const Route = createFileRoute('/projects/$slug')({
 })
 
 function ProjectNotFound() {
+  const { t } = useTranslation()
   return (
-    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
-      <p className="font-display text-3xl text-ink">Project not found</p>
-      <a href="/#projects" className="text-sm font-semibold text-mangrove">
-        ← Back to projects
-      </a>
+    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+      <p className="m-0 type-heading text-ink">{t('caseStudy.notFound')}</p>
+      <Button variant="ghost" size="small" href="/#projects">
+        {t('caseStudy.back')}
+      </Button>
     </main>
   )
 }
 
 function ProjectPage() {
-  const { project } = Route.useLoaderData()
+  const { project, next } = Route.useLoaderData()
   const { lang } = useLanguage()
-  const { t } = useTranslation()
 
   return (
     <main>
-      <ProjectHero
-        videoSrc={project.videoUrl ?? undefined}
-        posterSrc={project.cover?.url ?? undefined}
-        bgImageSrc={project.cover?.url ?? undefined}
-        imageAlt={project.cover?.alt[lang]}
-        ambientVideoSrc={EARTH_LOOP_SRC}
-        title={project.title[lang]}
-        date={formatDateRange(project.startDate, project.endDate, t('timeline.present'))}
-        scrollToExpand={t('project.scrollHint')}
-      >
-        <ProjectDetails project={project} lang={lang} />
-      </ProjectHero>
-      <div className="px-6 pb-16 text-center">
-        <a href="/#projects" className="text-sm font-semibold text-mangrove">
-          ← {t('project.back')}
-        </a>
-      </div>
+      <CaseStudyPage caseStudy={project} next={next} lang={lang} />
     </main>
   )
 }
