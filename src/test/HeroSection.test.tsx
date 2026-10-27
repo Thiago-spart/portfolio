@@ -231,7 +231,8 @@ describe('HeroSection', () => {
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     const options = scene.options!
-    expect(options.results.map((r) => r.height)).toEqual([0.95, 0.96, expect.closeTo(0.61, 2)])
+    // Lighthouse (0.95) sits a clear gap under Production bugs (0.96).
+    expect(options.results.map((r) => r.height)).toEqual([0.801, 0.96, expect.closeTo(0.61, 2)])
     expect(options.container).toContainElement(screen.getByTestId('hero-poster'))
     expect(options.lane()).toHaveLength(3)
     resultItems().forEach((li) => expect(li).toBeVisible())
