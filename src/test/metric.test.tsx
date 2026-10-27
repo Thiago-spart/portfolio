@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { formatMetric } from '../lib/metric'
+import { formatMetric, formatMetricParts } from '../lib/metric'
+import { Metric } from '../components/ui/Metric'
 import MetricTile from '../components/MetricTile'
 
 describe('formatMetric', () => {
@@ -49,5 +50,71 @@ describe('MetricTile', () => {
   it('renders qualified values', () => {
     render(<MetricTile metric={{ after: 95, qualifier: 'atLeast', direction: 'up' }} label="Lighthouse score" />)
     expect(screen.getByText('95+')).toBeInTheDocument()
+  })
+})
+
+describe('formatMetricParts', () => {
+  it('splits before and after, each with the unit', () => {
+    expect(formatMetricParts({ before: 23, after: 9, unit: '%' })).toEqual({ before: '23%', after: '9%' })
+  })
+
+  it('has no before for a single value', () => {
+    expect(formatMetricParts({ after: 95, qualifier: 'atLeast' })).toEqual({ before: null, after: '95+' })
+  })
+
+  it('uses a real minus sign on either side', () => {
+    const parts = formatMetricParts({ before: -3, after: -96, unit: '%' })
+    expect(parts).toEqual({ before: '−3%', after: '−96%' })
+    expect(parts.before).not.toContain('-')
+    expect(parts.after).not.toContain('-')
+  })
+})
+
+describe('Metric', () => {
+  it('renders a delta: the before value struck through, then the after value', () => {
+    render(<Metric label="Lighthouse" value={{ before: 40, after: 95 }} />)
+    const before = screen.getByText('40')
+    expect(before.tagName).toBe('S')
+    expect(before).toHaveClass('text-ink-muted')
+    expect(screen.getByText('95')).toHaveClass('type-metric')
+    expect(screen.getByText('→')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('reads "40 to 95" to assistive tech', () => {
+    const { container } = render(<Metric label="Lighthouse" value={{ before: 40, after: 95 }} />)
+    const values = container.querySelectorAll('p')[1]
+    const spoken = [...values.childNodes]
+      .filter((n) => !(n instanceof HTMLElement && n.getAttribute('aria-hidden') === 'true'))
+      .map((n) => n.textContent)
+      .join('')
+    expect(spoken.replace(/\s+/g, ' ')).toBe('40 to 95')
+  })
+
+  it('renders a single value without a before or an arrow', () => {
+    render(<Metric label="Production bugs" value={{ after: -96, unit: '%' }} />)
+    expect(screen.getByText('−96%')).toBeInTheDocument()
+    expect(screen.queryByText('→')).toBeNull()
+    expect(document.querySelector('s')).toBeNull()
+  })
+
+  it('puts the after value in mango only with the accent emphasis', () => {
+    const { rerender } = render(<Metric label="Lighthouse" value={{ after: 95 }} />)
+    expect(screen.getByText('95')).toHaveClass('text-ink')
+    rerender(<Metric label="Lighthouse" value={{ after: 95 }} emphasis="accent" />)
+    expect(screen.getByText('95')).toHaveClass('text-mango')
+  })
+
+  it('renders the label as a wrapping eyebrow and an optional description', () => {
+    render(
+      <Metric
+        label="Largest Contentful Paint"
+        value={{ after: 0.9, unit: 's' }}
+        description="Public platform on Vite SSR."
+      />,
+    )
+    const label = screen.getByText('Largest Contentful Paint')
+    expect(label).toHaveClass('type-label')
+    expect(label).not.toHaveClass('whitespace-nowrap')
+    expect(screen.getByText('Public platform on Vite SSR.')).toHaveClass('type-small')
   })
 })

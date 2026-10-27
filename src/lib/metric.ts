@@ -9,12 +9,23 @@ export interface MetricValue {
   qualifier?: 'atLeast' | 'change' | null
 }
 
-const MINUS = '\u2212' // a real minus sign, not a hyphen
+const MINUS = '−' // a real minus sign, not a hyphen
 
-export function formatMetric({ before, after, unit, qualifier }: MetricValue): string {
+// The two values as displayed, for components that style them apart (the
+// Metric primitive strikes through `before`). `before` is null for a
+// single value.
+export function formatMetricParts({ before, after, unit, qualifier }: MetricValue): {
+  before: string | null
+  after: string
+} {
   const value = (n: number) => `${n < 0 ? MINUS : ''}${Math.abs(n)}${unit ?? ''}`
-  let text = before == null ? value(after) : `${value(before)} → ${value(after)}`
-  if (qualifier === 'change' && before == null && after > 0) text = `+${text}`
-  if (qualifier === 'atLeast') text = `${text}+`
-  return text
+  let afterText = value(after)
+  if (qualifier === 'change' && before == null && after > 0) afterText = `+${afterText}`
+  if (qualifier === 'atLeast') afterText = `${afterText}+`
+  return { before: before == null ? null : value(before), after: afterText }
+}
+
+export function formatMetric(metric: MetricValue): string {
+  const { before, after } = formatMetricParts(metric)
+  return before == null ? after : `${before} → ${after}`
 }

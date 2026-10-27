@@ -14,8 +14,16 @@ const LanguageContext = createContext<LanguageContextValue>({
   setLang: () => {},
 })
 
+function readStoredLang(): string | null {
+  try {
+    return localStorage.getItem('lang')
+  } catch {
+    return null // storage blocked: fall back to the browser language
+  }
+}
+
 function detectLang(): Lang {
-  const stored = localStorage.getItem('lang') as Lang | null
+  const stored = readStoredLang()
   if (stored === 'en' || stored === 'pt' || stored === 'es') return stored
   const browser = navigator.language.slice(0, 2)
   if (browser === 'pt') return 'pt'
@@ -37,7 +45,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   function setLang(l: Lang) {
-    localStorage.setItem('lang', l)
+    try {
+      localStorage.setItem('lang', l)
+    } catch {
+      // Not remembered, but still switched for this page view.
+    }
     document.documentElement.lang = l
     setLangState(l)
   }

@@ -11,7 +11,11 @@
     // its own copy of the package even though no root src file imports it.
     // The sanity/ workspace below has its own separate `sanity` dependency
     // for actually running Studio.
-    "sanity"
+    "sanity",
+    // Referenced only from url() in src/styles/fonts.css, which knip doesn't
+    // follow. (newsreader is also imported from __root.tsx for the preload.)
+    "@fontsource-variable/jetbrains-mono",
+    "@fontsource-variable/public-sans"
   ],
   // Written by `pnpm typegen` (Sanity TypeGen): it exports every schema and
   // query type, whether or not the app imports it.

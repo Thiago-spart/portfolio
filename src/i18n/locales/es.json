@@ -28,5 +28,13 @@
   "project.scrollHint": "Desplázate para explorar",
   "project.status.completed": "Completado",
   "project.status.in-progress": "En progreso",
-  "project.status.archived": "Archivado"
+  "project.status.archived": "Archivado",
+  "header.home": "Thiago Souza, inicio",
+  "brand.role": "Ingeniero mobile y web sénior",
+  "locale.label": "Idioma",
+  "theme.toDark": "Tema oscuro",
+  "theme.toLight": "Tema claro",
+  "metric.to": "a",
+  "footer.copyright": "© {year} Thiago Moraes de Souza",
+  "footer.backToTop": "Volver arriba"
 }
