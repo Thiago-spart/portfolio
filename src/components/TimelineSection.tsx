@@ -1,88 +1,36 @@
-// src/components/TimelineSection.tsx
-import { useEffect, useRef } from 'react'
+import { Section } from '#/components/ui/Section'
 import { useTranslation } from '#/i18n/useTranslation'
 import TimelineEntry from './TimelineEntry'
-import type { SanityExperience, Lang } from '#/types/sanity'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { ROLES_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface Props {
-  experiences: SanityExperience[]
+  roles: ROLES_QUERY_RESULT
   lang: Lang
 }
 
-function useGlitchRise(ref: React.RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const children = Array.from(el.children) as HTMLElement[]
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const target = entry.target as HTMLElement
-          const index = children.indexOf(target)
-          if (entry.isIntersecting) {
-            target.style.animationDelay = `${index * 80}ms`
-            target.classList.remove('opacity-0')   // remove before adding animation to avoid fill-mode conflict
-            target.classList.add('glitch-rise')
-          } else {
-            target.classList.remove('glitch-rise')
-            target.classList.add('opacity-0')
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-    children.forEach((child) => observer.observe(child))
-    return () => observer.disconnect()
-  }, [ref])
-}
-
-export default function TimelineSection({ experiences, lang }: Props) {
+// Figma: Sections / Experience (35:851, 35:1341). Roles newest first on one
+// rail; the lede counts them ("Six roles since 2019"), spelling the count
+// out while there's a word for it.
+export default function TimelineSection({ roles, lang }: Props) {
   const { t } = useTranslation()
-  const listRef = useRef<HTMLDivElement>(null)
-  useGlitchRise(listRef as React.RefObject<HTMLElement>)
+  const words = t('experience.countWords').split(',')
+  const count = words[roles.length - 1] ?? String(roles.length)
+  const since = Math.min(...roles.map((role) => Number(role.startDate.slice(0, 4))))
+  const lede =
+    roles.length > 0
+      ? t('experience.lede').replace('{count}', count).replace('{year}', String(since))
+      : undefined
 
   return (
-    <section id="experience" className="cyberpunk-surface py-24 px-6">
-      <div className="mx-auto max-w-4xl">
-        {/* Section heading */}
-        <h2 className="mb-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
-          {t('timeline.title')}
-        </h2>
-
-        {/* Desktop: center spine + alternating; Mobile: left spine */}
-        <div className="relative">
-          {/* Spine */}
-          <div
-            className="absolute left-4 top-0 h-full w-px md:left-1/2"
-            style={{ background: '#00aaff', boxShadow: '0 0 8px rgba(0,170,255,0.5)' }}
-          />
-
-          <div ref={listRef} className="flex flex-col gap-8 pl-10 md:pl-0">
-            {experiences.map((entry, i) => (
-              <div
-                key={entry._id}
-                className={`relative opacity-0 md:w-[calc(50%-2rem)] ${
-                  i % 2 === 0 ? 'md:ml-auto md:pl-8' : 'md:mr-auto md:pr-8'
-                }`}
-              >
-                {/* Mobile: dot always on left */}
-                <span
-                  className="absolute -left-10 top-5 h-3 w-3 rounded-full bg-[#00aaff] md:hidden"
-                  style={{ boxShadow: '0 0 8px rgba(0,170,255,0.8)' }}
-                />
-                {/* Desktop: dot on the spine side of this entry */}
-                <span
-                  className={`absolute top-5 hidden h-3 w-3 rounded-full bg-[#00aaff] md:block ${
-                    i % 2 === 0 ? 'left-[-1.625rem]' : 'right-[-1.625rem]'
-                  }`}
-                  style={{ boxShadow: '0 0 8px rgba(0,170,255,0.8)' }}
-                />
-                <TimelineEntry entry={entry} lang={lang} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+    <Section id="experience" heading={t('experience.title')} lede={lede}>
+      <ol className="m-0 list-none p-0">
+        {roles.map((role, i) => (
+          <li key={role._id}>
+            <TimelineEntry entry={role} lang={lang} last={i === roles.length - 1} />
+          </li>
+        ))}
+      </ol>
+    </Section>
   )
 }

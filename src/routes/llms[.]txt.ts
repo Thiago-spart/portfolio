@@ -1,5 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { defineQuery } from 'groq'
 import { sanityClient } from '#/lib/sanity'
+import { STACK_QUERY } from '#/lib/queries/stack'
+import { SITE_SETTINGS_QUERY } from '#/lib/queries/siteSettings'
+import { groupStack } from '#/lib/stack'
+import { formatMetric } from '#/lib/metric'
 import {
   AUTHOR_EMAIL,
   AUTHOR_NAME,
@@ -9,37 +14,19 @@ import {
   SITE_URL,
 } from '#/lib/seo'
 
-interface LlmsProject {
-  title: string
-  slug: string
-  shortDescription: string
-}
-
-interface LlmsSkillCategory {
-  category: string
-  skills: string[]
-}
-
-interface LlmsQa {
-  question: string
-  answer: string
-}
-
-const projectsQuery = `*[_type == "project"] | order(startDate desc) {
+const LLMS_CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined(slug.current)]
+  | order(tier desc, order asc, startDate desc) {
   "title": title.en,
   "slug": slug.current,
-  "shortDescription": shortDescription.en
-}`
+  "summary": summary.en,
+  "results": results[]{ before, after, unit, qualifier, "label": label.en }
+}`)
 
-const skillsQuery = `*[_type == "skillCategory"] | order(order asc) {
-  "category": category.en,
-  "skills": skills[].name
-}`
-
-const qaQuery = `*[_type == "qa"] | order(order asc) {
+// Rich-text answers flattened to plain text for the digest.
+const LLMS_FAQ_QUERY = defineQuery(`*[_type == "faq"] | order(order asc) {
   "question": question.en,
-  "answer": answer.en
-}`
+  "answer": pt::text(answer.en)
+}`)
 
 // llms.txt convention (llmstxt.org): a plain-markdown digest at the site
 // root so AI agents/crawlers can ground themselves without parsing HTML/JS.
@@ -48,38 +35,47 @@ export const Route = createFileRoute('/llms.txt')({
   server: {
     handlers: {
       GET: async () => {
-        const [projects, skillCategories, qas] = await Promise.all([
-          sanityClient.fetch<LlmsProject[]>(projectsQuery),
-          sanityClient.fetch<LlmsSkillCategory[]>(skillsQuery),
-          sanityClient.fetch<LlmsQa[]>(qaQuery),
+        const [caseStudies, stack, faqs, settings] = await Promise.all([
+          sanityClient.fetch(LLMS_CASE_STUDIES_QUERY),
+          sanityClient.fetch(STACK_QUERY),
+          sanityClient.fetch(LLMS_FAQ_QUERY),
+          sanityClient.fetch(SITE_SETTINGS_QUERY),
         ])
 
-        const projectLines = projects
-          .map((p) => `- [${p.title}](${SITE_URL}/projects/${p.slug}): ${p.shortDescription}`)
+        const projectLines = caseStudies
+          .map((p) => {
+            const results = (p.results ?? []).map((r) => `${formatMetric(r)} ${r.label}`).join('; ')
+            const summary = [p.summary, results && `Results: ${results}.`].filter(Boolean).join(' ')
+            return `- [${p.title}](${SITE_URL}/projects/${p.slug})${summary ? `: ${summary}` : ''}`
+          })
           .join('\n')
 
-        const skillLines = skillCategories
-          .map((c) => `- ${c.category}: ${c.skills.join(', ')}`)
+        const stackLines = groupStack(stack.techs)
+          .map((group) => `- ${group.label.en}: ${group.techs.map((tech) => tech.name).join(', ')}`)
           .join('\n')
 
-        const qaLines = qas.map((qa) => `- Q: ${qa.question}\n  A: ${qa.answer}`).join('\n')
+        const qaLines = faqs.map((qa) => `- Q: ${qa.question}\n  A: ${qa.answer}`).join('\n')
 
-        const body = `# ${SITE_NAME} — Full-Stack Developer
+        const email    = settings?.email ?? AUTHOR_EMAIL
+        const linkedin = settings?.linkedin ?? LINKEDIN_URL
+        const github   = settings?.github ? `\n- GitHub: ${settings.github}` : ''
+
+        const body = `# ${SITE_NAME} — Senior Mobile & Web Engineer
 
 > ${DEFAULT_DESCRIPTION}
 
-${AUTHOR_NAME} is a full-stack developer working across React, Next.js, TypeScript, Node.js, and React Native, with production experience in micro-frontend architecture, performance/accessibility engineering, and AI-driven development workflows.
+${AUTHOR_NAME} is a senior mobile and web engineer based in Brazil, building React, React Native and TypeScript products for fintech, edtech and health companies. As Lead Frontend Engineer at Redação Online he took Lighthouse from 40 to 95 and cut checkout drop-off from 23% to 9%; at Capitual, a testing pipeline at 80% coverage reduced production bugs by 96%. He works in English, Portuguese and Spanish.
 
 ## Contact
-- Email: mailto:${AUTHOR_EMAIL}
-- LinkedIn: ${LINKEDIN_URL}
+- Email: mailto:${email}
+- LinkedIn: ${linkedin}${github}
 - Site: ${SITE_URL}
 
 ## Projects
 ${projectLines}
 
-## Skills
-${skillLines}
+## Stack
+${stackLines}
 
 ## Q&A
 ${qaLines}

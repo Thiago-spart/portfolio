@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 
-// Mock window.matchMedia for ThemeToggle tests
+// Mock window.matchMedia (theme toggle, reduced-motion checks)
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -45,7 +45,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   drawElements: vi.fn(),
 })) as unknown as typeof HTMLCanvasElement.prototype.getContext
 
-// Embla (shadcn Carousel) uses ResizeObserver internally — mock it for jsdom
+// React Three Fiber's canvas measures itself with ResizeObserver — mock it for jsdom
 class ResizeObserverMock {
   observe() {}
   unobserve() {}
@@ -53,7 +53,7 @@ class ResizeObserverMock {
 }
 window.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
 
-// Embla also uses IntersectionObserver — mock it for jsdom
+// Not implemented in jsdom either
 class IntersectionObserverMock {
   constructor() {}
   observe() {}
