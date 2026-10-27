@@ -35,7 +35,7 @@ export const Route = createFileRoute('/llms.txt')({
   server: {
     handlers: {
       GET: async () => {
-        const [caseStudies, techs, faqs, settings] = await Promise.all([
+        const [caseStudies, stack, faqs, settings] = await Promise.all([
           sanityClient.fetch(LLMS_CASE_STUDIES_QUERY),
           sanityClient.fetch(STACK_QUERY),
           sanityClient.fetch(LLMS_FAQ_QUERY),
@@ -50,8 +50,8 @@ export const Route = createFileRoute('/llms.txt')({
           })
           .join('\n')
 
-        const stackLines = groupStack(techs)
-          .map((group) => `- ${group.label.en}: ${group.techs.join(', ')}`)
+        const stackLines = groupStack(stack.techs)
+          .map((group) => `- ${group.label.en}: ${group.techs.map((tech) => tech.name).join(', ')}`)
           .join('\n')
 
         const qaLines = faqs.map((qa) => `- Q: ${qa.question}\n  A: ${qa.answer}`).join('\n')

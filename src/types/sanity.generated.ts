@@ -669,20 +669,24 @@ export type HERO_RESULTS_QUERY_RESULT = Array<{
 
 // Source: ../src/lib/queries/stack.ts
 // Variable: STACK_QUERY
-// Query: *[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]  | order(name asc) {  _id,  name,  category}
-export type STACK_QUERY_RESULT = Array<{
-  _id: string;
-  name: string;
-  category:
-    | "ai"
-    | "backend"
-    | "data"
-    | "frontend"
-    | "mobile"
-    | "practice"
-    | "testing"
-    | "tooling";
-}>;
+// Query: {  "caseStudyCount": count(*[_type == "caseStudy" && defined(slug.current)]),  "techs": *[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]    | order(name asc) {    _id,    name,    category,    "caseStudies": count(*[_type == "caseStudy" && defined(slug.current) && references(^._id)])  }}
+export type STACK_QUERY_RESULT = {
+  caseStudyCount: number;
+  techs: Array<{
+    _id: string;
+    name: string;
+    category:
+      | "ai"
+      | "backend"
+      | "data"
+      | "frontend"
+      | "mobile"
+      | "practice"
+      | "testing"
+      | "tooling";
+    caseStudies: number;
+  }>;
+};
 
 // Source: ../src/routes/llms[.]txt.ts
 // Variable: LLMS_CASE_STUDIES_QUERY
@@ -725,7 +729,7 @@ declare global {
     '*[_type == "role"] | order(startDate desc) {\n  _id,\n  company,\n  companyUrl,\n  title,\n  summary,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "caseStudies": *[_type == "caseStudy" && references(^._id) && defined(slug.current)]\n    | order(tier desc, order asc, startDate desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    "results": results[]{ _key, before, after, unit, qualifier, label, direction }\n  }\n}': ROLES_QUERY_RESULT;
     '*[_id == "siteSettings"][0]{\n  email,\n  linkedin,\n  github,\n  "seo": seo{\n    title,\n    description,\n    "ogImage": ogImage{\n      "url": asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",\n      alt\n    }\n  }\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_id == "siteSettings"][0].heroResults[]{\n  _key,\n  "caseStudy": caseStudy->{ title, "slug": slug.current },\n  "result": caseStudy->results[_key == ^.resultKey][0]{ _key, before, after, unit, qualifier, label, direction }\n}': HERO_RESULTS_QUERY_RESULT;
-    '*[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]\n  | order(name asc) {\n  _id,\n  name,\n  category\n}': STACK_QUERY_RESULT;
+    '{\n  "caseStudyCount": count(*[_type == "caseStudy" && defined(slug.current)]),\n  "techs": *[_type == "tech" && count(*[_type in ["caseStudy", "role"] && references(^._id)]) > 0]\n    | order(name asc) {\n    _id,\n    name,\n    category,\n    "caseStudies": count(*[_type == "caseStudy" && defined(slug.current) && references(^._id)])\n  }\n}': STACK_QUERY_RESULT;
     '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  "title": title.en,\n  "slug": slug.current,\n  "summary": summary.en,\n  "results": results[]{ before, after, unit, qualifier, "label": label.en }\n}': LLMS_CASE_STUDIES_QUERY_RESULT;
     '*[_type == "faq"] | order(order asc) {\n  "question": question.en,\n  "answer": pt::text(answer.en)\n}': LLMS_FAQ_QUERY_RESULT;
     '*[_type == "caseStudy" && defined(slug.current)]{\n  "slug": slug.current,\n  "updatedAt": _updatedAt\n}': SITEMAP_CASE_STUDIES_QUERY_RESULT;
