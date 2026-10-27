@@ -34,7 +34,7 @@ describe('HeroSection', () => {
 
   it('renders the available badge', () => {
     render(<HeroSection />, { wrapper: Wrapper })
-    expect(screen.getByText('Available for work')).toBeInTheDocument()
+    expect(screen.getByText('Open to senior and lead roles')).toBeInTheDocument()
   })
 
   it('renders CTA buttons with correct hrefs', () => {

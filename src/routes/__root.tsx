@@ -99,7 +99,7 @@ export const Route = createRootRoute({
           name: AUTHOR_NAME,
           alternateName: SITE_NAME,
           url: SITE_URL,
-          jobTitle: 'Full-Stack Developer',
+          jobTitle: 'Senior Mobile & Web Engineer',
           email: `mailto:${AUTHOR_EMAIL}`,
           sameAs: [LINKEDIN_URL],
         },

@@ -6,7 +6,7 @@ import { fetchStack }        from '#/lib/queries/stack'
 import { fetchSiteSettings } from '#/lib/queries/siteSettings'
 import { groupStack }        from '#/lib/stack'
 import { useLanguage }       from '#/i18n/LanguageContext'
-import { routeHead }         from '#/lib/seo'
+import { routeHead, DEFAULT_TITLE, DEFAULT_DESCRIPTION } from '#/lib/seo'
 import HeroSection           from '#/components/HeroSection'
 import TimelineSection       from '#/components/TimelineSection'
 import ProjectsSection       from '#/components/ProjectsSection'
@@ -14,18 +14,14 @@ import SkillsSection         from '#/components/SkillsSection'
 import QASection             from '#/components/QASection'
 import ContactSection        from '#/components/ContactSection'
 
-const HOME_TITLE = 'Thiago Souza — Full-Stack Developer'
-const HOME_DESCRIPTION =
-  'Full-stack developer building fast, thoughtful web experiences — explore Thiago Souza\'s projects, experience, and skills.'
-
 export const Route = createFileRoute('/')({
   // siteSettings.seo, when published, overrides the copy in code (and the
   // root route's og:image); otherwise the constants above stay in place.
   head: ({ loaderData }) => {
     const seo  = loaderData?.settings?.seo
     const head = routeHead({
-      title: seo?.title?.en ?? HOME_TITLE,
-      description: seo?.description?.en ?? HOME_DESCRIPTION,
+      title: seo?.title?.en ?? DEFAULT_TITLE,
+      description: seo?.description?.en ?? DEFAULT_DESCRIPTION,
       path: '/',
     })
     const og = seo?.ogImage
