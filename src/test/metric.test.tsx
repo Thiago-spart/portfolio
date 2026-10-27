@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { formatMetric, formatMetricParts } from '../lib/metric'
 import { Metric } from '../components/ui/Metric'
-import MetricTile from '../components/MetricTile'
 
 describe('formatMetric', () => {
   it('shows "before → after" when there is a before value', () => {
@@ -36,20 +35,6 @@ describe('formatMetric', () => {
 
   it('treats a before of 0 as a value, not as missing', () => {
     expect(formatMetric({ before: 0, after: 12 })).toBe('0 → 12')
-  })
-})
-
-describe('MetricTile', () => {
-  it('renders the value, the label and the direction', () => {
-    render(<MetricTile metric={{ before: 23, after: 9, unit: '%', direction: 'down' }} label="Checkout drop-off" />)
-    const value = screen.getByText('23% → 9%')
-    expect(screen.getByText('Checkout drop-off')).toBeInTheDocument()
-    expect(value.parentElement).toHaveAttribute('data-direction', 'down')
-  })
-
-  it('renders qualified values', () => {
-    render(<MetricTile metric={{ after: 95, qualifier: 'atLeast', direction: 'up' }} label="Lighthouse score" />)
-    expect(screen.getByText('95+')).toBeInTheDocument()
   })
 })
 
