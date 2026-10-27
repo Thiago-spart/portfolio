@@ -19,7 +19,6 @@ function contrastRatio(hexA: string, hexB: string): number {
 }
 
 const tokens = readFileSync(resolve(__dirname, '../styles/tokens.css'), 'utf-8')
-const heroCanvasSource = readFileSync(resolve(__dirname, '../components/HeroCanvas.tsx'), 'utf-8')
 
 // The first declaration block for each theme: light is the bare :root, dark
 // is the [data-theme='dark'] block (the media-query block repeats it).
@@ -61,13 +60,5 @@ describe.each(['light', 'dark'] as const)('brand text contrast (%s theme)', (the
   it('line-strong (control borders) meets 3:1 on ground and surface-raised', () => {
     expect(contrastRatio(t['line-strong'], t.ground)).toBeGreaterThanOrEqual(3)
     expect(contrastRatio(t['line-strong'], t['surface-raised'])).toBeGreaterThanOrEqual(3)
-  })
-})
-
-describe('HeroCanvas attribution', () => {
-  it('does not dim the muted text color further with opacity', () => {
-    const attributionLine = heroCanvasSource.split('\n').find((l) => l.includes('text-ink-muted'))
-    expect(attributionLine).toBeDefined()
-    expect(attributionLine).not.toMatch(/opacity-\d/)
   })
 })

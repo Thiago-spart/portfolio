@@ -1,5 +1,4 @@
 {
-  "hero.badge": "Abierto a roles sénior y de liderazgo",
   "hero.headline.line1": "Ingeniería",
   "hero.headline.line2": "que se mide.",
   "hero.subtitle": "Ingeniero sénior mobile y web. Construyo productos en React y React Native que cargan rápido, están bien probados y se sostienen en producción.",
@@ -48,5 +47,20 @@
   "howIWork.title": "Cómo trabajo",
   "howIWork.lede": "Preguntas que me hacen los responsables de ingeniería, respondidas con lo que de verdad hice.",
   "contact.github": "GitHub",
-  "contact.newTab": "(se abre en una pestaña nueva)"
+  "contact.newTab": "(se abre en una pestaña nueva)",
+  "hero.hint": "Haz clic o toca el agua para que crezca una raíz. Haz clic en una semilla marcada para ver un resultado.",
+  "hero.reset": "Reiniciar jardín",
+  "hero.results.label": "Resultados",
+  "hero.results.show": "Mostrar resultado: {label}, {value}",
+  "hero.drawing.propRoot": "Raíz zanco",
+  "hero.drawing.canopy": "Copa",
+  "hero.drawing.contact": "Contacto",
+  "hero.drawing.tide": "Marea {value} m",
+  "hero.drawing.rootSpread": "Extensión de raíces {value} m",
+  "hero.drawing.height": "H {value} m",
+  "hero.drawing.sheet": "El manglar · Hoja 01",
+  "hero.drawing.scale": "Escala 1:50",
+  "hero.drawing.day": "Día · Marea baja",
+  "hero.drawing.night": "Noche · Marea alta",
+  "hero.drawing.rev": "Rev 0.2"
 }

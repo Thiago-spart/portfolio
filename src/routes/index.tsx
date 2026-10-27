@@ -3,7 +3,7 @@ import { fetchRoles }        from '#/lib/queries/roles'
 import { fetchCaseStudies }  from '#/lib/queries/caseStudies'
 import { fetchFaq }          from '#/lib/queries/faq'
 import { fetchStack }        from '#/lib/queries/stack'
-import { fetchSiteSettings } from '#/lib/queries/siteSettings'
+import { fetchSiteSettings, fetchHeroResults } from '#/lib/queries/siteSettings'
 import { groupStack }        from '#/lib/stack'
 import { useLanguage }       from '#/i18n/LanguageContext'
 import { routeHead, DEFAULT_TITLE, DEFAULT_DESCRIPTION } from '#/lib/seo'
@@ -39,12 +39,14 @@ export const Route = createFileRoute('/')({
     }
   },
   loader: async () => {
-    const [roles, caseStudies, faq, stack, settings] = await Promise.all([
+    const [roles, caseStudies, faq, stack, settings, heroResults] = await Promise.all([
       fetchRoles(),
       fetchCaseStudies(),
       fetchFaq(),
       fetchStack(),
       fetchSiteSettings(),
+      // The hero still works without its results lane if this fails.
+      fetchHeroResults().catch(() => null),
     ])
     return {
       roles,
@@ -52,18 +54,19 @@ export const Route = createFileRoute('/')({
       faq,
       stack: { groups: groupStack(stack.techs), caseStudyCount: stack.caseStudyCount },
       settings,
+      heroResults,
     }
   },
   component: HomePage,
 })
 
 function HomePage() {
-  const { roles, caseStudies, faq, stack, settings } = Route.useLoaderData()
+  const { roles, caseStudies, faq, stack, settings, heroResults } = Route.useLoaderData()
   const { lang } = useLanguage()
 
   return (
     <main>
-      <HeroSection />
+      <HeroSection results={heroResults} />
       <ProjectsSection projects={caseStudies} lang={lang} />
       <TimelineSection roles={roles} lang={lang} />
       <StackSection groups={stack.groups} caseStudyCount={stack.caseStudyCount} lang={lang} />
