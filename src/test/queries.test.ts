@@ -162,9 +162,21 @@ describe('ROLES_QUERY', () => {
 
 describe('STACK_QUERY', () => {
   it('derives the stack from techs referenced by a case study or a role', async () => {
-    const techs = await run<{ name: string }[]>(STACK_QUERY)
+    const { techs } = await run<{ techs: { name: string }[] }>(STACK_QUERY)
     // Node.js is only on a role; COBOL is on nothing.
     expect(techs.map((t) => t.name)).toEqual(['Node.js', 'React', 'Vitest'])
+  })
+
+  it('counts the case studies using each tech, and the case studies with a slug', async () => {
+    const stack = await run<{ caseStudyCount: number; techs: { name: string; caseStudies: number }[] }>(STACK_QUERY)
+    // React: cs-feat-1 only (roles don't count); Node.js: on a role only.
+    expect(stack.techs.map((t) => [t.name, t.caseStudies])).toEqual([
+      ['Node.js', 0],
+      ['React', 1],
+      ['Vitest', 1],
+    ])
+    // cs-draft has no slug, so the site never shows it.
+    expect(stack.caseStudyCount).toBe(4)
   })
 })
 
