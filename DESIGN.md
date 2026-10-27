@@ -259,7 +259,7 @@ Gently squared. Small radii keep the drafting precision: 4px for Tags and focus 
 
 ### Buttons
 Precise and quiet: one primary action per view.
-- **Shape:** gently squared (8px), 44px tall (32px Small, desktop toolbars only).
+- **Shape:** gently squared (8px), 44px tall (32px Small, for desktop toolbars and the 48px sheet-index bar on phones, where it still clears WCAG 2.2's 24px target minimum).
 - **Primary:** Mangrove Green fill, ground-colored text, 16px side padding; hover deepens toward ink.
 - **Secondary:** transparent with a Strong Line border and Ink text; hover fills Mangrove Soft.
 - **Ghost:** Mangrove text with 8px padding; hover draws a 1px mangrove underline as an inset shadow, not text decoration.

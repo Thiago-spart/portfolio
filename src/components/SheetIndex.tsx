@@ -7,7 +7,7 @@ import { cn } from '#/lib/utils'
 
 // The home page's sections, in page order. The ids are the in-page anchors.
 const SHEET_SECTIONS = [
-  { id: 'projects', label: 'index.work' },
+  { id: 'projects', label: 'work.title' },
   { id: 'experience', label: 'experience.title' },
   { id: 'stack', label: 'stack.title' },
   { id: 'how-i-work', label: 'howIWork.title' },

@@ -90,7 +90,7 @@ describe('SheetIndex', () => {
     const links = within(desktopList()).getAllByRole('link')
     expect(links.map((a) => a.getAttribute('href'))).toEqual(IDS.map((id) => `#${id}`))
     expect(links.map((a) => a.textContent)).toEqual([
-      '01 Work',
+      '01 Projects',
       '02 Experience',
       '03 Stack',
       '04 How I work',
@@ -191,7 +191,7 @@ describe('SheetIndex', () => {
     const nav = screen.getByRole('navigation', { name: 'Seções' })
     const links = within(nav.querySelector('ol') as HTMLElement).getAllByRole('link')
     expect(links.map((a) => a.textContent)).toEqual([
-      '01 Trabalho',
+      '01 Projetos',
       '02 Experiência',
       '03 Stack',
       '04 Como eu trabalho',
