@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CONTENT_TYPES, LEGACY_TYPES, SINGLETONS, schemaTypes } from './index'
+import { CONTENT_TYPES, SINGLETONS, schemaTypes } from './index'
 
 const names = schemaTypes.map((type) => type.name)
 const OBJECTS = ['localeString', 'localeText', 'localeBlock', 'metric', 'imageWithAlt', 'heroResult']
@@ -9,13 +9,13 @@ describe('schema registration', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it.each([...OBJECTS, ...SINGLETONS, ...CONTENT_TYPES, ...LEGACY_TYPES])('registers %s', (name) => {
+  it.each([...OBJECTS, ...SINGLETONS, ...CONTENT_TYPES])('registers %s', (name) => {
     expect(names).toContain(name)
   })
 
   it('lists every document type in the Studio structure', () => {
     const documents = schemaTypes.filter((t) => t.type === 'document').map((t) => t.name)
-    expect([...SINGLETONS, ...CONTENT_TYPES, ...LEGACY_TYPES].sort()).toEqual(documents.sort())
+    expect([...SINGLETONS, ...CONTENT_TYPES].sort()).toEqual(documents.sort())
   })
 
   it('gives every document a preview and an icon', () => {
