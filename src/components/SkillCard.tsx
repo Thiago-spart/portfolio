@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import type { SanitySkillCategory, Lang } from '#/types/sanity'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { StackGroup } from '#/lib/stack'
 
 interface Props {
-  category: SanitySkillCategory
+  group: StackGroup
   lang: Lang
 }
 
 const VISIBLE_COUNT = 6
 
-export default function SkillCard({ category, lang }: Props) {
+export default function SkillCard({ group, lang }: Props) {
   const [expanded, setExpanded] = useState(false)
-  const hasOverflow = category.skills.length > VISIBLE_COUNT
-  const visibleSkills =
-    expanded || !hasOverflow ? category.skills : category.skills.slice(0, VISIBLE_COUNT)
-  const hiddenCount = category.skills.length - VISIBLE_COUNT
+  const hasOverflow = group.techs.length > VISIBLE_COUNT
+  const visibleTechs =
+    expanded || !hasOverflow ? group.techs : group.techs.slice(0, VISIBLE_COUNT)
+  const hiddenCount = group.techs.length - VISIBLE_COUNT
 
   return (
     <div
@@ -25,15 +26,15 @@ export default function SkillCard({ category, lang }: Props) {
       }}
     >
       <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#00aaff]">
-        {category.category[lang]}
+        {group.label[lang]}
       </p>
       <div className="flex flex-wrap gap-2">
-        {visibleSkills.map((skill) => (
+        {visibleTechs.map((tech) => (
           <span
-            key={skill.name}
+            key={tech}
             className="rounded-full border border-[rgba(0,170,255,0.2)] bg-[rgba(0,170,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
           >
-            {skill.name}
+            {tech}
           </span>
         ))}
         {hasOverflow && (

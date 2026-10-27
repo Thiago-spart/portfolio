@@ -1,13 +1,14 @@
 import { useTranslation } from '#/i18n/useTranslation'
 import SkillCard from './SkillCard'
-import type { SanitySkillCategory, Lang } from '#/types/sanity'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { StackGroup } from '#/lib/stack'
 
 interface Props {
-  categories: SanitySkillCategory[]
+  groups: StackGroup[]
   lang: Lang
 }
 
-export default function SkillsSection({ categories, lang }: Props) {
+export default function SkillsSection({ groups, lang }: Props) {
   const { t } = useTranslation()
 
   return (
@@ -17,15 +18,15 @@ export default function SkillsSection({ categories, lang }: Props) {
           {t('skills.title')}
         </p>
 
-        {/* Category grid */}
+        {/* Stack: techs used by case studies and roles, by category */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {categories.map((cat, i) => (
+          {groups.map((group, i) => (
             <div
-              key={cat._id}
+              key={group.category}
               className="rise-in opacity-0"
               style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
             >
-              <SkillCard category={cat} lang={lang} />
+              <SkillCard group={group} lang={lang} />
             </div>
           ))}
         </div>

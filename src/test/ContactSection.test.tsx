@@ -27,4 +27,25 @@ describe('ContactSection', () => {
     const { container } = render(<LanguageProvider><ContactSection /></LanguageProvider>)
     expect(container.querySelector('#contact')).toHaveClass('cyberpunk-surface')
   })
+
+  it('has no GitHub card until siteSettings sets one', () => {
+    render(<LanguageProvider><ContactSection settings={null} /></LanguageProvider>)
+    expect(screen.queryByRole('link', { name: /github/i })).not.toBeInTheDocument()
+  })
+
+  it('uses the links from siteSettings', () => {
+    const settings = {
+      email: 'hello@example.com',
+      linkedin: 'https://www.linkedin.com/in/someone/',
+      github: 'https://github.com/someone',
+      seo: null,
+    }
+    render(<LanguageProvider><ContactSection settings={settings} /></LanguageProvider>)
+    expect(screen.getByRole('link', { name: /email/i })).toHaveAttribute('href', 'mailto:hello@example.com')
+    expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', 'https://www.linkedin.com/in/someone/')
+    const github = screen.getByRole('link', { name: /github/i })
+    expect(github).toHaveAttribute('href', 'https://github.com/someone')
+    expect(github).toHaveAttribute('target', '_blank')
+    expect(screen.getAllByText('someone')).toHaveLength(2)
+  })
 })

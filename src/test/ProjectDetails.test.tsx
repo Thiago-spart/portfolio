@@ -2,47 +2,70 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import ProjectDetails from '../components/ProjectDetails'
-import type { SanityProject } from '../types/sanity'
+import { localeBlock, localeString, metric, paragraphs } from './fixtures'
+import type { CASE_STUDY_DETAIL_QUERY_RESULT } from '../types/sanity.generated'
 
-const baseProject: SanityProject = {
-  _id: 'proj-1',
-  title: { en: 'Portfolio Site', pt: 'Site Portfólio', es: 'Sitio Portafolio' },
-  slug: { current: 'portfolio-site' },
-  shortDescription: {
-    en: 'A personal site.',
-    pt: 'Um site pessoal.',
-    es: 'Un sitio personal.',
-  },
-  longDescription: {
-    en: 'A deep dive into the personal site build.',
-    pt: 'Um mergulho profundo na construção do site pessoal.',
-    es: 'Una inmersión profunda en la construcción del sitio personal.',
-  },
-  techStack: ['React', 'TypeScript'],
-  category: 'web',
-  status: 'completed',
+type CaseStudy = NonNullable<CASE_STUDY_DETAIL_QUERY_RESULT>
+
+const baseProject: CaseStudy = {
+  _id: 'cs-1',
+  title: localeString({ en: 'Portfolio Site' }),
+  slug: 'portfolio-site',
+  summary: localeString({ en: 'A personal site.' }),
+  problem: localeBlock(
+    paragraphs('The old site scored 40 on Lighthouse.'),
+    paragraphs('O site antigo tinha nota 40 no Lighthouse.'),
+  ),
+  approach: localeBlock(paragraphs('Rebuilt it with SSR.', 'Then trimmed the bundle.')),
+  results: null,
+  stack: ['React', 'TypeScript'],
+  role: { company: 'Acme Corp', companyUrl: null, title: localeString({ en: 'Senior Developer' }) },
+  cover: null,
+  gallery: null,
+  videoUrl: null,
+  liveUrl: null,
+  githubUrl: null,
   startDate: '2024-01-15',
   endDate: '2024-06-01',
-  featured: true,
 }
 
-function renderDetails(project: SanityProject) {
+function renderDetails(project: CaseStudy, lang: 'en' | 'pt' = 'en') {
   return render(
     <LanguageProvider>
-      <ProjectDetails project={project} lang="en" />
+      <ProjectDetails project={project} lang={lang} />
     </LanguageProvider>,
   )
 }
 
 describe('ProjectDetails', () => {
-  it('renders the long description for the active language', () => {
+  it('renders problem and approach as Portable Text paragraphs', () => {
     renderDetails(baseProject)
-    expect(screen.getByText('A deep dive into the personal site build.')).toBeInTheDocument()
+    const problem = screen.getByText('The old site scored 40 on Lighthouse.')
+    expect(problem.tagName).toBe('P')
+    expect(screen.getByText('Rebuilt it with SSR.').tagName).toBe('P')
+    expect(screen.getByText('Then trimmed the bundle.')).not.toBe(screen.getByText('Rebuilt it with SSR.'))
   })
 
-  it('renders the localized status label', () => {
+  it('renders the rich text for the active language', () => {
+    renderDetails(baseProject, 'pt')
+    expect(screen.getByText('O site antigo tinha nota 40 no Lighthouse.')).toBeInTheDocument()
+    expect(screen.queryByText('The old site scored 40 on Lighthouse.')).not.toBeInTheDocument()
+  })
+
+  it('renders without problem/approach', () => {
+    renderDetails({ ...baseProject, problem: null, approach: null })
+    expect(screen.getByText('React')).toBeInTheDocument()
+  })
+
+  it('renders the role title and company', () => {
     renderDetails(baseProject)
-    expect(screen.getByText('Completed')).toBeInTheDocument()
+    expect(screen.getByText('Senior Developer · Acme Corp')).toBeInTheDocument()
+  })
+
+  it('renders without a role (a case study outside the timeline)', () => {
+    renderDetails({ ...baseProject, role: null })
+    expect(screen.queryByText(/Acme Corp/)).not.toBeInTheDocument()
+    expect(screen.getByText(/jan 2024/i)).toBeInTheDocument()
   })
 
   it('renders a formatted date range when endDate is set', () => {
@@ -56,10 +79,38 @@ describe('ProjectDetails', () => {
     expect(screen.getByText(/present/i)).toBeInTheDocument()
   })
 
-  it('renders a tech chip for each techStack entry', () => {
+  it('leaves the date out when the case study has no start date', () => {
+    renderDetails({ ...baseProject, startDate: null, role: null })
+    expect(screen.queryByText(/2024/)).not.toBeInTheDocument()
+  })
+
+  it('renders a tech chip for each stack entry', () => {
     renderDetails(baseProject)
     expect(screen.getByText('React')).toBeInTheDocument()
     expect(screen.getByText('TypeScript')).toBeInTheDocument()
+  })
+
+  it('does not render a results section without results', () => {
+    renderDetails(baseProject)
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+    renderDetails({ ...baseProject, results: [] })
+    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
+  })
+
+  it('renders each result as "before → after" with its label and direction', () => {
+    renderDetails({
+      ...baseProject,
+      results: [
+        metric(95, 'Lighthouse score', { before: 40 }),
+        metric(9, 'Checkout drop-off', { before: 23, unit: '%', direction: 'down' }),
+        metric(-96, 'Production bugs', { unit: '%', direction: 'down' }),
+      ],
+    })
+    expect(screen.getByText('Highlights')).toBeInTheDocument()
+    expect(screen.getByText('40 → 95')).toBeInTheDocument()
+    expect(screen.getByText('Lighthouse score')).toBeInTheDocument()
+    expect(screen.getByText('23% → 9%').parentElement).toHaveAttribute('data-direction', 'down')
+    expect(screen.getByText('\u221296%')).toBeInTheDocument()
   })
 
   it('does not render live/source links when absent', () => {
@@ -74,111 +125,29 @@ describe('ProjectDetails', () => {
       liveUrl: 'https://example.com',
       githubUrl: 'https://github.com/example/repo',
     })
-    expect(screen.getByRole('link', { name: /live site/i })).toHaveAttribute(
-      'href',
-      'https://example.com',
-    )
+    expect(screen.getByRole('link', { name: /live site/i })).toHaveAttribute('href', 'https://example.com')
     expect(screen.getByRole('link', { name: /source code/i })).toHaveAttribute(
       'href',
       'https://github.com/example/repo',
     )
   })
 
-  it('does not render a gallery section when galleryUrls is absent', () => {
+  it('does not render a gallery section without images', () => {
     renderDetails(baseProject)
     expect(screen.queryByText('Gallery')).not.toBeInTheDocument()
   })
 
-  it('renders gallery images when galleryUrls is present', () => {
+  it('renders gallery images with their localized alt text', () => {
     renderDetails({
       ...baseProject,
-      galleryUrls: ['https://example.com/1.jpg', 'https://example.com/2.jpg'],
+      gallery: [
+        { _key: 'g1', url: 'https://example.com/1.jpg', alt: localeString({ en: 'Dashboard, dark theme' }) },
+        { _key: 'g2', url: 'https://example.com/2.jpg', alt: localeString({ en: 'Checkout on mobile' }) },
+        { _key: 'g3', url: null, alt: localeString({ en: 'Missing asset' }) },
+      ],
     })
     expect(screen.getByText('Gallery')).toBeInTheDocument()
     expect(screen.getAllByRole('img')).toHaveLength(2)
-  })
-
-  it('renders each blank-line-separated chunk of longDescription as its own paragraph', () => {
-    renderDetails({
-      ...baseProject,
-      longDescription: {
-        en: 'First paragraph.\n\nSecond paragraph.',
-        pt: 'Primeiro parágrafo.\n\nSegundo parágrafo.',
-        es: 'Primer párrafo.\n\nSegundo párrafo.',
-      },
-    })
-    const first = screen.getByText('First paragraph.')
-    const second = screen.getByText('Second paragraph.')
-    expect(first.tagName).toBe('P')
-    expect(second.tagName).toBe('P')
-    expect(first).not.toBe(second)
-  })
-
-  it('does not render a highlights section when highlights is absent', () => {
-    renderDetails(baseProject)
-    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
-  })
-
-  it('does not render a highlights section when highlights is an empty array', () => {
-    renderDetails({ ...baseProject, highlights: [] })
-    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
-  })
-
-  it('renders a highlights list when highlights is present', () => {
-    renderDetails({
-      ...baseProject,
-      highlights: [
-        { en: 'Shipped feature A', pt: 'Lançou a funcionalidade A', es: 'Lanzó la funcionalidad A' },
-        { en: 'Shipped feature B', pt: 'Lançou a funcionalidade B', es: 'Lanzó la funcionalidad B' },
-      ],
-    })
-    expect(screen.getByText('Highlights')).toBeInTheDocument()
-    expect(screen.getByText('Shipped feature A')).toBeInTheDocument()
-    expect(screen.getByText('Shipped feature B')).toBeInTheDocument()
-  })
-
-  it('does not render a highlights heading when every item lacks the active-language translation', () => {
-    renderDetails({
-      ...baseProject,
-      highlights: [
-        { en: '', pt: 'Lançou a funcionalidade A', es: 'Lanzó la funcionalidad A' },
-      ],
-    })
-    expect(screen.queryByText('Highlights')).not.toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
-  })
-
-  it('does not render a challenges section when challenges is absent', () => {
-    renderDetails(baseProject)
-    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
-  })
-
-  it('does not render a challenges section when challenges is an empty array', () => {
-    renderDetails({ ...baseProject, challenges: [] })
-    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
-  })
-
-  it('renders a challenges list when challenges is present', () => {
-    renderDetails({
-      ...baseProject,
-      challenges: [
-        { en: 'Handled tricky edge case', pt: 'Tratou um caso extremo complicado', es: 'Manejó un caso extremo complicado' },
-      ],
-    })
-    expect(screen.getByText('Challenges')).toBeInTheDocument()
-    expect(screen.getByText('Handled tricky edge case')).toBeInTheDocument()
-  })
-
-  it('does not render a challenges heading when every item lacks the active-language translation', () => {
-    renderDetails({
-      ...baseProject,
-      challenges: [
-        { en: '', pt: 'Tratou um caso extremo complicado', es: 'Manejó un caso extremo complicado' },
-      ],
-    })
-    expect(screen.queryByText('Challenges')).not.toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.getByAltText('Dashboard, dark theme')).toHaveAttribute('src', 'https://example.com/1.jpg')
   })
 })

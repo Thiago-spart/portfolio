@@ -1,22 +1,17 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { fetchProjectBySlug } from '#/lib/queries/projects'
+import { fetchCaseStudyBySlug } from '#/lib/queries/caseStudies'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
-import { routeHead } from '#/lib/seo'
-import { formatProjectDate } from '#/lib/formatDate'
+import { DEFAULT_DESCRIPTION, routeHead } from '#/lib/seo'
+import { formatDateRange } from '#/lib/formatDate'
 import ProjectHero from '#/components/ProjectHero'
 import ProjectDetails from '#/components/ProjectDetails'
 
 const EARTH_LOOP_SRC = '/media/earth-loop.mp4'
 
-function formatHeroDate(startDate: string, endDate: string | null, presentLabel: string): string {
-  const end = endDate ? formatProjectDate(endDate) : presentLabel
-  return `${formatProjectDate(startDate)} — ${end}`
-}
-
 export const Route = createFileRoute('/projects/$slug')({
   loader: async ({ params }) => {
-    const project = await fetchProjectBySlug({ data: params.slug })
+    const project = await fetchCaseStudyBySlug({ data: params.slug })
     if (!project) throw notFound()
     return { project }
   },
@@ -27,8 +22,8 @@ export const Route = createFileRoute('/projects/$slug')({
     loaderData
       ? routeHead({
           title: `${loaderData.project.title.en} — Thiago Souza`,
-          description: loaderData.project.shortDescription.en,
-          path: `/projects/${loaderData.project.slug.current}`,
+          description: loaderData.project.summary?.en ?? DEFAULT_DESCRIPTION,
+          path: `/projects/${loaderData.project.slug}`,
         })
       : { meta: [{ title: 'Project not found — Thiago Souza' }] },
   notFoundComponent: ProjectNotFound,
@@ -54,12 +49,13 @@ function ProjectPage() {
   return (
     <main>
       <ProjectHero
-        videoSrc={project.videoUrl}
-        posterSrc={project.coverImageUrl}
-        bgImageSrc={project.coverImageUrl}
+        videoSrc={project.videoUrl ?? undefined}
+        posterSrc={project.cover?.url ?? undefined}
+        bgImageSrc={project.cover?.url ?? undefined}
+        imageAlt={project.cover?.alt[lang]}
         ambientVideoSrc={EARTH_LOOP_SRC}
         title={project.title[lang]}
-        date={formatHeroDate(project.startDate, project.endDate, t('timeline.present'))}
+        date={formatDateRange(project.startDate, project.endDate, t('timeline.present'))}
         scrollToExpand={t('project.scrollHint')}
       >
         <ProjectDetails project={project} lang={lang} />

@@ -1,16 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { defineQuery } from 'groq'
 import { sanityClient } from '#/lib/sanity'
 import { SITE_URL } from '#/lib/seo'
 
-interface SitemapProject {
-  slug: string
-  updatedAt: string
-}
-
-const projectsQuery = `*[_type == "project"]{
+const SITEMAP_CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined(slug.current)]{
   "slug": slug.current,
   "updatedAt": _updatedAt
-}`
+}`)
 
 function urlEntry(loc: string, lastmod: string | undefined, changefreq: string, priority: string) {
   return `  <url>
@@ -24,9 +20,9 @@ export const Route = createFileRoute('/sitemap.xml')({
   server: {
     handlers: {
       // Generated at request time (not a static public/ file) so newly
-      // published Sanity projects show up without a redeploy.
+      // published Sanity case studies show up without a redeploy.
       GET: async () => {
-        const projects = await sanityClient.fetch<SitemapProject[]>(projectsQuery)
+        const projects = await sanityClient.fetch(SITEMAP_CASE_STUDIES_QUERY)
 
         const entries = [
           urlEntry(`${SITE_URL}/`, undefined, 'monthly', '1.0'),

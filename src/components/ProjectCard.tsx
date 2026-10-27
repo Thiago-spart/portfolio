@@ -1,8 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import type { Lang, SanityProject } from '#/types/sanity'
+import { formatMetric } from '#/lib/metric'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { CASE_STUDIES_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface ProjectCardProps {
-  project: SanityProject
+  project: CASE_STUDIES_QUERY_RESULT[number]
   lang: Lang
   accentIndex: number
 }
@@ -11,12 +13,14 @@ const ACCENT_COLORS = ['#00aaff', '#7b2fff', '#ff6a00']
 
 export default function ProjectCard({ project, lang, accentIndex }: ProjectCardProps) {
   const accent = ACCENT_COLORS[accentIndex % ACCENT_COLORS.length]
-  const hasImage = Boolean(project.coverImageUrl)
+  const coverUrl = project.cover?.url
+  const hasImage = Boolean(coverUrl)
+  const result   = project.headlineResult
 
   return (
     <Link
       to="/projects/$slug"
-      params={{ slug: project.slug.current }}
+      params={{ slug: project.slug }}
       className="group relative block h-72 w-full overflow-hidden rounded-2xl"
       style={
         !hasImage
@@ -27,9 +31,11 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
       {hasImage ? (
         <div
           data-testid="project-card-image"
+          role="img"
+          aria-label={project.cover?.alt[lang]}
           className="absolute inset-0 saturate-0 transition-all duration-500 group-hover:scale-110 group-hover:saturate-100"
           style={{
-            backgroundImage: `url(${project.coverImageUrl})`,
+            backgroundImage: `url(${coverUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -44,11 +50,18 @@ export default function ProjectCard({ project, lang, accentIndex }: ProjectCardP
         <h3 className="glitch-flicker font-['Bebas_Neue'] text-2xl tracking-wide text-white transition-colors group-hover:text-electric-blue">
           {project.title[lang]}
         </h3>
-        <p className="line-clamp-3 text-sm text-[rgba(255,255,255,0.75)]">
-          {project.shortDescription[lang]}
-        </p>
+        {project.summary?.[lang] && (
+          <p className="line-clamp-3 text-sm text-[rgba(255,255,255,0.75)]">
+            {project.summary[lang]}
+          </p>
+        )}
+        {result && (
+          <p data-direction={result.direction} className="text-xs font-semibold text-electric-blue">
+            {formatMetric(result)} · {result.label[lang]}
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap gap-2">
-          {project.techStack.slice(0, 3).map((tech) => (
+          {(project.stack ?? []).slice(0, 3).map((tech) => (
             <span
               key={tech}
               className="rounded-full border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"

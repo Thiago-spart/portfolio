@@ -1,75 +1,63 @@
 import { ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
-import { formatProjectDate } from '#/lib/formatDate'
-import type { Lang, SanityProject } from '#/types/sanity'
+import { formatDateRange } from '#/lib/formatDate'
+import MetricTile from './MetricTile'
+import RichText from './RichText'
+import type { Lang } from '#/i18n/LanguageContext'
+import type { CASE_STUDY_DETAIL_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface ProjectDetailsProps {
-  project: SanityProject
+  project: NonNullable<CASE_STUDY_DETAIL_QUERY_RESULT>
   lang: Lang
 }
 
 export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
   const { t } = useTranslation()
-  const endLabel = project.endDate ? formatProjectDate(project.endDate) : t('timeline.present')
-  const highlights = (project.highlights ?? []).filter((highlight) => highlight[lang])
-  const challenges = (project.challenges ?? []).filter((challenge) => challenge[lang])
+  const dates   = formatDateRange(project.startDate, project.endDate, t('timeline.present'))
+  const role    = project.role ? `${project.role.title[lang]} · ${project.role.company}` : null
+  const results = project.results ?? []
+  const stack   = project.stack ?? []
+  const gallery = (project.gallery ?? []).filter((image) => image.url)
 
   return (
     <div className="mx-auto max-w-3xl text-left">
-      {(project.longDescription[lang] ?? '')
-        .split(/\n\s*\n/)
-        .map((paragraph) => paragraph.trim())
-        .filter(Boolean)
-        .map((paragraph, index) => (
-          <p key={index} className="mt-4 text-sm text-[rgba(255,255,255,0.75)] first:mt-0">
-            {paragraph}
-          </p>
-        ))}
+      {/* Problem, then approach: prose, no headings until the redesign adds them */}
+      <RichText value={project.problem?.[lang]} className="text-sm text-[rgba(255,255,255,0.75)]" />
+      <RichText value={project.approach?.[lang]} className="mt-4 text-sm text-[rgba(255,255,255,0.75)]" />
 
-      {highlights.length > 0 && (
+      {results.length > 0 && (
         <div className="mt-6">
           <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
             {t('project.highlights')}
           </h3>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {highlights.map((highlight, index) => (
-              <li key={index}>{highlight[lang]}</li>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {results.map((result) => (
+              <MetricTile key={result._key} metric={result} label={result.label[lang]} />
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
-      {challenges.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
-            {t('project.challenges')}
-          </h3>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[rgba(255,255,255,0.75)]">
-            {challenges.map((challenge, index) => (
-              <li key={index}>{challenge[lang]}</li>
-            ))}
-          </ul>
+      {(role || dates) && (
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold tracking-widest text-[var(--electric-blue,#00aaff)] uppercase">
+          {role && <span>{role}</span>}
+          {role && dates && <span aria-hidden="true">•</span>}
+          {dates && <span>{dates}</span>}
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold tracking-widest text-[var(--electric-blue,#00aaff)] uppercase">
-        <span>{t(`project.status.${project.status}`)}</span>
-        <span aria-hidden="true">•</span>
-        <span>
-          {formatProjectDate(project.startDate)} — {endLabel}
-        </span>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        {project.techStack.map((tech) => (
-          <span
-            key={tech}
-            className="rounded-full border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
+      {stack.length > 0 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {stack.map((tech) => (
+            <span
+              key={tech}
+              className="rounded-full border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-xs text-[rgba(255,255,255,0.75)]"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      )}
 
       {(project.liveUrl || project.githubUrl) && (
         <div className="mt-6 flex flex-wrap gap-4">
@@ -100,14 +88,14 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
         </div>
       )}
 
-      {project.galleryUrls && project.galleryUrls.length > 0 && (
+      {gallery.length > 0 && (
         <div className="mt-10">
           <h3 className="font-['Bebas_Neue'] text-2xl tracking-wide text-white">
             {t('project.gallery')}
           </h3>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {project.galleryUrls.map((url, index) => (
-              <img key={url} src={url} alt={`${project.title[lang]} screenshot ${index + 1}`} className="w-full rounded-xl object-cover" />
+            {gallery.map((image) => (
+              <img key={image._key} src={image.url ?? undefined} alt={image.alt[lang]} className="w-full rounded-xl object-cover" />
             ))}
           </div>
         </div>

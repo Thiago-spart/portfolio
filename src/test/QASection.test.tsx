@@ -3,20 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import QASection from '../components/QASection'
-import type { SanityQA } from '../types/sanity'
+import { localeBlock, localeString, paragraphs } from './fixtures'
+import type { FAQ_QUERY_RESULT } from '../types/sanity.generated'
 
-const mockItems: SanityQA[] = [
+const mockItems: FAQ_QUERY_RESULT = [
   {
     _id: '1',
-    order: 1,
-    question: { en: 'Are you available?', pt: 'Está disponível?', es: '¿Estás disponible?' },
-    answer:   { en: 'Yes, I am.',         pt: 'Sim, estou.',       es: 'Sí, lo estoy.' },
+    question: localeString({ en: 'Are you available?', pt: 'Está disponível?', es: '¿Estás disponible?' }),
+    answer:   localeBlock(paragraphs('Yes, I am.'), paragraphs('Sim, estou.'), paragraphs('Sí, lo estoy.')),
   },
   {
     _id: '2',
-    order: 2,
-    question: { en: 'Do you work remotely?', pt: 'Você trabalha remotamente?', es: '¿Trabajas de forma remota?' },
-    answer:   { en: 'Absolutely.',           pt: 'Com certeza.',                es: 'Por supuesto.' },
+    question: localeString({ en: 'Do you work remotely?', pt: 'Você trabalha remotamente?', es: '¿Trabajas de forma remota?' }),
+    answer:   localeBlock(paragraphs('Absolutely.', 'Across time zones, too.')),
   },
 ]
 
@@ -48,6 +47,19 @@ describe('QASection', () => {
     fireEvent.click(screen.getByText('Are you available?'))
     fireEvent.click(screen.getByText('Are you available?'))
     expect(screen.queryByText('Yes, I am.')).not.toBeInTheDocument()
+  })
+
+  it('renders the answer as Portable Text, one paragraph per block', () => {
+    render(<LanguageProvider><QASection items={mockItems} lang="en" /></LanguageProvider>)
+    fireEvent.click(screen.getByText('Do you work remotely?'))
+    expect(screen.getByText('Absolutely.').tagName).toBe('P')
+    expect(screen.getByText('Across time zones, too.').tagName).toBe('P')
+  })
+
+  it('renders the answer in the active language', () => {
+    render(<LanguageProvider><QASection items={mockItems} lang="pt" /></LanguageProvider>)
+    fireEvent.click(screen.getByText('Está disponível?'))
+    expect(screen.getByText('Sim, estou.')).toBeInTheDocument()
   })
 
   it('renders question in correct language', () => {
