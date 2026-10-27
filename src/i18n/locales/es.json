@@ -5,7 +5,7 @@
   "hero.cta.contact": "Contáctame",
   "hero.cta.projects": "Ver mi trabajo",
   "contact.title": "Hablemos",
-  "contact.subtitle": "Abierto a roles sénior y de liderazgo, y a contratos en productos web y mobile. Cuéntame qué tiene que salir, y para cuándo.",
+  "contact.subtitle": "Cuéntame qué tiene que salir en web o mobile, y para cuándo.",
   "contact.linkedin": "LinkedIn",
   "contact.email": "Correo",
   "work.title": "Proyectos",
@@ -31,7 +31,7 @@
   "theme.toDark": "Tema oscuro",
   "theme.toLight": "Tema claro",
   "metric.to": "a",
-  "footer.copyright": "© {year} Thiago Moraes de Souza",
+  "footer.copyright": "© {year} Thiago Souza",
   "footer.backToTop": "Volver arriba",
   "experience.title": "Experiencia",
   "experience.lede": "{count} puestos desde {year}, del más reciente al más antiguo. Cada uno enlaza a los casos de estudio que produjo.",
@@ -63,5 +63,6 @@
   "hero.drawing.scale": "Escala 1:50",
   "hero.drawing.day": "Día · Marea baja",
   "hero.drawing.night": "Noche · Marea alta",
-  "hero.drawing.rev": "Rev 0.2"
+  "hero.drawing.rev": "Rev 0.2",
+  "index.contact": "Contacto"
 }

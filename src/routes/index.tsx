@@ -1,9 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, getRouteApi, rootRouteId } from '@tanstack/react-router'
 import { fetchRoles }        from '#/lib/queries/roles'
 import { fetchCaseStudies }  from '#/lib/queries/caseStudies'
 import { fetchFaq }          from '#/lib/queries/faq'
 import { fetchStack }        from '#/lib/queries/stack'
-import { fetchSiteSettings, fetchHeroResults } from '#/lib/queries/siteSettings'
+import { fetchHeroResults } from '#/lib/queries/siteSettings'
 import { groupStack }        from '#/lib/stack'
 import { useLanguage }       from '#/i18n/LanguageContext'
 import { routeHead, DEFAULT_TITLE, DEFAULT_DESCRIPTION } from '#/lib/seo'
@@ -13,12 +13,17 @@ import ProjectsSection       from '#/components/ProjectsSection'
 import StackSection          from '#/components/StackSection'
 import HowIWorkSection       from '#/components/HowIWorkSection'
 import ContactSection        from '#/components/ContactSection'
+import type { SITE_SETTINGS_QUERY_RESULT } from '#/types/sanity.generated'
+
+// siteSettings is loaded once by the root route (the footer needs it too).
+const rootRoute = getRouteApi(rootRouteId)
 
 export const Route = createFileRoute('/')({
   // siteSettings.seo, when published, overrides the copy in code (and the
   // root route's og:image); otherwise the constants above stay in place.
-  head: ({ loaderData }) => {
-    const seo  = loaderData?.settings?.seo
+  head: ({ matches }) => {
+    const root = matches.find((m) => (m.routeId as string) === rootRouteId)
+    const seo  = (root?.loaderData as SITE_SETTINGS_QUERY_RESULT | undefined)?.seo
     const head = routeHead({
       title: seo?.title?.en ?? DEFAULT_TITLE,
       description: seo?.description?.en ?? DEFAULT_DESCRIPTION,
@@ -39,12 +44,11 @@ export const Route = createFileRoute('/')({
     }
   },
   loader: async () => {
-    const [roles, caseStudies, faq, stack, settings, heroResults] = await Promise.all([
+    const [roles, caseStudies, faq, stack, heroResults] = await Promise.all([
       fetchRoles(),
       fetchCaseStudies(),
       fetchFaq(),
       fetchStack(),
-      fetchSiteSettings(),
       // The hero still works without its results lane if this fails.
       fetchHeroResults().catch(() => null),
     ])
@@ -53,7 +57,6 @@ export const Route = createFileRoute('/')({
       caseStudies,
       faq,
       stack: { groups: groupStack(stack.techs), caseStudyCount: stack.caseStudyCount },
-      settings,
       heroResults,
     }
   },
@@ -61,7 +64,8 @@ export const Route = createFileRoute('/')({
 })
 
 function HomePage() {
-  const { roles, caseStudies, faq, stack, settings, heroResults } = Route.useLoaderData()
+  const { roles, caseStudies, faq, stack, heroResults } = Route.useLoaderData()
+  const settings = rootRoute.useLoaderData()
   const { lang } = useLanguage()
 
   return (

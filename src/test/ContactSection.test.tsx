@@ -49,6 +49,7 @@ describe('ContactSection', () => {
 
   it('uses the links from siteSettings', () => {
     renderSection({
+      availability: null,
       email: 'hello@example.com',
       linkedin: 'https://www.linkedin.com/in/someone/',
       github: 'https://github.com/someone',
@@ -71,5 +72,31 @@ describe('ContactSection', () => {
     } finally {
       localStorage.clear()
     }
+  })
+
+  it('shows the availability line from siteSettings, in the visitor\'s language', () => {
+    const availability = {
+      _type: 'localeString' as const,
+      en: 'Taking on contract work. Open to senior and lead roles.',
+      pt: 'Disponível para projetos. Aberto a vagas sênior e de liderança.',
+      es: 'Disponible para proyectos. Abierto a roles sénior y de liderazgo.',
+    }
+    const settings = { availability, email: null, linkedin: null, github: null, seo: null }
+    const { unmount } = renderSection(settings)
+    expect(screen.getByTestId('availability')).toHaveTextContent(availability.en)
+    unmount()
+    localStorage.setItem('lang', 'pt')
+    try {
+      renderSection(settings)
+      expect(screen.getByTestId('availability')).toHaveTextContent(availability.pt)
+    } finally {
+      localStorage.clear()
+    }
+  })
+
+  it('leaves the availability line out until siteSettings sets it', () => {
+    renderSection(null)
+    expect(screen.queryByTestId('availability')).toBeNull()
+    expect(screen.queryByText(/open to senior/i)).toBeNull()
   })
 })

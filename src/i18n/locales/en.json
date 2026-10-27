@@ -5,7 +5,7 @@
   "hero.cta.contact": "Get in touch",
   "hero.cta.projects": "See my work",
   "contact.title": "Let's talk",
-  "contact.subtitle": "Open to senior and lead roles, and to contract work on web and mobile products. Tell me what has to ship, and by when.",
+  "contact.subtitle": "Tell me what has to ship on web or mobile, and by when.",
   "contact.linkedin": "LinkedIn",
   "contact.email": "Email",
   "work.title": "Projects",
@@ -31,7 +31,7 @@
   "theme.toDark": "Dark theme",
   "theme.toLight": "Light theme",
   "metric.to": "to",
-  "footer.copyright": "© {year} Thiago Moraes de Souza",
+  "footer.copyright": "© {year} Thiago Souza",
   "footer.backToTop": "Back to top",
   "experience.title": "Experience",
   "experience.lede": "{count} roles since {year}, newest first. Each links to the case studies it produced.",
@@ -63,5 +63,6 @@
   "hero.drawing.scale": "Scale 1:50",
   "hero.drawing.day": "Day · Low tide",
   "hero.drawing.night": "Night · High tide",
-  "hero.drawing.rev": "Rev 0.2"
+  "hero.drawing.rev": "Rev 0.2",
+  "index.contact": "Contact"
 }

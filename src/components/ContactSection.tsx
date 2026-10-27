@@ -2,7 +2,7 @@ import { Mail } from 'lucide-react'
 import { Button } from '#/components/ui/Button'
 import { Container } from '#/components/ui/Section'
 import { useTranslation } from '#/i18n/useTranslation'
-import { AUTHOR_EMAIL, LINKEDIN_URL } from '#/lib/seo'
+import { contactLinks } from '#/lib/contact'
 import { GithubMark, LinkedinMark } from './brandIcons'
 import type { SITE_SETTINGS_QUERY_RESULT } from '#/types/sanity.generated'
 
@@ -16,14 +16,13 @@ interface Props {
 // Contract with the hero: the mango scrolls to #contact and focuses
 // #contact-heading (tabIndex -1), which then shows the mango focus ring.
 //
-// Links come from siteSettings. Until that singleton is published, email and
-// LinkedIn fall back to src/lib/seo.ts so the section never empties; GitHub
-// only shows once it's set.
+// Links come from siteSettings with the fallbacks in src/lib/contact.ts. The
+// availability line under the heading is siteSettings.availability (marked
+// like the current role on the timeline); it's left out until it's set.
 export default function ContactSection({ settings }: Props) {
-  const { t } = useTranslation()
-  const email = settings?.email ?? AUTHOR_EMAIL
-  const linkedin = settings?.linkedin ?? LINKEDIN_URL
-  const github = settings?.github
+  const { t, lang } = useTranslation()
+  const { email, linkedin, github } = contactLinks(settings)
+  const availability = settings?.availability?.[lang]
   const newTab = <span className="sr-only"> {t('contact.newTab')}</span>
 
   return (
@@ -36,6 +35,14 @@ export default function ContactSection({ settings }: Props) {
         >
           {t('contact.title')}
         </h2>
+        {availability && (
+          <p data-testid="availability" className="-mt-2 mb-0 flex items-start gap-2 type-small text-ink">
+            <svg aria-hidden="true" width="11" height="11" viewBox="0 0 11 11" className="mt-[4.5px] shrink-0">
+              <circle cx="5.5" cy="5.5" r="4.75" strokeWidth="1.5" className="fill-mangrove stroke-mangrove" />
+            </svg>
+            {availability}
+          </p>
+        )}
         <p className="m-0 max-w-160 type-lede text-ink-muted">{t('contact.subtitle')}</p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Button href={`mailto:${email}`} icon={Mail}>
