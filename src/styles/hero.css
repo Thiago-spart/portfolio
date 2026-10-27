@@ -1,0 +1,123 @@
+/* The Mangrove: the results lane and its dimension lines.
+
+   From 900px the drawing box sits beside the copy and the three results
+   stand in a lane right of the tide gauge, each joined to its gauge mark by
+   a leader. The lane is laid out in CSS from the box width alone, so the
+   server render already has every label, line and tick in place (no layout
+   shift, no script):
+
+   - the sheet (.mangrove-sheet) is an inline-size container; the box's
+     height follows from its width (aspect 880/480, 300–560px);
+   - the poster SVG is scaled so the lane keeps at least --lane-min px
+     right of the gauge; --k is one drawing unit (the Figma drawing's
+     827.2 × 451.2 coordinates) in px;
+   - labels sit in three fixed slots, centered on their slot, so a leader
+     can run from the slot's left edge to the gauge mark at (602u, --my). */
+
+@layer components {
+  .mangrove-sheet {
+    container-type: inline-size;
+  }
+
+  @media (min-width: 900px) {
+    .mangrove-sheet {
+      --lane-gap: 32px;
+      --lane-min: 168px;
+      --slot: 100px;
+      --bh: clamp(300px, calc(100cqw * 480 / 880), 560px);
+      --k: min(
+        calc(100cqw / 827.2),
+        calc(var(--bh) / 451.2),
+        calc((100cqw - var(--lane-gap) - var(--lane-min) - 8px) / 602)
+      );
+      --oy: calc((var(--bh) - 451.2 * var(--k)) / 2);
+      --lane-x: calc(602 * var(--k) + var(--lane-gap));
+      /* Three slots, centered on the gauge's middle and kept in the box. */
+      --lane-top: clamp(0px, calc(var(--oy) + 210 * var(--k) - 1.5 * var(--slot)), calc(var(--bh) - 3 * var(--slot)));
+    }
+
+    .mangrove-poster {
+      top: var(--oy);
+      left: 0;
+      width: calc(827.2 * var(--k));
+      height: calc(451.2 * var(--k));
+    }
+
+    .mangrove-lane-item {
+      position: absolute;
+      left: var(--lane-x);
+      top: calc(var(--lane-top) + (var(--i) + 0.5) * var(--slot));
+      translate: 0 -50%;
+      width: max-content;
+      max-width: min(calc(100cqw - var(--lane-x) - 8px), 240px);
+    }
+
+    /* Leader: from the label's left edge, back to its mark on the gauge. */
+    .mangrove-leader {
+      --dx: calc(-1 * var(--lane-gap));
+      --dy: calc(var(--oy) + var(--my) * var(--k) - var(--lane-top) - (var(--i) + 0.5) * var(--slot));
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 1px;
+      width: hypot(var(--dx), var(--dy));
+      transform-origin: 0 50%;
+      rotate: atan2(var(--dy), var(--dx));
+      background-image: repeating-linear-gradient(90deg, var(--mangrove) 0 3px, transparent 3px 6px);
+      pointer-events: none;
+    }
+
+    /* Tick numbers in HTML from 900px: 10px at every drawing scale (9px
+       where the drawing is smallest, to fit between the ticks and the post). */
+    .mangrove-tick {
+      position: absolute;
+      right: calc(100cqw - 589.5 * var(--k) + 1px);
+      font-size: 10px;
+      top: calc(var(--oy) + var(--y) * var(--k));
+      translate: 0 -50%;
+    }
+
+    @container (width < 560px) {
+      .mangrove-tick {
+        font-size: 9px;
+      }
+    }
+  }
+
+  /* First view: each shoot grows, its dimension line runs to the gauge,
+     the mark lands and the leader reaches the label. Staggered per result,
+     replayed by remounting. Reduced motion: drawn, not animated. */
+  .mangrove-draw {
+    stroke-dasharray: 1;
+    animation: mangrove-draw var(--dur, 450ms) cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms) both;
+  }
+
+  .mangrove-leader {
+    animation: mangrove-leader 300ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mangrove-draw,
+    .mangrove-leader {
+      animation: none;
+    }
+  }
+}
+
+@keyframes mangrove-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mangrove-leader {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
