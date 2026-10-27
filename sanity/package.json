@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "sanity dev",
     "build": "sanity build",
-    "deploy": "sanity deploy"
+    "deploy": "sanity deploy",
+    "typegen": "sanity schema extract --enforce-required-fields --force && sanity typegen generate"
   },
   "dependencies": {
+    "@sanity/icons": "^5.2.3",
+    "@sanity/ui": "^4.4.9",
     "@sanity/vision": "^6.20.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

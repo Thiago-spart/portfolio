@@ -1,62 +1,81 @@
-import type { Rule } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
+import { ProjectsIcon } from '@sanity/icons/Projects'
 
-export const project = {
+// Legacy: read by the live site until the switch to `caseStudy` (#47).
+export const project = defineType({
   name: 'project',
   title: 'Project',
   type: 'document',
+  icon: ProjectsIcon,
   fields: [
-    { name: 'title',            title: 'Title',             type: 'localeString' },
-    { name: 'slug',             title: 'Slug',              type: 'slug', options: { source: 'title.en' } },
-    { name: 'shortDescription', title: 'Short Description', type: 'localeString' },
-    {
+    defineField({ name: 'title',            title: 'Title',             type: 'localeString' }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: { source: 'title.en' },
+      // The slug type already validates uniqueness within its document type.
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: 'shortDescription', title: 'Short Description', type: 'localeString' }),
+    defineField({
       name: 'longDescription',
       title: 'Long Description',
       type: 'localeText',
-      validation: (Rule: Rule) => Rule.required(),
-    },
-    {
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'highlights',
       title: 'Highlights',
       type: 'array',
-      of: [{ type: 'localeString' }],
-    },
-    {
+      of: [defineArrayMember({ type: 'localeString' })],
+    }),
+    defineField({
       name: 'challenges',
       title: 'Challenges',
       type: 'array',
-      of: [{ type: 'localeString' }],
-    },
-    { name: 'coverImage',       title: 'Cover Image',       type: 'image' },
-    { name: 'gallery',          title: 'Gallery',           type: 'array', of: [{ type: 'image' }] },
-    { name: 'video',            title: 'Video',             type: 'file', options: { accept: 'video/*' } },
-    {
+      of: [defineArrayMember({ type: 'localeString' })],
+    }),
+    defineField({ name: 'coverImage',       title: 'Cover Image',       type: 'image' }),
+    defineField({ name: 'gallery',          title: 'Gallery',           type: 'array', of: [defineArrayMember({ type: 'image' })] }),
+    defineField({ name: 'video',            title: 'Video',             type: 'file', options: { accept: 'video/*' } }),
+    defineField({
       name: 'techStack',
       title: 'Tech Stack',
       type: 'array',
-      of: [{ type: 'string' }],
-      validation: (Rule: Rule) => Rule.required().min(1),
-    },
-    {
+      of: [defineArrayMember({ type: 'string' })],
+      validation: (rule) => rule.required().min(1),
+    }),
+    defineField({
       name: 'category',
       title: 'Category',
       type: 'string',
       options: { list: ['web', 'mobile', 'api', 'other'] },
-    },
-    { name: 'liveUrl',   title: 'Live URL',    type: 'url' },
-    { name: 'githubUrl', title: 'GitHub URL',  type: 'url' },
-    {
+    }),
+    defineField({ name: 'liveUrl',   title: 'Live URL',   type: 'url' }),
+    defineField({ name: 'githubUrl', title: 'GitHub URL', type: 'url' }),
+    defineField({
       name: 'startDate',
       title: 'Start Date',
       type: 'date',
-      validation: (Rule: Rule) => Rule.required(),
-    },
-    { name: 'endDate',   title: 'End Date',    type: 'date' },
-    {
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: 'endDate',   title: 'End Date',   type: 'date' }),
+    defineField({
       name: 'status',
       title: 'Status',
       type: 'string',
       options: { list: ['completed', 'in-progress', 'archived'] },
-    },
-    { name: 'featured', title: 'Featured', type: 'boolean' },
+    }),
+    defineField({ name: 'featured', title: 'Featured', type: 'boolean' }),
   ],
-}
+  orderings: [{ title: 'Start Date, Newest', name: 'startDateDesc', by: [{ field: 'startDate', direction: 'desc' }] }],
+  preview: {
+    select: { title: 'title.en', category: 'category', featured: 'featured', media: 'coverImage' },
+    prepare: ({ title, category, featured, media }) => ({
+      title: title ?? 'Untitled project',
+      subtitle: [category, featured ? 'featured' : null].filter(Boolean).join(' · '),
+      media,
+    }),
+  },
+})

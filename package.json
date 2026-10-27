@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "knip": "knip",
-    "knip:fix": "knip --fix"
+    "knip:fix": "knip --fix",
+    "typegen": "pnpm --dir sanity run typegen"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
