@@ -72,6 +72,8 @@
 
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
+  /* The hero brief's split: copy left and drawing right from 900px. */
+  --breakpoint-hero: 900px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
 }

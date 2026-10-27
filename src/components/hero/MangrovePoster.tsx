@@ -207,7 +207,7 @@ export function MangrovePoster({ className }: { className?: string }) {
           transform="translate(101.05 379.41)"
           className={DIM}
         />
-        <text x={284.35} y={389.5} textAnchor="middle" fontSize="10.34" letterSpacing="0.62" className={TEXT}>
+        <text x={284.35} y={376} textAnchor="middle" fontSize="10.34" letterSpacing="0.62" className={TEXT}>
           {t('hero.drawing.rootSpread').replace('{value}', '6.5')}
         </text>
 

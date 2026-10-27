@@ -38,9 +38,9 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
 
   return (
     <section aria-labelledby="hero-heading" className="overflow-x-clip">
-      <Container className="grid gap-8 pt-4 pb-12 min-[900px]:min-h-[calc(100svh-var(--space-16)-var(--space-2))] min-[900px]:grid-cols-[minmax(0,380px)_minmax(0,1fr)] min-[900px]:items-center min-[900px]:gap-0 min-[900px]:py-16 xl:grid-cols-[450px_minmax(0,1fr)]">
+      <Container className="grid gap-8 pt-4 pb-12 hero:min-h-[calc(100svh-var(--space-16)-var(--space-2)-var(--space-24))] hero:grid-cols-[minmax(0,380px)_minmax(0,1fr)] hero:items-center hero:gap-0 hero:py-12 xl:grid-cols-[450px_minmax(0,1fr)]">
         <div className="flex flex-col items-start gap-6">
-          <h1 id="hero-heading" className="m-0 type-display-l text-ink md:type-display-xl min-[900px]:type-display-l xl:type-display-xl">
+          <h1 id="hero-heading" className="m-0 type-display-l text-ink md:type-display-xl hero:type-display-l xl:type-display-xl">
             {`${t('hero.headline.line1')} ${t('hero.headline.line2')}`}
           </h1>
           <p className="m-0 type-lede text-ink">{t('hero.subtitle')}</p>
@@ -174,13 +174,13 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
   const visible = (i: number) => fallback || active[i]
 
   return (
-    <div ref={heroRef} className="relative min-w-0 min-[900px]:-mr-[max(var(--space-6),calc((100vw-var(--content-max))/2))]">
+    <div ref={heroRef} className="relative min-w-0 hero:-mr-[max(var(--space-6),calc((100vw-var(--content-max))/2))]">
       {/* The drawing box: its size is reserved before anything loads (no
           layout shift when the canvas mounts). Drafting grid by day. */}
       <div
         ref={boxRef}
         data-mode={mode}
-        className="relative aspect-[358/288] w-full overflow-hidden [background-image:linear-gradient(color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px)] [background-size:40px_40px] sm:aspect-[880/480] min-[900px]:max-h-[560px] min-[900px]:min-h-[300px] dark:[background-image:none]"
+        className="relative aspect-[358/288] w-full overflow-hidden [background-image:linear-gradient(color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px)] [background-size:40px_40px] sm:aspect-[880/480] hero:max-h-[560px] hero:min-h-[300px] dark:[background-image:none]"
       >
         <MangrovePoster
           className={cn(
@@ -199,9 +199,9 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
             'm-0 list-none p-0',
             fallback
               ? 'mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap'
-              : 'flex flex-col gap-3 has-[li:not([hidden])]:mt-6 min-[900px]:has-[li:not([hidden])]:mt-0',
-            !fallback && mode === 'poster' && 'min-[900px]:absolute min-[900px]:top-[8%] min-[900px]:right-6 min-[900px]:w-58',
-            !fallback && mode === 'scene' && 'min-[900px]:pointer-events-none min-[900px]:absolute min-[900px]:inset-x-0 min-[900px]:top-0 min-[900px]:z-20 min-[900px]:size-0',
+              : 'flex flex-col gap-3 has-[li:not([hidden])]:mt-6 hero:has-[li:not([hidden])]:mt-0',
+            !fallback && mode === 'poster' && 'hero:absolute hero:top-[8%] hero:right-6 hero:w-58',
+            !fallback && mode === 'scene' && 'hero:pointer-events-none hero:absolute hero:inset-x-0 hero:top-0 hero:z-20 hero:size-0',
           )}
         >
           {results.map((result, i) => (
@@ -212,7 +212,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
               }}
               hidden={!visible(i)}
               className={cn(
-                mode === 'scene' && 'min-[900px]:absolute min-[900px]:top-0 min-[900px]:left-0 min-[900px]:w-max min-[900px]:max-w-58',
+                mode === 'scene' && 'hero:absolute hero:top-0 hero:left-0 hero:w-max hero:max-w-58',
               )}
             >
               <ResultLabel result={result} className="w-full" />
@@ -222,7 +222,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
       )}
 
       {!fallback && (
-        <div className="mt-8 flex flex-col items-start gap-1 min-[900px]:mt-2 min-[900px]:flex-row min-[900px]:flex-wrap min-[900px]:items-center min-[900px]:gap-4 min-[900px]:pl-5">
+        <div className="mt-8 flex flex-col items-start gap-1 hero:mt-2 hero:flex-row hero:flex-wrap hero:items-center hero:gap-4 hero:pl-5">
           <p className={cn('m-0 type-code text-ink-muted', hintSeen && 'invisible')}>{t('hero.hint')}</p>
           <Button variant="ghost" size="small" onClick={resetGarden}>
             {t('hero.reset')}
@@ -254,7 +254,7 @@ function TitleBlock() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-1 bottom-1 z-10 hidden grid-cols-[auto_auto] border border-ink bg-ground font-mono text-[10px] leading-[15px] font-medium tracking-[0.06em] text-ink uppercase md:max-[899px]:grid xl:grid"
+      className="pointer-events-none absolute right-1 bottom-1 z-10 hidden grid-cols-[auto_auto] border border-ink bg-ground font-mono text-[10px] leading-[15px] font-medium tracking-[0.06em] text-ink uppercase md:max-hero:grid xl:grid"
     >
       <span className={cn(cell, 'border-r border-b')}>{t('hero.drawing.sheet')}</span>
       <span className={cn(cell, 'border-b')}>{t('hero.drawing.scale')}</span>
