@@ -10,8 +10,8 @@ import { routeHead, DEFAULT_TITLE, DEFAULT_DESCRIPTION } from '#/lib/seo'
 import HeroSection           from '#/components/HeroSection'
 import TimelineSection       from '#/components/TimelineSection'
 import ProjectsSection       from '#/components/ProjectsSection'
-import SkillsSection         from '#/components/SkillsSection'
-import QASection             from '#/components/QASection'
+import StackSection          from '#/components/StackSection'
+import HowIWorkSection       from '#/components/HowIWorkSection'
 import ContactSection        from '#/components/ContactSection'
 
 export const Route = createFileRoute('/')({
@@ -46,7 +46,13 @@ export const Route = createFileRoute('/')({
       fetchStack(),
       fetchSiteSettings(),
     ])
-    return { roles, caseStudies, faq, stack: groupStack(stack), settings }
+    return {
+      roles,
+      caseStudies,
+      faq,
+      stack: { groups: groupStack(stack.techs), caseStudyCount: stack.caseStudyCount },
+      settings,
+    }
   },
   component: HomePage,
 })
@@ -58,10 +64,10 @@ function HomePage() {
   return (
     <main>
       <HeroSection />
-      <TimelineSection roles={roles} lang={lang} />
       <ProjectsSection projects={caseStudies} lang={lang} />
-      <SkillsSection groups={stack} lang={lang} />
-      <QASection items={faq} lang={lang} />
+      <TimelineSection roles={roles} lang={lang} />
+      <StackSection groups={stack.groups} caseStudyCount={stack.caseStudyCount} lang={lang} />
+      <HowIWorkSection items={faq} lang={lang} />
       <ContactSection settings={settings} />
     </main>
   )
