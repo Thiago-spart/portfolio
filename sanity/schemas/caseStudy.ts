@@ -40,7 +40,14 @@ export const caseStudy = defineType({
       // The slug type already validates uniqueness within its document type.
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: 'role', title: 'Role', type: 'reference', to: [{ type: 'role' }], group: 'overview' }),
+    defineField({
+      name: 'role',
+      title: 'Role',
+      type: 'reference',
+      to: [{ type: 'role' }],
+      group: 'overview',
+      description: 'Optional. Leave empty for work that sits outside the roles on the timeline.',
+    }),
     defineField({
       name: 'tier',
       title: 'Tier',
