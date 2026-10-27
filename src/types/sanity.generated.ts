@@ -385,6 +385,7 @@ export type Metric = {
   after: number;
   unit?: string;
   label: LocaleString;
+  qualifier?: "atLeast" | "change";
   direction: "up" | "down";
 };
 

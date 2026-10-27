@@ -13,6 +13,10 @@ describe('caseStudy schema', () => {
     expect(isRequired(fieldOf(caseStudy, name))).toBe(true)
   })
 
+  it('leaves role optional, so a case study can stand without one', () => {
+    expect(isRequired(fieldOf(caseStudy, 'role'))).toBe(false)
+  })
+
   it('sources the slug from the English title', () => {
     expect(fieldOf(caseStudy, 'slug')).toMatchObject({ options: { source: 'title.en' } })
   })
