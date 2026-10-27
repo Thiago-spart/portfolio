@@ -14,8 +14,23 @@ describe('formatMetric', () => {
   })
 
   it('shows only the after value without a before', () => {
-    expect(formatMetric({ after: -96, unit: '%' })).toBe('-96%')
     expect(formatMetric({ before: null, after: 3, unit: null })).toBe('3')
+  })
+
+  it('prints negatives with a real minus sign (U+2212), not a hyphen', () => {
+    expect(formatMetric({ after: -96, unit: '%' })).toBe('\u221296%')
+    expect(formatMetric({ after: -96, unit: '%' })).not.toContain('-')
+    expect(formatMetric({ after: -96, unit: '%', qualifier: 'change' })).toBe('−96%')
+  })
+
+  it('adds a trailing + for "at least" values', () => {
+    expect(formatMetric({ after: 95, qualifier: 'atLeast' })).toBe('95+')
+    expect(formatMetric({ after: 80, unit: '%', qualifier: 'atLeast' })).toBe('80%+')
+  })
+
+  it('shows the sign of a positive change', () => {
+    expect(formatMetric({ after: 40, unit: '%', qualifier: 'change' })).toBe('+40%')
+    expect(formatMetric({ after: 40, unit: '%', qualifier: null })).toBe('40%')
   })
 
   it('treats a before of 0 as a value, not as missing', () => {
@@ -29,5 +44,10 @@ describe('MetricTile', () => {
     const value = screen.getByText('23% → 9%')
     expect(screen.getByText('Checkout drop-off')).toBeInTheDocument()
     expect(value.parentElement).toHaveAttribute('data-direction', 'down')
+  })
+
+  it('renders qualified values', () => {
+    render(<MetricTile metric={{ after: 95, qualifier: 'atLeast', direction: 'up' }} label="Lighthouse score" />)
+    expect(screen.getByText('95+')).toBeInTheDocument()
   })
 })

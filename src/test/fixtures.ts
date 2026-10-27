@@ -37,14 +37,15 @@ export function localeBlock(en: Blocks, pt: Blocks = en, es: Blocks = en): Local
 export function metric(
   after: number,
   label: string,
-  { before = null, unit = null, direction = 'up', key = label }: {
+  { before = null, unit = null, qualifier = null, direction = 'up', key = label }: {
     before?: number | null
     unit?: string | null
+    qualifier?: 'atLeast' | 'change' | null
     direction?: 'up' | 'down'
     key?: string
   } = {},
 ) {
-  return { _key: key, before, after, unit, label: localeString({ en: label }), direction }
+  return { _key: key, before, after, unit, qualifier, label: localeString({ en: label }), direction }
 }
 
 /** A CASE_STUDIES_QUERY row (home page card). */

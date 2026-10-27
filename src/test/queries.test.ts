@@ -66,6 +66,15 @@ const dataset = [
     cover: image('image-cover-1', 'The new home page'),
     gallery: [{ ...image('image-shot-1', 'Checkout'), _key: 'g1' }],
   },
+  // No role (e.g. Bask): on the cards and its page, never on the timeline.
+  {
+    _id: 'cs-solo', _type: 'caseStudy', title: localeString({ en: 'Solo' }),
+    slug: { _type: 'slug', current: 'solo' }, tier: 'archive', startDate: '2024-07-01',
+    results: [
+      metric(40, 'Organic search', { unit: '%', qualifier: 'change', key: 'seo' }),
+      metric(45, 'Components', { qualifier: 'atLeast', key: 'components' }),
+    ],
+  },
   // No slug yet: must not produce a /projects/undefined link.
   { _id: 'cs-draft', _type: 'caseStudy', title: localeString({ en: 'No slug' }), tier: 'archive', role: ref('role-new') },
 
@@ -97,7 +106,7 @@ async function run<T>(query: string, params: Record<string, unknown> = {}): Prom
 describe('CASE_STUDIES_QUERY', () => {
   it('lists featured case studies by order, then the archive; skips ones without a slug', async () => {
     const rows = await run<{ slug: string }[]>(CASE_STUDIES_QUERY)
-    expect(rows.map((r) => r.slug)).toEqual(['first', 'second', 'archive'])
+    expect(rows.map((r) => r.slug)).toEqual(['first', 'second', 'solo', 'archive'])
   })
 
   it('projects the card fields: CDN-sized cover with alt, stack names, first result', async () => {
@@ -124,6 +133,15 @@ describe('CASE_STUDY_DETAIL_QUERY', () => {
     }])
   })
 
+  it('returns a null role and the qualifiers for a case study without a role', async () => {
+    const study = await run<any>(CASE_STUDY_DETAIL_QUERY, { slug: 'solo' })
+    expect(study.role).toBeNull()
+    expect(study.results).toMatchObject([
+      { _key: 'seo', after: 40, unit: '%', qualifier: 'change' },
+      { _key: 'components', after: 45, qualifier: 'atLeast' },
+    ])
+  })
+
   it('returns null for an unknown slug', async () => {
     expect(await run(CASE_STUDY_DETAIL_QUERY, { slug: 'nope' })).toBeNull()
   })
@@ -135,6 +153,7 @@ describe('ROLES_QUERY', () => {
     expect(roles.map((r) => r.company)).toEqual(['New Co', 'Old Co'])
     expect(roles[0].caseStudies.map((c: { slug: string }) => c.slug)).toEqual(['first', 'second'])
     expect(roles[1].caseStudies.map((c: { slug: string }) => c.slug)).toEqual(['archive'])
+    expect(roles.flatMap((r) => r.caseStudies.map((c: { slug: string }) => c.slug))).not.toContain('solo')
     expect(roles[0].stack).toEqual(['React'])
   })
 })

@@ -62,6 +62,12 @@ describe('ProjectDetails', () => {
     expect(screen.getByText('Senior Developer · Acme Corp')).toBeInTheDocument()
   })
 
+  it('renders without a role (a case study outside the timeline)', () => {
+    renderDetails({ ...baseProject, role: null })
+    expect(screen.queryByText(/Acme Corp/)).not.toBeInTheDocument()
+    expect(screen.getByText(/jan 2024/i)).toBeInTheDocument()
+  })
+
   it('renders a formatted date range when endDate is set', () => {
     renderDetails(baseProject)
     expect(screen.getByText(/jan 2024/i)).toBeInTheDocument()
@@ -104,7 +110,7 @@ describe('ProjectDetails', () => {
     expect(screen.getByText('40 → 95')).toBeInTheDocument()
     expect(screen.getByText('Lighthouse score')).toBeInTheDocument()
     expect(screen.getByText('23% → 9%').parentElement).toHaveAttribute('data-direction', 'down')
-    expect(screen.getByText('-96%')).toBeInTheDocument()
+    expect(screen.getByText('\u221296%')).toBeInTheDocument()
   })
 
   it('does not render live/source links when absent', () => {

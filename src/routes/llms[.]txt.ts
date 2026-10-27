@@ -19,7 +19,7 @@ const LLMS_CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined(s
   "title": title.en,
   "slug": slug.current,
   "summary": summary.en,
-  "results": results[]{ before, after, unit, "label": label.en }
+  "results": results[]{ before, after, unit, qualifier, "label": label.en }
 }`)
 
 // Rich-text answers flattened to plain text for the digest.
