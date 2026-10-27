@@ -4,43 +4,72 @@ import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import ContactSection from '../components/ContactSection'
 
+const renderSection = (settings?: Parameters<typeof ContactSection>[0]['settings']) =>
+  render(<LanguageProvider><ContactSection settings={settings} /></LanguageProvider>)
+
 describe('ContactSection', () => {
-  it('has the #contact anchor', () => {
-    const { container } = render(<LanguageProvider><ContactSection /></LanguageProvider>)
-    expect(container.querySelector('#contact')).toBeInTheDocument()
+  it('keeps the anchor contract with the hero: #contact labelled by a focusable #contact-heading', () => {
+    renderSection()
+    const section = screen.getByRole('region', { name: "Let's talk" })
+    expect(section).toHaveAttribute('id', 'contact')
+    expect(section).toHaveAttribute('aria-labelledby', 'contact-heading')
+    const heading = screen.getByRole('heading', { level: 2, name: "Let's talk" })
+    expect(heading).toHaveAttribute('id', 'contact-heading')
+    expect(heading).toHaveAttribute('tabindex', '-1')
+    heading.focus()
+    expect(heading).toHaveFocus()
   })
 
-  it('renders LinkedIn link with correct href', () => {
-    render(<LanguageProvider><ContactSection /></LanguageProvider>)
+  it('makes Email the primary action, a mailto link', () => {
+    renderSection()
+    const link = screen.getByRole('link', { name: /email/i })
+    expect(link).toHaveAttribute('href', 'mailto:thiagomoraes.contact@gmail.com')
+    expect(link).toHaveClass('bg-mangrove')
+    expect(link).not.toHaveAttribute('target')
+  })
+
+  it('renders LinkedIn as a secondary link that opens in a new tab', () => {
+    renderSection()
     const link = screen.getByRole('link', { name: /linkedin/i })
     expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/thiago-moraes-souza/')
     expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(link).toHaveAccessibleName(/^LinkedIn ?\(opens in a new tab\)$/)
   })
 
-  it('renders email link with mailto', () => {
-    render(<LanguageProvider><ContactSection /></LanguageProvider>)
-    const link = screen.getByRole('link', { name: /email/i })
-    expect(link).toHaveAttribute('href', 'mailto:thiagomoraes.contact@gmail.com')
+  it('shows the email address in text', () => {
+    renderSection()
+    expect(screen.getByText('thiagomoraes.contact@gmail.com')).toBeInTheDocument()
   })
 
-  it('has no GitHub card until siteSettings sets one', () => {
-    render(<LanguageProvider><ContactSection settings={null} /></LanguageProvider>)
+  it('has no GitHub link until siteSettings sets one', () => {
+    renderSection(null)
     expect(screen.queryByRole('link', { name: /github/i })).not.toBeInTheDocument()
   })
 
   it('uses the links from siteSettings', () => {
-    const settings = {
+    renderSection({
       email: 'hello@example.com',
       linkedin: 'https://www.linkedin.com/in/someone/',
       github: 'https://github.com/someone',
       seo: null,
-    }
-    render(<LanguageProvider><ContactSection settings={settings} /></LanguageProvider>)
+    })
     expect(screen.getByRole('link', { name: /email/i })).toHaveAttribute('href', 'mailto:hello@example.com')
     expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', 'https://www.linkedin.com/in/someone/')
     const github = screen.getByRole('link', { name: /github/i })
     expect(github).toHaveAttribute('href', 'https://github.com/someone')
     expect(github).toHaveAttribute('target', '_blank')
-    expect(screen.getAllByText('someone')).toHaveLength(2)
+    expect(screen.getByText('hello@example.com')).toBeInTheDocument()
+  })
+
+  it('translates the heading and labels', () => {
+    localStorage.setItem('lang', 'pt')
+    try {
+      renderSection()
+      expect(screen.getByRole('heading', { name: 'Vamos conversar' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /e-mail/i })).toBeInTheDocument()
+    } finally {
+      localStorage.clear()
+    }
   })
 })
