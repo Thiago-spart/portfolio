@@ -15,7 +15,7 @@ export interface HeroResult {
   text: string
   band: ScoreBand | null
   // How tall the proof shoot grows, 0–1 of the tallest shoot, spaced so no
-  // two gauge marks overlap (spaceHeights).
+  // two gauge marks overlap and leaders never cross (stackHeights).
   height: number
 }
 
@@ -35,24 +35,23 @@ function shootHeight({ before, after, unit }: MetricValue): number {
   return Math.min(1, Math.max(0.15, h))
 }
 
-// The gauge reads a full shoot (height 1) as 2.2 m. Marks closer than
-// MIN_GAP_M would draw as one line, so the lower one moves down; order by
-// height is kept and every mark stays between FLOOR and 1.
+// The gauge reads a full shoot (height 1) as 2.2 m. The marks stack in the
+// lane's order, top to bottom, so no two leaders cross: the first result
+// takes the highest mark (the tallest height), and each next one sits at
+// its own height or at least MIN_GAP_M under the previous mark, whichever
+// is lower. Every mark stays between FLOOR (above the waterline) and 1.
 const GAUGE_SPAN_M = 2.2
 const MIN_GAP_M = 0.35
 const FLOOR = 0.15
 
-export function spaceHeights(heights: number[], minGap = MIN_GAP_M / GAUGE_SPAN_M): number[] {
-  const order = heights.map((h, i) => ({ h, i })).sort((a, b) => b.h - a.h || a.i - b.i)
+export function stackHeights(heights: number[], minGap = MIN_GAP_M / GAUGE_SPAN_M): number[] {
+  if (heights.length === 0) return []
   const out = [...heights]
-  // Top down: each mark at least minGap under the one above it.
-  order.forEach(({ h, i }, k) => {
-    out[i] = k === 0 ? Math.min(1, h) : Math.min(h, out[order[k - 1].i] - minGap)
-  })
+  out[0] = Math.min(1, Math.max(...heights))
+  for (let i = 1; i < out.length; i++) out[i] = Math.min(heights[i], out[i - 1] - minGap)
   // Bottom up: nothing under the floor; push the stack up if needed.
-  for (let k = order.length - 1; k >= 0; k--) {
-    const i = order[k].i
-    const below = k === order.length - 1 ? FLOOR - minGap : out[order[k + 1].i]
+  for (let i = out.length - 1; i >= 0; i--) {
+    const below = i === out.length - 1 ? FLOOR - minGap : out[i + 1]
     out[i] = Math.min(1, Math.max(out[i], below + minGap))
   }
   return out.map((h) => Math.round(h * 1000) / 1000)
@@ -89,6 +88,6 @@ export function toHeroResults(rows: HERO_RESULTS_QUERY_RESULT | undefined, lang:
       },
     ]
   }).slice(0, 3)
-  const spaced = spaceHeights(results.map((r) => r.height))
+  const spaced = stackHeights(results.map((r) => r.height))
   return results.map((r, i) => ({ ...r, height: spaced[i] }))
 }
