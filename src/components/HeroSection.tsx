@@ -43,7 +43,7 @@ export default function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="font-display text-[clamp(3rem,7vw,6rem)] leading-none tracking-wider text-ink">
+            <h1 className="font-display text-[clamp(3rem,7vw,6rem)] leading-none text-ink">
               <span className="block">{t('hero.headline.line1')}</span>
               <span
                 className="block"

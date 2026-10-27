@@ -27,7 +27,7 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
 
       {results.length > 0 && (
         <div className="mt-6">
-          <h3 className="font-display text-2xl tracking-wide text-ink">
+          <h3 className="font-display text-2xl text-ink">
             {t('project.highlights')}
           </h3>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -90,7 +90,7 @@ export default function ProjectDetails({ project, lang }: ProjectDetailsProps) {
 
       {gallery.length > 0 && (
         <div className="mt-10">
-          <h3 className="font-display text-2xl tracking-wide text-ink">
+          <h3 className="font-display text-2xl text-ink">
             {t('project.gallery')}
           </h3>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

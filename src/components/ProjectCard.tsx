@@ -38,7 +38,7 @@ export default function ProjectCard({ project, lang }: ProjectCardProps) {
       <div className="absolute inset-0 bg-gradient-to-t from-ground via-transparent to-transparent" />
 
       <div className="relative z-10 flex h-full flex-col justify-end gap-2 p-5">
-        <h3 className="font-display text-2xl tracking-wide text-ink transition-colors group-hover:text-mangrove">
+        <h3 className="font-display text-2xl text-ink transition-colors group-hover:text-mangrove">
           {project.title[lang]}
         </h3>
         {project.summary?.[lang] && (

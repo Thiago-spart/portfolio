@@ -278,13 +278,13 @@ export default function ProjectHero({
 
               <div className="relative z-10 flex w-full flex-col items-center justify-center gap-4 text-center">
                 <motion.h2
-                  className="font-display text-4xl tracking-wider text-ink md:text-5xl lg:text-6xl"
+                  className="font-display text-4xl text-ink md:text-5xl lg:text-6xl"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className="text-center font-display text-4xl tracking-wider text-ink md:text-5xl lg:text-6xl"
+                  className="text-center font-display text-4xl text-ink md:text-5xl lg:text-6xl"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}

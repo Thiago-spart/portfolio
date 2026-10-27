@@ -33,7 +33,7 @@ export const Route = createFileRoute('/projects/$slug')({
 function ProjectNotFound() {
   return (
     <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
-      <p className="font-display text-3xl tracking-wider text-ink">Project not found</p>
+      <p className="font-display text-3xl text-ink">Project not found</p>
       <a href="/#projects" className="text-sm font-semibold text-mangrove">
         ← Back to projects
       </a>
