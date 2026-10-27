@@ -26,6 +26,7 @@ describe('formatResultPhrase', () => {
   it('lowercases the label after the number', () => {
     expect(formatResultPhrase(metric(90, 'Test coverage', { unit: '%' }), 'en')).toBe('90% test coverage')
     expect(formatResultPhrase(metric(-96, 'Production bugs', { unit: '%' }), 'en')).toBe('−96% production bugs')
+    expect(formatResultPhrase(metric(80, 'Screens in Storybook', { unit: '%' }), 'en')).toBe('80% screens in Storybook')
   })
   it('keeps names capitalized', () => {
     expect(formatResultPhrase(metric(95, 'Lighthouse', { qualifier: 'atLeast' }), 'en')).toBe('95+ Lighthouse')

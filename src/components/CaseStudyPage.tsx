@@ -150,7 +150,7 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
           alt={caseStudy.cover.alt[lang]}
           width={2240}
           height={1120}
-          className="aspect-8/5 h-auto w-full rounded-md border border-line bg-surface-sunken object-cover md:aspect-2/1"
+          className="aspect-2/1 h-auto w-full rounded-md border border-line bg-surface-sunken object-cover"
         />
       )}
 

@@ -60,12 +60,13 @@ const PROPER_LEADS = new Set(['Lighthouse'])
  * A result as one phrase for the archive row: "90% test coverage",
  * "95+ Lighthouse", "3.5 → 4.8 App Store rating". The label reads in
  * sentence case after the number, so its capital is dropped unless the
- * label looks like a name (a known proper noun, or more capitals after).
+ * label starts with a name (a known proper noun, a capitalized second word
+ * as in "App Store rating", or an inner capital as in "iOS").
  */
 export function formatResultPhrase(result: Result, lang: Lang): string {
   const label = result.label[lang]
-  const [lead = '', ...rest] = label.split(' ')
-  const keepsCapital = PROPER_LEADS.has(lead) || rest.some((word) => /^\p{Lu}/u.test(word)) || /\p{Lu}/u.test(lead.slice(1))
+  const [lead = '', second = ''] = label.split(' ')
+  const keepsCapital = PROPER_LEADS.has(lead) || /^\p{Lu}/u.test(second) || /\p{Lu}/u.test(lead.slice(1))
   const phrase = keepsCapital ? label : label.charAt(0).toLocaleLowerCase(lang) + label.slice(1)
   return `${formatMetric(result)} ${phrase}`
 }
