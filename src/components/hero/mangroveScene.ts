@@ -280,7 +280,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   const nightOnly: THREE.Object3D[] = []
 
   // ---- Two mangroves whose prop roots tangle together ----
-  const treeXs = small ? [-0.9, 0.9] : [-1.0, 1.0]
+  const treeXs = small ? [-1.0, 1.0] : [-1.3, 1.3]
   const rootsPerTree = small ? 4 : 5
   const lines: number[] = []
   const hatchPairs: number[] = []
@@ -303,8 +303,9 @@ export function createScene(opts: SceneOptions): MangroveScene {
 
     // Prop roots: start on the trunk 20–60% up, bow outward and down, dive in.
     for (let k = 0; k < rootsPerTree; k++) {
-      let side = k % 2 ? 1 : -1
-      if (rand() < 0.25) side = -side
+      // Alternate sides so each trunk stands on roots both ways.
+      const side = k % 2 ? 1 : -1
+      rand()
       const f = 0.2 + rand() * 0.4
       const S = trunkAt(f)
       S.x += side * 0.07
@@ -493,7 +494,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   for (let i = 0; i <= 6; i++) {
     const y = GAUGE_ZERO + i * 0.5
-    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[10px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.14, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
+    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[10px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
     a.el.textContent = (i * 0.5).toFixed(1)
   }
   const tideAnno = anno(CALLOUT, () => V(gx - 0.88, tide - 0.95, gaugeZ), { align: 'right', minWidth: 640 })
@@ -750,6 +751,8 @@ export function createScene(opts: SceneOptions): MangroveScene {
   // The drawing is fitted into a band of the box. From 900px the band leaves
   // a strip on the right for the results lane.
   const band = { x0: 0.03, x1: 0.97, y0: 0.04, y1: 0.96 }
+  // The box size, measured on resize only (reading it per frame forces layout).
+  const size = { w: 0, h: 0 }
   const drawing = { x0: 0, x1: 0, y0: 0, y1: 0 }
   const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
   const camPos = V(0, 0, 0)
@@ -762,7 +765,8 @@ export function createScene(opts: SceneOptions): MangroveScene {
   function measureBand() {
     const w = container.clientWidth
     const annotated = w >= 640
-    drawing.x0 = treeLeft - (annotated ? 0.9 : 0.15)
+    // Room on the left for the "1 Prop root" callout.
+    drawing.x0 = treeLeft - (annotated ? 1.6 : 0.15)
     drawing.x1 = gx + 0.3
     drawing.y0 = annotated ? -1.45 : -0.9
     drawing.y1 = canopyTop + (annotated ? 0.45 : 0.15)
@@ -795,6 +799,8 @@ export function createScene(opts: SceneOptions): MangroveScene {
     const w = container.clientWidth
     const h = container.clientHeight
     if (!w || !h) return
+    size.w = w
+    size.h = h
     renderer.setSize(w, h, false)
     lineMats.forEach((m) => m.resolution.set(w, h))
     growHeight = w < 900 ? 1.6 : 2.2
@@ -865,9 +871,21 @@ export function createScene(opts: SceneOptions): MangroveScene {
     return { x: ((v3.x + 1) / 2) * w, y: ((1 - v3.y) / 2) * h, ok: v3.z < 1 && Math.abs(v3.x) < 1.15 && Math.abs(v3.y) < 1.15 }
   }
   let tideShown = ''
+  // DOM writes only when a value changed: rewriting every label each frame
+  // costs a style and layout pass per frame.
+  const written = new WeakMap<Element, string>()
+  function write(el: Element, key: 'transform' | 'points' | 'hidden', value: string) {
+    const prev = written.get(el)
+    const next = `${key}:${value}`
+    if (prev === next) return
+    written.set(el, next)
+    if (key === 'transform') (el as HTMLElement).style.transform = value
+    else if (key === 'hidden') (el as HTMLElement).hidden = value === '1'
+    else el.setAttribute('points', value)
+  }
   function placeLabels() {
-    const w = container.clientWidth
-    const h = container.clientHeight
+    const w = size.w
+    const h = size.h
     const tideText = labels.tide.replace('{value}', fmtSigned(tide - GAUGE_ZERO))
     if (tideText !== tideShown) {
       tideAnno.el.textContent = tideText
@@ -876,12 +894,17 @@ export function createScene(opts: SceneOptions): MangroveScene {
     for (const a of annos) {
       const p = project(a.getPos(), w, h)
       const show = p.ok && w >= a.minWidth
-      a.el.hidden = !show
-      if (!show) continue
+      if (!show) {
+        a.el.hidden = true
+        written.delete(a.el)
+        continue
+      }
+      a.el.hidden = false
       const shift = a.align === 'right' ? 'translate(-100%, -50%)' : a.align === 'center-above' ? 'translate(-50%, -100%)' : 'translate(0, -50%)'
-      a.el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) ${shift}`
+      write(a.el, 'transform', `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) ${shift}`)
     }
     dims.visible = w >= 640
+    tideCallout.visible = w >= 640
 
     // The lane: one slot per result from the top of the gauge down, each
     // with a leader to its mark on the gauge.
@@ -896,11 +919,12 @@ export function createScene(opts: SceneOptions): MangroveScene {
     proofs.forEach((pr, i) => {
       const el = els[i]
       const y = top + i * slot
-      if (el) el.style.transform = `translate(${laneX.toFixed(1)}px, ${y.toFixed(1)}px)`
+      if (el) write(el, 'transform', `translate(${laneX.toFixed(1)}px, ${y.toFixed(1)}px)`)
       const height = pr.height * growHeight * easeOut(pr.t)
       const mark = project(V(gx + 0.16, tide + height, gaugeZ), w, h)
       const midY = y + 30
-      leaderPaths[i].setAttribute(
+      write(
+        leaderPaths[i],
         'points',
         pr.shown ? `${(laneX - 2).toFixed(1)},${midY.toFixed(1)} ${(laneX - 10).toFixed(1)},${midY.toFixed(1)} ${(mark.x + 2).toFixed(1)},${mark.y.toFixed(1)}` : '',
       )
@@ -994,11 +1018,17 @@ export function createScene(opts: SceneOptions): MangroveScene {
   const running = () => heroVisible && !document.hidden && !destroyed
   const idleOn = () => idleReady && !idleDropped && !reducedMotion
 
-  function draw() {
+  // Idle-only frames (shimmer, drifting water) move nothing the labels
+  // follow, so they skip the DOM entirely.
+  function draw(labelsToo = true) {
     renderer.render(scene, camera)
-    placeLabels()
-    canvas.classList.remove('opacity-0')
+    if (labelsToo) placeLabels()
+    if (!shownOnce) {
+      shownOnce = true
+      canvas.classList.remove('opacity-0')
+    }
   }
+  let shownOnce = false
 
   const frameCosts: number[] = []
   function measureFrame(cost: number) {
@@ -1034,7 +1064,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
       if (idleAcc >= IDLE_STEP) {
         idleAcc %= IDLE_STEP
         applyIdle(idleClock)
-        draw()
+        draw(false)
       }
     }
     measureFrame(performance.now() - t0)
@@ -1057,17 +1087,26 @@ export function createScene(opts: SceneOptions): MangroveScene {
     raf = requestAnimationFrame(loop)
   }
 
+  // Idle motion starts once the visitor engages (pointer over the hero, a
+  // touch, a key or a scroll), then waits for an idle moment. Until then the
+  // drawing is still and costs nothing after its first frame, which keeps
+  // the page's load (and its blocking time on slow phones) clean.
   let idleHandle = 0
   function startIdle() {
     if (reducedMotion) return
     const idle = (cb: () => void) =>
-      'requestIdleCallback' in window ? window.requestIdleCallback(cb, { timeout: 3000 }) : (setTimeout(cb, 1500) as unknown as number)
-    requestAnimationFrame(() => {
+      'requestIdleCallback' in window ? window.requestIdleCallback(cb, { timeout: 3000 }) : (setTimeout(cb, 300) as unknown as number)
+    const engage = () => {
+      stopListening()
       idleHandle = idle(() => {
         idleReady = true
         wake()
       })
-    })
+    }
+    const events = ['pointerover', 'touchstart', 'keydown', 'scroll'] as const
+    const stopListening = () => events.forEach((type) => (type === 'pointerover' ? hero : window).removeEventListener(type, engage))
+    events.forEach((type) => (type === 'pointerover' ? hero : window).addEventListener(type, engage, { passive: true }))
+    cleanups.push(stopListening)
   }
 
   const io = new IntersectionObserver(([entry]) => {
