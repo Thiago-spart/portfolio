@@ -9,6 +9,21 @@ pnpm install
 pnpm dev
 ```
 
+# Sanity Studio
+
+The content Studio lives in `sanity/`, versioned with the code that queries it. It is a
+separate pnpm project with its own `package.json` and lockfile (not a workspace of the app).
+
+```bash
+pnpm --dir sanity install
+pnpm --dir sanity dev      # Studio on http://localhost:3333
+pnpm --dir sanity build    # static build into sanity/dist
+```
+
+Project ID and dataset default to `wbbntp0o` / `production` (see `sanity/env.ts`); override
+with `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET`. Schemas are in `sanity/schemas/`;
+their tests run with the app's `pnpm test`.
+
 # Building For Production
 
 To build this application for production:
