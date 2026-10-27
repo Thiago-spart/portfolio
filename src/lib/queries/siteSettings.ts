@@ -25,15 +25,15 @@ export const fetchSiteSettings = createServerFn({ method: 'GET' }).handler(() =>
 )
 
 // The three hero results, each resolved to the metric it points at inside
-// its case study (heroResult stores that metric's _key). Not rendered yet:
-// the hero redesign (Figma "Result label" lane) will consume it.
+// its case study (heroResult stores that metric's _key). Rendered by the
+// hero's results lane (Figma "Result label").
 export const HERO_RESULTS_QUERY = defineQuery(`*[_id == "siteSettings"][0].heroResults[]{
   _key,
   "caseStudy": caseStudy->{ title, "slug": slug.current },
   "result": caseStudy->results[_key == ^.resultKey][0]{ ${METRIC_FIELDS} }
 }`)
 
-/** @public No caller until the hero redesign; kept typed and tested meanwhile. */
+// Server function — see fetchRoles.
 export const fetchHeroResults = createServerFn({ method: 'GET' }).handler(() =>
   sanityClient.fetch(HERO_RESULTS_QUERY),
 )
