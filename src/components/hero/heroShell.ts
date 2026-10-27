@@ -46,23 +46,34 @@ export function hasWebGL(): boolean {
   }
 }
 
-// Runs `cb` once the page has loaded and the browser is idle, so the scene
-// never competes with the headline for the first paint. Returns a cancel.
-export function whenIdleAfterLoad(cb: () => void): () => void {
-  let cancelled = false
-  let idleId: number | null = null
-  let timer: ReturnType<typeof setTimeout> | null = null
-  const run = () => {
-    if (cancelled) return
-    if ('requestIdleCallback' in window) idleId = window.requestIdleCallback(() => !cancelled && cb(), { timeout: 2000 })
-    else timer = setTimeout(() => !cancelled && cb(), 200)
+// Runs `cb` once, on the visitor's first sign of engagement (pointer,
+// touch, key, wheel or scroll) after the page has loaded. Until then the SVG
+// poster is the hero: the three.js scene costs ~600 ms of main-thread work
+// to build, and loading it on idle put that inside the mobile page-load
+// window (Lighthouse TBT 650-810 ms on the Vercel preview). Desktop
+// visitors move the pointer almost at once, so they still get the scene
+// straight away. Returns a cancel.
+const ENGAGE_EVENTS = ['pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'] as const
+
+export function whenEngaged(cb: () => void): () => void {
+  let done = false
+  const fire = () => {
+    if (done) return
+    done = true
+    detach()
+    cb()
   }
-  if (document.readyState === 'complete') run()
-  else window.addEventListener('load', run, { once: true })
+  const detach = () => {
+    for (const type of ENGAGE_EVENTS) window.removeEventListener(type, fire)
+    window.removeEventListener('load', attach)
+  }
+  const attach = () => {
+    for (const type of ENGAGE_EVENTS) window.addEventListener(type, fire, { once: true, passive: true })
+  }
+  if (document.readyState === 'complete') attach()
+  else window.addEventListener('load', attach, { once: true })
   return () => {
-    cancelled = true
-    window.removeEventListener('load', run)
-    if (idleId != null) window.cancelIdleCallback(idleId)
-    if (timer != null) clearTimeout(timer)
+    done = true
+    detach()
   }
 }

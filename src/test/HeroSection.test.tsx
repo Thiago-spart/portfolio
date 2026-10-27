@@ -80,6 +80,13 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+// The scene loads on the first pointer, touch, key, wheel or scroll.
+function engage() {
+  act(() => {
+    window.dispatchEvent(new Event('pointermove'))
+  })
+}
+
 describe('HeroSection', () => {
   it('server-renders the headline, the buttons and the poster', () => {
     const html = renderToString(
@@ -152,8 +159,11 @@ describe('HeroSection', () => {
     }
   })
 
-  it('loads the 3D scene after first paint and passes it the drawing box', async () => {
+  it('keeps the poster until the visitor engages, then loads the 3D scene with the drawing box', async () => {
     renderHero()
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(scene.options).toBeNull()
+    engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     const options = scene.options!
     expect(options.results.map((r) => r.height)).toEqual([0.95, 0.96, expect.closeTo(0.61, 2)])
@@ -168,6 +178,7 @@ describe('HeroSection', () => {
     renderHero()
     const hint = screen.getByText(/Click or tap the water/)
     expect(hint).not.toHaveClass('invisible')
+    engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
 
     act(() => scene.options!.onPlant())
@@ -190,6 +201,7 @@ describe('HeroSection', () => {
 
   it('cleans up the scene on unmount', async () => {
     const { unmount } = renderHero()
+    engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     unmount()
     expect(scene.destroy).toHaveBeenCalled()
@@ -222,6 +234,7 @@ describe('goToContact (the mango)', () => {
 
   it('is what the scene calls when the mango is clicked', async () => {
     renderHero()
+    engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     expect(scene.options!.onMango).toBe(goToContact)
   })

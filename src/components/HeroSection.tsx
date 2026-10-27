@@ -15,7 +15,7 @@ import {
   hasWebGL,
   prefersReducedMotion,
   readStore,
-  whenIdleAfterLoad,
+  whenEngaged,
   writeStore,
 } from './hero/heroShell'
 import type { MangroveScene, SceneLabels } from './hero/mangroveScene'
@@ -107,7 +107,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
     }
 
     let disposed = false
-    const cancel = whenIdleAfterLoad(() => {
+    const cancel = whenEngaged(() => {
       import('./hero/mangroveScene')
         .then(({ createScene }) => {
           const box = boxRef.current
