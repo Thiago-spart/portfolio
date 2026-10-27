@@ -29,7 +29,7 @@ export function Section({ id, heading, lede, className, children }: SectionProps
     <section
       id={id}
       aria-labelledby={headingId}
-      className={cn('scroll-mt-4 py-16 md:py-24', className)}
+      className={cn('scroll-mt-16 py-16 md:py-24', className)}
     >
       <Container>
         {heading && (

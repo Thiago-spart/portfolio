@@ -13,6 +13,7 @@ import ProjectsSection       from '#/components/ProjectsSection'
 import StackSection          from '#/components/StackSection'
 import HowIWorkSection       from '#/components/HowIWorkSection'
 import ContactSection        from '#/components/ContactSection'
+import SheetIndex            from '#/components/SheetIndex'
 import type { SITE_SETTINGS_QUERY_RESULT } from '#/types/sanity.generated'
 
 // siteSettings is loaded once by the root route (the footer needs it too).
@@ -70,6 +71,7 @@ function HomePage() {
 
   return (
     <main>
+      <SheetIndex />
       <HeroSection results={heroResults} />
       <ProjectsSection projects={caseStudies} lang={lang} />
       <TimelineSection roles={roles} lang={lang} />

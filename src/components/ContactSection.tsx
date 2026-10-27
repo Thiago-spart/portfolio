@@ -26,7 +26,7 @@ export default function ContactSection({ settings }: Props) {
   const newTab = <span className="sr-only"> {t('contact.newTab')}</span>
 
   return (
-    <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-4 py-16 md:py-24">
+    <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-16 py-16 md:py-24">
       <Container className="flex flex-col items-start gap-6">
         <h2
           id="contact-heading"
