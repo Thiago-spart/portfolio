@@ -17,6 +17,7 @@ export type Issue = { id: string; path: string; message: string }
 const NEW_TYPES = ['tech', 'role', 'caseStudy', 'faq', 'siteSettings']
 export const TIERS = ['featured', 'archive']
 export const DIRECTIONS = ['up', 'down']
+export const QUALIFIERS = ['atLeast', 'change']
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 const URL_RE = /^https?:\/\/[^\s]+$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -157,6 +158,8 @@ export function validateDocuments(docs: Doc[], opts: { assetIds?: Set<string>; l
           if (m.before != null && typeof m.before !== 'number') err(`${p}.before`, 'not a number')
           if (m.unit != null && typeof m.unit !== 'string') err(`${p}.unit`, 'not a string')
           if (!DIRECTIONS.includes(m.direction)) err(`${p}.direction`, `"${m.direction}" is not up/down`)
+          if (m.qualifier != null && !QUALIFIERS.includes(m.qualifier)) err(`${p}.qualifier`, `"${m.qualifier}" is not a qualifier`)
+          if (m.qualifier === 'change' && m.before != null) err(`${p}.qualifier`, 'A change has no Before value')
           localeString(`${p}.label`, m.label)
         })
         stack(doc.stack)

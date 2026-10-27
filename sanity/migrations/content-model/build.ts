@@ -23,7 +23,8 @@ import {
 } from './mapping.ts'
 import {
   ALT_BY_ASSET, AVAILABILITY, COMPANY_URL_OVERRIDES, CONTACT, FAQ_KEEP, FEATURED, HERO_RESULTS,
-  FAQ_CUT_REASONS, HIGHLIGHTS_FOLDED_INTO_RESULTS, METRICS, MISFITS, ROLE_SUMMARIES, SEO, SKILL_CATEGORY_DEFAULTS, TRIM_UNUSED_IN,
+  FAQ_CUT_REASONS, HIGHLIGHTS_FOLDED_INTO_RESULTS, KEEP_UNUSED, METRICS, MISFITS, ROLE_SUMMARIES, SEO, SKILL_CATEGORY_DEFAULTS,
+  STACK_ADDITIONS, TRIM_UNUSED_IN,
 } from './content.ts'
 
 // Snapshot documents are untyped JSON.
@@ -68,9 +69,15 @@ export function buildDocuments(snapshot: Doc[], idFor: (sourceKey: string) => st
     }
     return names
   }
+  for (const id of Object.keys(STACK_ADDITIONS)) {
+    if (![...experiences, ...projects].some((d) => d._id === id)) throw new Error(`STACK_ADDITIONS: no experience or project ${id}`)
+  }
+  for (const name of KEEP_UNUSED) if (!(name in CANONICAL)) throw new Error(`KEEP_UNUSED: "${name}" is not a canonical tech name`)
+  // The old techStack strings plus the approved additions from content.ts.
+  const rawStack = (d: Doc): string[] => [...(d.techStack ?? []), ...(STACK_ADDITIONS[d._id] ?? [])]
   const stacks = new Map<string, string[]>()
   for (const d of [...experiences, ...projects]) {
-    const names = stackOf(d.techStack, `${d._type} ${d._id}`)
+    const names = stackOf(rawStack(d), `${d._type} ${d._id}`)
     stacks.set(d._id, names)
     for (const n of names) used.set(n, (used.get(n) ?? 0) + 1)
   }
@@ -95,7 +102,7 @@ export function buildDocuments(snapshot: Doc[], idFor: (sourceKey: string) => st
       if (canon.length === 0) throw new Error(`Unknown skill "${raw}": add it to CANONICAL in mapping.ts`)
       for (const name of canon) {
         const category = CANONICAL[name].category
-        if (TRIM_UNUSED_IN.includes(category) && !used.has(name)) {
+        if (TRIM_UNUSED_IN.includes(category) && !used.has(name) && !KEEP_UNUSED.includes(name)) {
           dropped.push({ name: raw === name ? name : `${raw} (→ ${name})`, category: title, reason: `Not in any role or case study stack (${category} trimmed, #43)` })
           continue
         }
@@ -104,7 +111,7 @@ export function buildDocuments(snapshot: Doc[], idFor: (sourceKey: string) => st
     }
   }
   for (const d of [...experiences, ...projects]) {
-    for (const raw of d.techStack ?? []) for (const name of normalizeTech(raw)) addTech(name, raw)
+    for (const raw of rawStack(d)) for (const name of normalizeTech(raw)) addTech(name, raw)
   }
 
   const techIds = new Map<string, string>()
@@ -171,8 +178,7 @@ export function buildDocuments(snapshot: Doc[], idFor: (sourceKey: string) => st
         const _key = keyFor('metric', slug, m.id)
         resultKeys.set(`${slug}:${m.id}`, _key)
         const notes = [
-          parsed.atLeast ? `"${m.raw}" stored as ${numbers.after}: the "+" is lost` : null,
-          parsed.signed && numbers.after > 0 ? 'the "+" sign is lost (renders as a level)' : null,
+          numbers.qualifier ? `qualifier ${numbers.qualifier}` : null,
           m.isChange && m.direction === 'down' ? 'reduction stored as a negative after' : null,
         ].filter(Boolean)
         metricsReport.push({ target: slug, id: m.id, source: m.source, raw: m.raw, stored: JSON.stringify({ ...numbers, direction: m.direction }), note: notes.join('; ') || undefined })

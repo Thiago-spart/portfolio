@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { matchRole, normalizeTech, parseMetricValue, techKey, toBlocks, toMetricNumbers, TECH_CATEGORIES } from './mapping.ts'
 import { buildDocuments, readNdjson } from './build.ts'
-import { assetIdsIn, DIRECTIONS, TIERS, validateDocuments } from './validate.ts'
+import { assetIdsIn, DIRECTIONS, QUALIFIERS, TIERS, validateDocuments } from './validate.ts'
 import { tech } from '../../schemas/tech'
 import { caseStudy } from '../../schemas/caseStudy'
 import { metric, formatMetric } from '../../schemas/objects/metric'
@@ -38,12 +38,21 @@ describe('parseMetricValue', () => {
 })
 
 describe('toMetricNumbers', () => {
-  it('stores a reduction without a baseline as a negative after', () => {
-    expect(toMetricNumbers(parseMetricValue('96%')!, 'down', true)).toEqual({ after: -96, unit: '%' })
+  it('stores a reduction without a baseline as a negative change', () => {
+    expect(toMetricNumbers(parseMetricValue('96%')!, 'down', true)).toEqual({ after: -96, unit: '%', qualifier: 'change' })
   })
 
   it('leaves an already negative reduction alone', () => {
-    expect(toMetricNumbers(parseMetricValue('−96%')!, 'down', true)).toEqual({ after: -96, unit: '%' })
+    expect(toMetricNumbers(parseMetricValue('−96%')!, 'down', true)).toEqual({ after: -96, unit: '%', qualifier: 'change' })
+  })
+
+  it('keeps growth as a positive change', () => {
+    expect(toMetricNumbers(parseMetricValue('+40%')!, 'up', true)).toEqual({ after: 40, unit: '%', qualifier: 'change' })
+  })
+
+  it('stores "N+" as an at-least value', () => {
+    expect(toMetricNumbers(parseMetricValue('95+')!, 'up', false)).toEqual({ after: 95, qualifier: 'atLeast' })
+    expect(toMetricNumbers(parseMetricValue('80%+')!, 'up', false)).toEqual({ after: 80, unit: '%', qualifier: 'atLeast' })
   })
 
   it('keeps levels and before → after pairs as written', () => {
@@ -54,8 +63,14 @@ describe('toMetricNumbers', () => {
 
   it('renders the hero numbers the way the schema preview formats them', () => {
     expect(formatMetric(toMetricNumbers(parseMetricValue('40 → 95')!, 'up', false))).toBe('40 → 95')
-    expect(formatMetric(toMetricNumbers(parseMetricValue('96%')!, 'down', true))).toBe('-96%')
+    expect(formatMetric(toMetricNumbers(parseMetricValue('96%')!, 'down', true))).toBe('\u221296%')
     expect(formatMetric(toMetricNumbers(parseMetricValue('23% → 9%')!, 'down', false))).toBe('23% → 9%')
+  })
+
+  it('renders the qualified values as written in the source', () => {
+    expect(formatMetric(toMetricNumbers(parseMetricValue('+40%')!, 'up', true))).toBe('+40%')
+    expect(formatMetric(toMetricNumbers(parseMetricValue('95+')!, 'up', false))).toBe('95+')
+    expect(formatMetric(toMetricNumbers(parseMetricValue('80%+')!, 'up', false))).toBe('80%+')
   })
 })
 
@@ -152,6 +167,24 @@ describe('build + validate on the committed snapshot', () => {
     expect(distinctHeroResults(settings.heroResults)).toBe(true)
   })
 
+  it('keeps the approved practices and Claude Code, linked where the text shows them', () => {
+    const techId = (name: string) => docs.find((d) => d._type === 'tech' && d.name === name)?._id
+    const stackOf = (type: string, match: (d: Record<string, any>) => boolean) =>
+      ((docs.find((d) => d._type === type && match(d))?.stack ?? []) as { _ref: string }[]).map((r) => r._ref)
+    for (const name of ['Headless CMS', 'Code review & pair programming', 'Code splitting & lazy loading', 'Design systems & tokens', 'Claude Code']) {
+      expect(techId(name), name).toBeDefined()
+    }
+    expect(stackOf('caseStudy', (d) => d.slug.current === 'redacao-online-landing-page-migration')).toContain(techId('Headless CMS'))
+    expect(stackOf('caseStudy', (d) => d.slug.current === 'customer-assistance-internal-tool-capitual')).toContain(techId('Design systems & tokens'))
+    expect(stackOf('role', (d) => d.company === 'Freelance (Independent Contracts)')).toContain(techId('Code splitting & lazy loading'))
+  })
+
+  it('leaves Bask without a role', () => {
+    const bask = docs.find((d) => d._type === 'caseStudy' && d.slug.current === 'bask-telehealth-platform-3d')
+    expect(bask).toBeDefined()
+    expect(bask!.role).toBeUndefined()
+  })
+
   it('drops every Operating Systems skill', () => {
     const os = report.dropped.filter((d) => d.category === 'Operating Systems').map((d) => d.name)
     expect(os).toContain('Arch Linux')
@@ -161,6 +194,7 @@ describe('build + validate on the committed snapshot', () => {
   it('validator lists match the schema options', () => {
     expect(TIERS).toEqual(listValues(caseStudy, 'tier'))
     expect(DIRECTIONS).toEqual(listValues(metric, 'direction'))
+    expect(QUALIFIERS).toEqual(listValues(metric, 'qualifier'))
   })
 
   it('validator catches a broken hero result', () => {

@@ -26,6 +26,27 @@ export const SKILL_CATEGORY_DEFAULTS: Record<string, string | null> = {
 // an item in one of these that no techStack references is dropped.
 export const TRIM_UNUSED_IN: string[] = ['ai', 'practice']
 
+// Kept although no stack references them (approved 2026-10-27). Each is a
+// tech document; the Stack section only lists techs a role or case study
+// references, so these stay off it until something links them.
+export const KEEP_UNUSED: string[] = ['Claude Code']
+
+// Techs the old stacks left out but the text clearly shows (approved
+// 2026-10-27). Keyed by old document _id; added to that role's or case
+// study's stack, which also keeps them from being trimmed.
+export const STACK_ADDITIONS: Record<string, string[]> = {
+  // Redação Online – landing page: "turning WordPress into a Headless CMS behind a dedicated Next.js BFF layer"
+  'goWIk3h6SuGMXzHRsOCwz9': ['Headless CMS'],
+  // Capitual internal administration tool: "regular pair programming sessions and code review"
+  'goWIk3h6SuGMXzHRsL16Ih': ['Code review & pair programming'],
+  // Capitual customer assistance tool: "Converted Figma design tokens into pixel-perfect components",
+  // "mentored two junior developers through pair programming and code review"
+  'VFYot6xKbKJzLTTu0Lgugc': ['Design systems & tokens', 'Code review & pair programming'],
+  // Freelance (Independent Contracts) role: no case study shows it; the role says
+  // "reduced client-side bundle sizes using code splitting & lazy loading"
+  'YBlKZ1cd22qYaJmOB4l9Sp': ['Code splitting & lazy loading'],
+}
+
 // ---------------------------------------------------------------------------
 // Roles
 // ---------------------------------------------------------------------------
@@ -237,15 +258,15 @@ export const MISFITS: Misfit[] = [
     problem: 'Not a measurement.', proposal: 'Folded into the Capitual internal tools approach (already in its highlights). Nothing to do.' },
   { source: 'experience Freelance (Independent Contracts) · h1', value: '95+/98+', label: 'Lighthouse performance (mobile & desktop)',
     problem: 'Two values in one, both "at least"; and the role\'s only case study (Electromaps) is a mobile app, so the web scores have no case study to live on.',
-    proposal: 'Kept in the role summary text. If you want it as a metric, create a case study for one of those web contracts and add two metrics (mobile 95, desktop 98), or add a `qualifier` field to `metric` for "+".' },
+    proposal: 'Kept in the role summary text. If you want it as metrics, create a case study for one of those web contracts and add two metrics with qualifier "atLeast" (mobile 95+, desktop 98+).' },
   { source: 'experience Freelance (Independent Contracts) · h2', value: '100', label: 'Accessibility score achieved',
     problem: 'Fits the schema, but no case study for the web contracts it came from.', proposal: 'Kept in the role summary. Same fix as above.' },
   { source: 'experience Freelance (Independent Contracts) · h3', value: '3 wks', label: 'Avg. MVP delivery time for mobile projects',
     problem: 'An average across projects, not one case study\'s result; the only case study here (Electromaps) took 3 months.',
     proposal: 'Kept in the role summary. Do not attach it to Electromaps.' },
   { source: 'experience Government of Pernambuco · h1–h5', value: '70k+ · 13 · 14 · 90+ · 30%', label: 'Active users · Schools · Blogs & portals · Lighthouse · Bundle size',
-    problem: 'No project/case study exists for this role, so there is nowhere to attach metrics. "70k+" would also render as 70000 (no "k", no "+").',
-    proposal: 'Numbers kept in the role summary. Strong candidate for a new case study (school app, 70k+ users); then add metrics, with a `qualifier` field or unit "k" for 70k+.' },
+    problem: 'No project/case study exists for this role, so there is nowhere to attach metrics.',
+    proposal: 'Numbers kept in the role summary. Strong candidate for a new case study (school app, 70k+ users); then add metrics: after 70, unit "k", qualifier "atLeast" renders "70k+".' },
   { source: 'experience Plin · h1–h3', value: '30% · 100% · 70%', label: 'Faster feature delivery · Components in Storybook · Test coverage',
     problem: 'No case study for this role.', proposal: 'Kept in the role summary. The FAQ answer on zero-downtime migrations also cites Plin; a short case study would back it.' },
   { source: 'experience Freelance (2025–now) · h1–h3', value: 'PWA · Firebase · AI Agents', label: 'Offline & engagement · Replicated legacy backend · Developer tooling',

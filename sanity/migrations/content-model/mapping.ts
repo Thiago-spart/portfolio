@@ -14,8 +14,7 @@ export type ParsedMetric = {
   before?: number
   after: number
   unit?: string
-  // The source said "N+" (at least N). The schema has no field for that, so
-  // the value is kept as N and the loss is reported in REVIEW.md.
+  // The source said "N+" (at least N): stored with qualifier "atLeast".
   atLeast?: boolean
   // The source had an explicit sign ("+40%", "−96%").
   signed?: boolean
@@ -66,17 +65,22 @@ export function parseMetricValue(value: string): ParsedMetric | null {
 
 export type Direction = 'up' | 'down'
 
+type Qualifier = 'atLeast' | 'change'
+
 /**
- * Applies the one convention for single-value changes: a reduction with no
- * "before" is stored as a negative `after` with direction "down", so "96%
- * fewer production bugs" becomes after −96, unit %, rendered "−96%". Levels
- * ("80% coverage") and before → after pairs keep their numbers as-is.
+ * Applies the one convention for single-value changes: a change with no
+ * "before" gets qualifier "change", and a reduction is stored as a negative
+ * `after` with direction "down". So "96% fewer production bugs" becomes after
+ * −96, unit %, rendered "−96%", and "+40%" becomes after 40, rendered "+40%".
+ * "N+" gets qualifier "atLeast" (rendered "95+"). Levels ("80% coverage") and
+ * before → after pairs keep their numbers as-is.
  */
 export function toMetricNumbers(parsed: ParsedMetric, direction: Direction, isChange: boolean) {
   const { before, unit } = parsed
   let after = parsed.after
   if (before == null && isChange && direction === 'down' && after > 0) after = -after
-  return { ...(before != null ? { before } : {}), after, ...(unit ? { unit } : {}) }
+  const qualifier: Qualifier | undefined = parsed.atLeast ? 'atLeast' : before == null && isChange ? 'change' : undefined
+  return { ...(before != null ? { before } : {}), after, ...(unit ? { unit } : {}), ...(qualifier ? { qualifier } : {}) }
 }
 
 // ---------------------------------------------------------------------------
