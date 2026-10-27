@@ -1,3 +1,4 @@
+import { createServerFn } from '@tanstack/react-start'
 import { sanityClient } from '#/lib/sanity'
 import type { SanityQA } from '#/types/sanity'
 
@@ -8,6 +9,7 @@ const query = `*[_type == "qa"] | order(order asc) {
   order
 }`
 
-export function fetchQA(): Promise<SanityQA[]> {
-  return sanityClient.fetch(query)
-}
+// Server function — see fetchExperiences.
+export const fetchQA = createServerFn({ method: 'GET' }).handler(
+  (): Promise<SanityQA[]> => sanityClient.fetch(query),
+)
