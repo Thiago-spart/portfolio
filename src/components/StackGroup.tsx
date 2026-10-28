@@ -10,18 +10,18 @@ interface Props {
   lang: Lang
 }
 
-// Figma: Components / Stack group (37:570): up to eight Tags, most-used
+// Figma: Components / Stack group (37:570): the featured Tags, most-used
 // first, then "+N more" expands the rest in place.
-const VISIBLE = 8
-
 // One category row of the Stack section. Wide (640+): the category in a 232
 // column beside the tags; Compact: the category above them.
 export default function StackGroup({ group, lang }: Props) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const tagsId = useId()
-  const hidden = Math.max(group.techs.length - VISIBLE, 0)
-  const techs = expanded ? group.techs : group.techs.slice(0, VISIBLE)
+  const featured = group.techs.filter((tech) => tech.featured)
+  const hidden = group.techs.length - featured.length
+  // Featured techs stay first so expanding only appends.
+  const techs = expanded ? [...featured, ...group.techs.filter((tech) => !tech.featured)] : featured
 
   return (
     <li className="flex flex-col gap-3 border-t border-line py-4 sm:flex-row sm:gap-6">

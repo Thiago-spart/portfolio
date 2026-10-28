@@ -19,31 +19,35 @@ function BandGlyph({ band }: { band: ScoreBand }) {
   )
 }
 
-// Figma: Components / Result label (10:50), Plain emphasis: the mango is the
-// one accent in the hero. A delta shows the muted before value, an arrow,
-// the band glyph (scores only) and the after value.
-export function ResultLabel({ result, className }: { result: HeroResult; className?: string }) {
+// The value line: the muted before value, an arrow, the band glyph (scores
+// only) and the after value.
+export function ResultValue({ result }: { result: HeroResult }) {
   const { t } = useTranslation()
   return (
-    <div
-      className={cn(
-        'flex flex-col items-start gap-1 rounded-sm border border-line bg-surface-raised p-3',
-        className,
+    <span className="flex items-center gap-2 whitespace-nowrap type-metric-s">
+      {result.before != null && (
+        <>
+          <span className="text-ink-muted">{result.before}</span>
+          <span aria-hidden="true" className="text-ink-muted">
+            →
+          </span>
+          <span className="sr-only">{` ${t('metric.to')} `}</span>
+        </>
       )}
-    >
+      {result.band && <BandGlyph band={result.band} />}
+      <span className="text-ink">{result.after}</span>
+    </span>
+  )
+}
+
+// Figma: Components / Result label (10:50), Plain emphasis: the mango is the
+// one accent in the hero.
+export function ResultLabel({ result, className }: { result: HeroResult; className?: string }) {
+  return (
+    <div className={cn('flex flex-col items-start gap-1 rounded-sm border border-line bg-surface-raised p-3', className)}>
       <p className="m-0 type-label text-ink-muted">{result.label}</p>
-      <p className="m-0 flex items-center gap-2 whitespace-nowrap type-metric-s">
-        {result.before != null && (
-          <>
-            <span className="text-ink-muted">{result.before}</span>
-            <span aria-hidden="true" className="text-ink-muted">
-              →
-            </span>
-            <span className="sr-only">{` ${t('metric.to')} `}</span>
-          </>
-        )}
-        {result.band && <BandGlyph band={result.band} />}
-        <span className="text-ink">{result.after}</span>
+      <p className="m-0">
+        <ResultValue result={result} />
       </p>
     </div>
   )

@@ -1,9 +1,10 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, rootRouteId, useMatch } from '@tanstack/react-router'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import { LanguageProvider } from '../i18n/LanguageContext'
+import { fetchSiteSettings } from '../lib/queries/siteSettings'
 import {
   AUTHOR_EMAIL,
   AUTHOR_NAME,
@@ -32,6 +33,12 @@ import headlineFontUrl from '@fontsource-variable/newsreader/files/newsreader-la
 const LANG_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('lang');var lang=(stored==='en'||stored==='pt'||stored==='es')?stored:null;if(!lang){var browser=(navigator.language||'en').slice(0,2);lang=(browser==='pt'||browser==='es')?browser:'en';}document.documentElement.lang=lang;}catch(e){}})();`
 
 export const Route = createRootRoute({
+  // siteSettings feeds the footer on every page and the home page's contact
+  // block and SEO (read there from this match). Fetched once per visit: a
+  // client navigation doesn't refetch it. Without it, the footer and contact
+  // fall back to src/lib/contact.ts.
+  loader: () => fetchSiteSettings().catch(() => null),
+  staleTime: Infinity,
   head: () => ({
     meta: [
       {
@@ -125,13 +132,21 @@ export const Route = createRootRoute({
         rel: 'preconnect',
         href: SANITY_CDN_ORIGIN,
       },
+      // The SVG follows the browser's color scheme; the .ico is for
+      // browsers without SVG favicons.
       {
         rel: 'icon',
         href: '/favicon.ico',
+        sizes: '32x32',
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
       },
       {
         rel: 'apple-touch-icon',
-        href: '/logo192.png',
+        href: '/apple-touch-icon.png',
       },
       {
         rel: 'manifest',
@@ -143,6 +158,7 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const settings = useMatch({ from: rootRouteId, shouldThrow: false })?.loaderData
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -170,7 +186,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <LanguageProvider>
           <Header />
           {children}
-          <Footer />
+          <Footer settings={settings} />
         </LanguageProvider>
         <Analytics />
         <SpeedInsights />

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import './styles/fonts.css';
 @import './styles/tokens.css';
+@import './styles/hero.css';
+@import './styles/motion.css';
 
 /* Dark utilities follow the same rule as the tokens: the system preference,
    unless the theme toggle set data-theme. Prefer tokens over dark: — every
@@ -49,6 +51,8 @@
   --spacing: var(--space-1);
 
   --container-content: var(--content-max);
+  /* Reading measure: about 70 characters of 16px body (max-w-measure). */
+  --container-measure: 34rem;
 }
 
 /* Static tokens. These names are the Figma variables' CSS names and also
@@ -158,7 +162,7 @@
 }
 @utility type-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 16px;
   font-weight: 500;
   letter-spacing: 0.06em;

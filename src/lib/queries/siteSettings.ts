@@ -3,9 +3,11 @@ import { defineQuery }    from 'groq'
 import { sanityClient }   from '#/lib/sanity'
 import { METRIC_FIELDS }  from '#/lib/queryFragments'
 
-// Singleton at a fixed id (see sanity/structure.ts). Contact links and SEO
-// defaults; src/lib/seo.ts keeps the fallbacks for when it isn't published.
+// Singleton at a fixed id (see sanity/structure.ts). Availability line,
+// contact links and SEO defaults; src/lib/seo.ts keeps the fallbacks for
+// when it isn't published.
 export const SITE_SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0]{
+  availability,
   email,
   linkedin,
   github,

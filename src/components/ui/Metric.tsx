@@ -32,7 +32,7 @@ export function Metric({ value, label, description, emphasis = 'plain', classNam
         )}
         <span
           data-emphasis={emphasis}
-          className={cn('type-metric', emphasis === 'accent' ? 'text-mango' : 'text-ink')}
+          className={cn('metric-after type-metric', emphasis === 'accent' ? 'text-mango' : 'text-ink')}
         >
           {after}
         </span>
