@@ -22,8 +22,8 @@ describe('groupStack', () => {
     tech('jQuery', 'frontend', 0),
   ]
 
-  it('orders rows Frontend, Mobile, Testing, Backend & data, Tooling, AI, Practice, leaving empty ones out', () => {
-    expect(groupStack(techs).map((g) => g.key)).toEqual(['frontend', 'testing', 'backend', 'ai'])
+  it('orders rows Frontend, Mobile, Testing, Backend & data, Tooling, Practice, leaving empty ones and AI out', () => {
+    expect(groupStack(techs).map((g) => g.key)).toEqual(['frontend', 'testing', 'backend'])
     expect(groupStack([])).toEqual([])
   })
 
@@ -40,6 +40,14 @@ describe('groupStack', () => {
       ['Next.js', 5],
       ['jQuery', 0],
     ])
+  })
+
+  it('features techs three or more case studies use, and core techs at any count', () => {
+    const featured = groupStack([...techs, tech('TypeScript', 'frontend', 1), tech('Vue', 'frontend', 2)])
+      .flatMap((g) => g.techs)
+      .filter((t) => t.featured)
+      .map((t) => t.name)
+    expect(featured).toEqual(['React', 'Astro', 'Next.js', 'TypeScript'])
   })
 
   it('marks React, React Native and TypeScript as core', () => {

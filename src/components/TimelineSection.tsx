@@ -12,6 +12,9 @@ interface Props {
 // Figma: Sections / Experience (35:851, 35:1341). Roles newest first on one
 // rail; the lede counts them ("Six roles since 2019"), spelling the count
 // out while there's a word for it.
+// The newest roles show in full; older ones collapse to one line each.
+const FULL_ROLES = 2
+
 export default function TimelineSection({ roles, lang }: Props) {
   const { t } = useTranslation()
   const words = t('experience.countWords').split(',')
@@ -27,7 +30,7 @@ export default function TimelineSection({ roles, lang }: Props) {
       <ol className="m-0 list-none p-0">
         {roles.map((role, i) => (
           <li key={role._id}>
-            <TimelineEntry entry={role} lang={lang} last={i === roles.length - 1} />
+            <TimelineEntry entry={role} lang={lang} last={i === roles.length - 1} compact={i >= FULL_ROLES} />
           </li>
         ))}
       </ol>

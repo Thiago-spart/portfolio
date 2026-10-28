@@ -41,8 +41,10 @@ const mockEntry: Role = {
   ],
 }
 
-const render = (entry: Role = mockEntry, { lang = 'en', last = false }: { lang?: Lang; last?: boolean } = {}) =>
-  renderWithRouter(<TimelineEntry entry={entry} lang={lang} last={last} />)
+const render = (
+  entry: Role = mockEntry,
+  { lang = 'en', last = false, compact = false }: { lang?: Lang; last?: boolean; compact?: boolean } = {},
+) => renderWithRouter(<TimelineEntry entry={entry} lang={lang} last={last} compact={compact} />)
 
 describe('TimelineEntry', () => {
   it('shows the role title as a heading and the company', async () => {
@@ -78,10 +80,40 @@ describe('TimelineEntry', () => {
     expect(screen.queryByRole('link', { name: 'Study 5' })).not.toBeInTheDocument()
   })
 
-  it('shows everything at once: no toggle, no results', async () => {
+  it('keeps the case links behind a closed count, since Projects already shows them', async () => {
     await render()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    const list = screen.getByRole('list', { name: 'Case studies' })
+    const details = list.closest('details')
+    expect(details).not.toHaveAttribute('open')
+    expect(within(details as HTMLElement).getByText('2 case studies').tagName).toBe('SUMMARY')
     expect(screen.queryByText('23% → 9%')).not.toBeInTheDocument()
+  })
+
+  it('counts a single case study in the singular', async () => {
+    await render({ ...mockEntry, caseStudies: [study(1)] })
+    expect(screen.getByText('1 case study')).toBeInTheDocument()
+  })
+
+  it('shows summary and stack openly on a full entry', async () => {
+    await render()
+    expect(screen.getByText('Built great things.').closest('details')).toBeNull()
+    expect(screen.getByRole('list', { name: 'Stack' }).closest('details')).toBeNull()
+  })
+
+  it('collapses a compact entry to its title line, with the rest behind "Details"', async () => {
+    await render(mockEntry, { compact: true })
+    expect(screen.getByRole('heading', { level: 3, name: 'Senior Developer' }).closest('details')).toBeNull()
+    const details = screen.getByText('Built great things.').closest('details') as HTMLElement
+    expect(details).not.toHaveAttribute('open')
+    expect(within(details).getByText('Details').tagName).toBe('SUMMARY')
+    expect(within(details).getByRole('list', { name: 'Case studies' })).toBeInTheDocument()
+    expect(within(details).getByRole('list', { name: 'Stack' })).toBeInTheDocument()
+    expect(within(details).queryByText('2 case studies')).not.toBeInTheDocument()
+  })
+
+  it('has no "Details" on a compact entry with nothing to show', async () => {
+    await render({ ...mockEntry, summary: null, stack: null, caseStudies: [] }, { compact: true })
+    expect(screen.queryByText('Details')).not.toBeInTheDocument()
   })
 
   it('leaves the case study list out when the role has none', async () => {
