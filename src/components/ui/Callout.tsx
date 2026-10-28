@@ -20,7 +20,7 @@ export function Callout({ label, number, className }: CalloutProps) {
       {number != null && (
         <span
           aria-hidden="true"
-          className="inline-flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full border border-ink-muted font-mono text-[9px] leading-4 font-medium tracking-[0.06em]"
+          className="inline-flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full border border-ink-muted font-mono text-[11px] leading-4 font-medium tracking-[0.06em]"
         >
           {number}
         </span>

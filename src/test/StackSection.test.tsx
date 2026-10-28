@@ -14,6 +14,7 @@ const many = Array.from({ length: 11 }, (_, i) => ({
 const groups = groupStack([
   ...many,
   { _id: 'r', name: 'React', category: 'frontend', caseStudies: 20 },
+  { _id: 'n', name: 'React Native', category: 'mobile', caseStudies: 1 },
   { _id: 'w', name: 'WebSockets', category: 'backend', caseStudies: 3 },
   { _id: 'p', name: 'PostgreSQL', category: 'data', caseStudies: 0 },
 ])
@@ -36,29 +37,36 @@ describe('StackSection', () => {
 
   it('renders one row per category, backend and data merged', () => {
     renderSection()
-    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Frontend', 'Backend & data'])
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Frontend', 'Mobile', 'Backend & data'])
   })
 
-  it('shows eight tags most-used first, each with its count; core tags marked', () => {
+  it('shows the techs three or more case studies use, most-used first, each with its count; core tags marked', () => {
     renderSection()
     const tags = within(row('Frontend')).getAllByRole('listitem')
-    expect(tags).toHaveLength(8)
+    expect(tags).toHaveLength(10)
+    expect(tags.at(-1)).toHaveTextContent('Tech I3')
     expect(tags[0]).toHaveTextContent('React20')
     expect(tags[0].firstElementChild).toHaveAttribute('data-core', 'true')
     expect(tags[1]).toHaveTextContent('Tech A11')
     expect(tags[1].firstElementChild).not.toHaveAttribute('data-core')
   })
 
+  it('always shows a core tech, however few case studies use it', () => {
+    renderSection()
+    expect(within(row('Mobile')).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['React Native1'])
+  })
+
   it('hides the count when no case study uses the tech', () => {
     renderSection()
-    const tags = within(row('Backend & data')).getAllByRole('listitem')
-    expect(tags.map((t) => t.textContent)).toEqual(['WebSockets3', 'PostgreSQL'])
+    const backend = row('Backend & data')
+    fireEvent.click(within(backend).getByRole('button', { name: '+1 more' }))
+    expect(within(backend).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['WebSockets3', 'PostgreSQL'])
   })
 
   it('expands the rest in place with "+N more" and collapses with "Show less"', () => {
     renderSection()
     const frontend = row('Frontend')
-    const toggle = within(frontend).getByRole('button', { name: '+4 more' })
+    const toggle = within(frontend).getByRole('button', { name: '+2 more' })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     expect(toggle).toHaveAttribute('aria-controls', within(frontend).getByRole('list').id)
 
@@ -68,11 +76,11 @@ describe('StackSection', () => {
     expect(within(frontend).getAllByRole('listitem')).toHaveLength(12)
 
     fireEvent.click(toggle)
-    expect(within(frontend).getAllByRole('listitem')).toHaveLength(8)
+    expect(within(frontend).getAllByRole('listitem')).toHaveLength(10)
   })
 
   it('has no toggle when everything fits', () => {
     renderSection()
-    expect(within(row('Backend & data')).queryByRole('button')).not.toBeInTheDocument()
+    expect(within(row('Mobile')).queryByRole('button')).not.toBeInTheDocument()
   })
 })

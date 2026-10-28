@@ -37,7 +37,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
       {(role || years) && (
         <div className="flex w-full items-baseline justify-between gap-4 text-ink-muted">
           <span className="type-label">{role}</span>
-          <span className="shrink-0 whitespace-nowrap type-small">{years}</span>
+          <span className="shrink-0 whitespace-nowrap type-code">{years}</span>
         </div>
       )}
       <h3 className="m-0 type-title text-ink">
@@ -63,7 +63,8 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
         </div>
       )}
       {results.length > 0 && (
-        <div className="flex w-full items-end gap-6">
+        // case-tide: the before → after wipe as the card scrolls in (motion.css).
+        <div className="case-tide flex w-full items-end gap-6">
           {results.map((result, i) => (
             <Metric
               key={result._key}

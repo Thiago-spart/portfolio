@@ -1,4 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { HERO_RESULTS_QUERY_RESULT } from '../types/sanity.generated'
@@ -7,12 +9,15 @@ import HeroSection from '../components/HeroSection'
 import { goToContact, HINT_KEY, ROOTS_KEY } from '../components/hero/heroShell'
 import type { SceneOptions } from '../components/hero/mangroveScene'
 import { localeString, metric } from './fixtures'
+import en from '../i18n/locales/en.json'
+import pt from '../i18n/locales/pt.json'
+import es from '../i18n/locales/es.json'
 
 // The 3D scene is a dynamic import; here it is a fake that records how the
 // shell drives it and lets tests fire its callbacks.
 const scene = vi.hoisted(() => ({
   options: null as SceneOptions | null,
-  activateProof: vi.fn(),
+  replayProof: vi.fn(),
   reset: vi.fn(),
   setTheme: vi.fn(),
   setLabels: vi.fn(),
@@ -125,12 +130,60 @@ describe('HeroSection', () => {
     expect(items[0].innerHTML).not.toContain('mango')
   })
 
-  it('hides the results until a seed is grown, with keyboard buttons for each', () => {
+  it('server-renders every result as text, each with its dimension line on the drawing', () => {
+    const html = renderToString(
+      <LanguageProvider>
+        <HeroSection results={RESULTS} />
+      </LanguageProvider>,
+    )
+    expect(html).toContain('Lighthouse performance score')
+    expect(html).toContain('Production bugs')
+    expect(html).toContain('Checkout drop-off')
+    expect(html).not.toMatch(/<li[^>]*hidden/)
+    // Three shoots with their dashed lines to the gauge, and three leaders.
+    expect(html.match(/<mask /g)).toHaveLength(3)
+    expect(html.match(/mangrove-leader/g)).toHaveLength(3)
+  })
+
+  it('shows the results before any interaction', () => {
     renderHero()
-    resultItems().forEach((li) => expect(li).not.toBeVisible())
-    const button = screen.getByRole('button', { name: 'Show result: Production bugs, −96%' })
+    resultItems().forEach((li) => expect(li).toBeVisible())
+    expect(scene.options).toBeNull()
+  })
+
+  it('replays a result from its seed button without hiding or toggling it', () => {
+    renderHero()
+    const leaderBefore = resultItems()[1].querySelector('.mangrove-leader')
+    const maskBefore = screen.getByTestId('hero-poster').querySelectorAll('mask')[1].id
+    const button = screen.getByRole('button', { name: 'Replay result: Production bugs, −96%' })
     fireEvent.click(button)
-    expect(resultItems()[1]).toBeVisible()
+    resultItems().forEach((li) => expect(li).toBeVisible())
+    // Remounted, so the draw runs again.
+    expect(resultItems()[1].querySelector('.mangrove-leader')).not.toBe(leaderBefore)
+    expect(screen.getByTestId('hero-poster').querySelectorAll('mask')[1].id).not.toBe(maskBefore)
+    fireEvent.click(button)
+    resultItems().forEach((li) => expect(li).toBeVisible())
+  })
+
+  it('replays through the scene once it has loaded', async () => {
+    renderHero()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    fireEvent.click(screen.getByRole('button', { name: 'Replay result: Checkout drop-off, 23% → 9%' }))
+    expect(scene.replayProof).toHaveBeenCalledWith(2)
+    resultItems().forEach((li) => expect(li).toBeVisible())
+  })
+
+  it('puts the headline result under the subtitle on phones, above the actions', () => {
+    renderHero()
+    const line = screen.getByTestId('hero-headline-result')
+    expect(line).toHaveTextContent('Lighthouse performance score')
+    expect(line).toHaveTextContent('40→ to 95')
+    expect(line).toHaveClass('hero:hidden')
+    const subtitle = screen.getByText(/Senior mobile and web engineer/)
+    const contact = screen.getByRole('link', { name: 'Get in touch' })
+    expect(subtitle.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(line.compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('still renders without results', () => {
@@ -139,10 +192,21 @@ describe('HeroSection', () => {
     expect(screen.queryByRole('list', { name: 'Results', hidden: true })).toBeNull()
   })
 
-  it('shows the final grown state with all three results under reduced motion', () => {
+  it('shows the final grown state with all three results under reduced motion', async () => {
     mockMatchMedia(['prefers-reduced-motion'])
     renderHero()
     resultItems().forEach((li) => expect(li).toBeVisible())
+    expect(screen.getByTestId('hero-poster').querySelectorAll('.mangrove-draw')).toHaveLength(9)
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    expect(scene.options!.reducedMotion).toBe(true)
+  })
+
+  it('draws the dimension lines without animation under reduced motion (CSS)', () => {
+    const css = readFileSync(join(process.cwd(), 'src/styles/hero.css'), 'utf8')
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.mangrove-draw,\s*\.mangrove-leader\s*\{\s*animation: none;/)
+    // Without the animation the lines are simply drawn: the base state.
+    expect(css).toMatch(/\.mangrove-draw \{\s*stroke-dasharray: 1;\s*animation:/)
   })
 
   it('keeps the poster and lists the results when WebGL is unavailable', () => {
@@ -154,6 +218,7 @@ describe('HeroSection', () => {
       resultItems().forEach((li) => expect(li).toBeVisible())
       expect(screen.queryByText(/Click or tap the water/)).toBeNull()
       expect(screen.queryByRole('button', { name: 'Reset garden' })).toBeNull()
+      expect(screen.getByRole('button', { name: 'Replay result: Production bugs, −96%' })).toBeInTheDocument()
     } finally {
       HTMLCanvasElement.prototype.getContext = original
     }
@@ -166,12 +231,11 @@ describe('HeroSection', () => {
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     const options = scene.options!
-    expect(options.results.map((r) => r.height)).toEqual([0.95, 0.96, expect.closeTo(0.61, 2)])
+    // Marks stack in lane order: the first result highest, a clear gap between each.
+    expect(options.results.map((r) => r.height)).toEqual([0.96, 0.801, expect.closeTo(0.61, 2)])
     expect(options.container).toContainElement(screen.getByTestId('hero-poster'))
     expect(options.lane()).toHaveLength(3)
-    // A grown shoot shows its result.
-    act(() => options.onProofShown(2))
-    expect(resultItems()[2]).toBeVisible()
+    resultItems().forEach((li) => expect(li).toBeVisible())
   })
 
   it('hides the hint after the first root and remembers it; Reset garden brings it back', async () => {
@@ -191,6 +255,35 @@ describe('HeroSection', () => {
     expect(hint).not.toHaveClass('invisible')
     expect(localStorage.getItem(HINT_KEY)).toBeNull()
     expect(localStorage.getItem(ROOTS_KEY)).toBeNull()
+  })
+
+  it('keeps Reset garden as a quiet text button by the hint, out of the actions', () => {
+    renderHero()
+    const reset = screen.getByRole('button', { name: 'Reset garden' })
+    expect(reset).toHaveTextContent(/^Reset$/)
+    expect(reset.closest('div')).toContainElement(screen.getByText(/Click or tap the water/))
+    const actions = screen.getByRole('link', { name: 'Get in touch' }).parentElement!
+    expect(actions).not.toContainElement(reset)
+  })
+
+  it('words the hint for replays and for the keyboard, in all three languages', () => {
+    expect(en['hero.hint']).toBe('Click or tap the water to grow a root. Click a seed to replay its result.')
+    for (const locale of [en, pt, es]) {
+      expect(locale['hero.hint']).not.toMatch(/marked|marcada/)
+      expect(locale['hero.hintKeys']).toMatch(/Tab/)
+      expect(locale['hero.hintKeys']).toMatch(/Enter/)
+      expect(locale['hero.results.replay']).toContain('{label}')
+      expect(locale['hero.reset']).toContain(locale['hero.resetShort'])
+    }
+    renderHero()
+    expect(screen.getByText(en['hero.hintKeys'])).toBeInTheDocument()
+  })
+
+  it('renders the hint in Portuguese', async () => {
+    localStorage.setItem('lang', 'pt')
+    renderHero()
+    expect(await screen.findByText(pt['hero.hint'])).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Limpar jardim' })).toHaveTextContent('Limpar')
   })
 
   it('keeps the hint hidden on a return visit', () => {

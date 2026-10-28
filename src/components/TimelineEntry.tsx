@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronRight } from 'lucide-react'
+import { Fragment } from 'react'
+import type { ReactNode } from 'react'
 import { Tag } from '#/components/ui/Tag'
 import { useTranslation } from '#/i18n/useTranslation'
 import { formatRoleDates } from '#/lib/formatDate'
@@ -14,6 +16,8 @@ interface Props {
   lang: Lang
   // The last role ends the rail line.
   last?: boolean
+  // Older roles keep one line (title, company, dates); the rest opens on demand.
+  compact?: boolean
 }
 
 // Figma: Components / Role entry (33:481) caps both lists.
@@ -39,15 +43,75 @@ function CaseLink({ study, lang }: { study: Role['caseStudies'][number]; lang: L
   )
 }
 
+// A native disclosure styled like a case link: mangrove text after a chevron
+// that turns when open. Works before hydration and opens for find-in-page.
+function Disclosure({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="group/disclosure">
+      <summary className="inline-flex min-h-11 w-fit cursor-pointer list-none items-center gap-2 type-body text-mangrove transition-colors duration-150 ease-out hover:text-mangrove-hover [&::-webkit-details-marker]:hidden">
+        <ChevronRight
+          aria-hidden="true"
+          size={16}
+          strokeWidth={1.5}
+          className="transition-transform duration-150 ease-out group-open/disclosure:rotate-90 motion-reduce:transition-none"
+        />
+        {label}
+      </summary>
+      <div className="flex flex-col gap-4 pt-2">{children}</div>
+    </details>
+  )
+}
+
 // One role on the Experience rail. Wide (640+): dates right-aligned in a
 // 160 column, then the rail, then the content. Compact: rail first, dates
 // above the title. The ongoing role (no end date) gets the filled marker.
-export default function TimelineEntry({ entry, lang, last = false }: Props) {
+export default function TimelineEntry({ entry, lang, last = false, compact = false }: Props) {
   const { t } = useTranslation()
   const current = !entry.endDate
   const summary = entry.summary?.[lang]
   const caseStudies = entry.caseStudies.slice(0, MAX_CASE_LINKS)
   const stack = (entry.stack ?? []).slice(0, MAX_TAGS)
+  const caseCount = (
+    caseStudies.length === 1 ? t('experience.caseCountOne') : t('experience.caseCount')
+  ).replace('{count}', String(caseStudies.length))
+
+  const caseList = (
+    <ul aria-label={t('experience.caseStudies')} className="m-0 flex list-none flex-col gap-1 p-0">
+      {caseStudies.map((study) => (
+        <li key={study._id} className="flex">
+          <CaseLink study={study} lang={lang} />
+        </li>
+      ))}
+    </ul>
+  )
+
+  // Everything under the title. A full entry shows it with the case links
+  // behind a count (they repeat the Projects section); a compact one puts
+  // all of it behind "Details".
+  const details = [
+    summary && (
+      <p key="summary" className="m-0 max-w-measure type-body text-ink-muted">
+        {summary}
+      </p>
+    ),
+    caseStudies.length > 0 &&
+      (compact ? (
+        <Fragment key="cases">{caseList}</Fragment>
+      ) : (
+        <Disclosure key="cases" label={caseCount}>
+          {caseList}
+        </Disclosure>
+      )),
+    stack.length > 0 && (
+      <ul key="stack" aria-label={t('experience.stack')} className="m-0 flex list-none flex-wrap gap-2 p-0">
+        {stack.map((tech) => (
+          <li key={tech} className="flex">
+            <Tag label={tech} />
+          </li>
+        ))}
+      </ul>
+    ),
+  ].filter(Boolean)
 
   return (
     <article
@@ -78,35 +142,24 @@ export default function TimelineEntry({ entry, lang, last = false }: Props) {
             className={cn('stroke-mangrove', current ? 'fill-mangrove' : 'fill-ground')}
           />
         </svg>
-        {!last && <span data-testid="rail-line" className="w-px flex-1 bg-line-strong" />}
+        {!last && <span data-testid="rail-line" className="rail-draw w-px flex-1 bg-line-strong" />}
       </div>
 
-      <div className="col-start-2 flex min-w-0 flex-col gap-4 pb-8 sm:col-start-3 sm:row-start-1 sm:pb-12">
+      <div
+        className={cn(
+          'col-start-2 flex min-w-0 flex-col sm:col-start-3 sm:row-start-1',
+          compact ? 'gap-2 pb-6 sm:pb-8' : 'gap-4 pb-8 sm:pb-12',
+        )}
+      >
         <div className="flex flex-col gap-1">
           <h3 className="m-0 type-title text-ink">{entry.title[lang]}</h3>
           <p className="m-0 type-label text-ink-muted">{entry.company}</p>
         </div>
 
-        {summary && <p className="m-0 max-w-180 type-body text-ink-muted">{summary}</p>}
-
-        {caseStudies.length > 0 && (
-          <ul aria-label={t('experience.caseStudies')} className="m-0 flex list-none flex-col gap-1 p-0">
-            {caseStudies.map((study) => (
-              <li key={study._id} className="flex">
-                <CaseLink study={study} lang={lang} />
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {stack.length > 0 && (
-          <ul aria-label={t('experience.stack')} className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {stack.map((tech) => (
-              <li key={tech} className="flex">
-                <Tag label={tech} />
-              </li>
-            ))}
-          </ul>
+        {compact ? (
+          details.length > 0 && <Disclosure label={t('experience.details')}>{details}</Disclosure>
+        ) : (
+          details
         )}
       </div>
     </article>

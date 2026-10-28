@@ -12,7 +12,8 @@ interface LogoProps {
 }
 
 // Figma: Components / Logo (9:40). The wordmark is live type: Newsreader
-// 600, −1.5% tracking; the gap is a quarter of the mark's width.
+// 600, −1.5% tracking; the gap is a quarter of the mark's width, and the
+// wordmark scales with the mark (22/28 at the 44px desktop size).
 export function Logo({ variant = 'mark', size = 44, className }: LogoProps) {
   const { t } = useTranslation()
   return (
@@ -20,7 +21,10 @@ export function Logo({ variant = 'mark', size = 44, className }: LogoProps) {
       <Monogram size={size} />
       {variant !== 'mark' && (
         <span className="flex flex-col items-start whitespace-nowrap">
-          <span className="font-display text-[22px] leading-7 font-semibold tracking-[-0.015em] text-ink">
+          <span
+            className="font-display font-semibold tracking-[-0.015em] text-ink"
+            style={{ fontSize: size / 2, lineHeight: `${(size * 7) / 11}px` }}
+          >
             Thiago Souza
           </span>
           {variant === 'lockup-role' && (

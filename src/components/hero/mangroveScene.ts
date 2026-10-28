@@ -3,8 +3,9 @@
 // Ported from the hero POC (portfolio/hero-poc/scene.js). Client only, loaded
 // with a dynamic import() after first paint, so three.js stays out of the
 // main bundle. The React shell (HeroSection) owns the copy, the hint, the
-// result labels and the poster; this module owns the canvas, the drawing's
-// annotations and where the result labels sit.
+// result labels (laid out in CSS, in the lane beside the gauge) and the
+// poster; this module owns the canvas, the drawing's annotations and the
+// leaders from each label to its mark on the gauge.
 import * as THREE from 'three'
 import { LineSegments2 } from 'three/addons/lines/LineSegments2.js'
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js'
@@ -27,8 +28,9 @@ export interface SceneOptions {
   overlay: HTMLElement
   // The hero section, for scroll progress and visibility.
   hero: HTMLElement
-  // The result label elements, by result index (rendered by React). From
-  // 900px the scene places them in the lane beside the gauge.
+  // The result label elements, by result index (rendered and placed by
+  // React). From 900px the drawing makes room for them and draws a leader
+  // from each to its mark on the gauge.
   lane: () => Array<HTMLElement | null>
   // One proof seed per result; height is 0–1 of the tallest shoot.
   results: Array<{ height: number }>
@@ -36,8 +38,6 @@ export interface SceneOptions {
   reducedMotion: boolean
   isDark: () => boolean
   onMango: () => void
-  // A shoot finished growing: its result label can show.
-  onProofShown: (index: number) => void
   // A visitor grew a root.
   onPlant: () => void
   readStore: (key: string) => string | null
@@ -46,7 +46,8 @@ export interface SceneOptions {
 }
 
 export interface MangroveScene {
-  activateProof: (index: number) => void
+  // Grows a result's shoot again and redraws its dimension line.
+  replayProof: (index: number) => void
   reset: () => void
   setTheme: () => void
   setLabels: (labels: SceneLabels) => void
@@ -56,7 +57,8 @@ export interface MangroveScene {
 type V3 = THREE.Vector3
 
 const LANE_MIN_WIDTH = 900
-const LANE_WIDTH = 232
+// Space kept between the gauge and the lane's labels.
+const LANE_GAP = 28
 const TIDE = { light: 0.0, dark: 0.5 }
 const GAUGE_ZERO = -0.6 // the gauge reads 0.0 m here
 const ROOT_FLOOR = -0.45 // where roots disappear into the water
@@ -473,7 +475,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   const annos: Anno[] = []
   const CALLOUT = 'absolute left-0 top-0 inline-flex items-center gap-1.5 whitespace-nowrap bg-ground/90 px-1 py-0.5 type-label text-ink-muted will-change-transform'
-  const NUMBER = 'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-ink-muted font-mono text-[9px] leading-4'
+  const NUMBER = 'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-ink-muted font-mono text-[11px] leading-4'
   function anno(className: string, getPos: () => V3, o: { align?: Align; minWidth?: number } = {}) {
     const el = document.createElement('div')
     el.className = className
@@ -494,7 +496,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   for (let i = 0; i <= 6; i++) {
     const y = GAUGE_ZERO + i * 0.5
-    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[10px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
+    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[11px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
     a.el.textContent = (i * 0.5).toFixed(1)
   }
   const tideAnno = anno(CALLOUT, () => V(gx - 0.88, tide - 0.95, gaugeZ), { align: 'right', minWidth: 640 })
@@ -589,11 +591,14 @@ export function createScene(opts: SceneOptions): MangroveScene {
     scene.add(g)
     // Dimension line from the shoot tip across to a mark on the gauge.
     const leader = new THREE.Group()
-    leader.add(segs(dashPairs(V(proofX[i] + 0.05, 0, proofZ[i]), V(gx - 0.1, 0, gaugeZ), 0.07, 0.06), M.mangrove1))
-    leader.add(segs([gx - 0.16, 0, gaugeZ, gx + 0.16, 0, gaugeZ], M.mangrove2))
-    leader.visible = false
+    const dashPos = dashPairs(V(proofX[i] + 0.05, 0, proofZ[i]), V(gx - 0.1, 0, gaugeZ), 0.07, 0.06)
+    const dashes = segs(dashPos, M.mangrove1)
+    const mark = segs([gx - 0.16, 0, gaugeZ, gx + 0.16, 0, gaugeZ], M.mangrove2)
+    leader.add(dashes, mark)
     scene.add(leader)
-    return { height: def.height, group: g, ring, stem, tip, hit, leader, t: 0, active: false, shown: false }
+    // Every result starts grown (the poster already showed it); t runs 0 → 1
+    // again on a replay.
+    return { height: def.height, group: g, ring, stem, tip, hit, leader, dashes, mark, dashCount: dashPos.length / 6, t: 1 }
   })
   const seedHits = proofs.map((p) => p.hit)
 
@@ -610,13 +615,17 @@ export function createScene(opts: SceneOptions): MangroveScene {
     return p
   })
 
-  function activateProof(i: number) {
+  // Reduced motion: the result is already drawn; nothing replays.
+  function replayProof(i: number) {
     const p = proofs[i]
-    if (!p || p.active) return
-    p.active = true
-    if (reducedMotion) p.t = 1
+    if (!p || reducedMotion) return
+    p.t = 0
     wake()
   }
+  // The shoot grows over the first 60% of t, the dimension line runs to the
+  // gauge over the rest.
+  const growOf = (t: number) => easeOut(clamp01(t / 0.6))
+  const drawOf = (t: number) => easeOut(clamp01((t - 0.5) / 0.5))
 
   // ---- Visitor roots: grow from the nearest trunk or root to the click ----
   const CAP = small ? 10 : 24
@@ -761,6 +770,16 @@ export function createScene(opts: SceneOptions): MangroveScene {
   const targetLook = V(0, 0, 0)
   let scrollP = 0
   const laneOn = () => window.innerWidth >= LANE_MIN_WIDTH && proofs.length > 0
+  // Each label's left-middle in box pixels, measured on resize only.
+  let laneAnchors: Array<{ x: number; y: number } | null> = []
+  function measureLane() {
+    const box = container.getBoundingClientRect()
+    laneAnchors = opts.lane().map((el) => {
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      return { x: r.left - box.left, y: r.top - box.top + r.height / 2 }
+    })
+  }
 
   function measureBand() {
     const w = container.clientWidth
@@ -771,7 +790,8 @@ export function createScene(opts: SceneOptions): MangroveScene {
     drawing.y0 = annotated ? -1.45 : -0.9
     drawing.y1 = canopyTop + (annotated ? 0.45 : 0.15)
     band.x0 = annotated ? 0.03 : 0.02
-    band.x1 = laneOn() ? 1 - (LANE_WIDTH + 32) / w : 0.97
+    const laneX = laneOn() ? Math.min(...laneAnchors.map((a) => a?.x ?? w)) : w
+    band.x1 = laneOn() && laneX < w ? Math.max(0.4, (laneX - LANE_GAP) / w) : 0.97
     band.y0 = 0.04
     band.y1 = 0.96
   }
@@ -806,6 +826,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
     growHeight = w < 900 ? 1.6 : 2.2
     camera.aspect = w / h
     camera.updateProjectionMatrix()
+    measureLane()
     measureBand()
     frameTargets()
     camPos.copy(targetPos)
@@ -853,7 +874,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
       return
     }
     if (obj && obj.userData.proof !== undefined) {
-      activateProof(obj.userData.proof as number)
+      replayProof(obj.userData.proof as number)
       return
     }
     if (raycaster.ray.intersectPlane(waterPlane, hitPoint) && inWater(hitPoint)) {
@@ -874,13 +895,12 @@ export function createScene(opts: SceneOptions): MangroveScene {
   // DOM writes only when a value changed: rewriting every label each frame
   // costs a style and layout pass per frame.
   const written = new WeakMap<Element, string>()
-  function write(el: Element, key: 'transform' | 'points' | 'hidden', value: string) {
+  function write(el: Element, key: 'transform' | 'points', value: string) {
     const prev = written.get(el)
     const next = `${key}:${value}`
     if (prev === next) return
     written.set(el, next)
     if (key === 'transform') (el as HTMLElement).style.transform = value
-    else if (key === 'hidden') (el as HTMLElement).hidden = value === '1'
     else el.setAttribute('points', value)
   }
   function placeLabels() {
@@ -906,27 +926,19 @@ export function createScene(opts: SceneOptions): MangroveScene {
     dims.visible = w >= 640
     tideCallout.visible = w >= 640
 
-    // The lane: one slot per result from the top of the gauge down, each
-    // with a leader to its mark on the gauge.
+    // The lane: a leader from each label (placed by React) to its mark on
+    // the gauge, once the mark has landed.
     const lane = laneOn()
     leaderSvg.style.display = lane ? '' : 'none'
     if (!lane) return
-    const els = opts.lane()
-    const gaugeTop = project(V(gx + 0.09, gTop, gaugeZ), w, h)
-    const laneX = gaugeTop.x + 24
-    const slot = Math.max(70, Math.min(86, (h - 8) / 3))
-    const top = Math.max(4, Math.min(gaugeTop.y - 36, h - slot * 3))
     proofs.forEach((pr, i) => {
-      const el = els[i]
-      const y = top + i * slot
-      if (el) write(el, 'transform', `translate(${laneX.toFixed(1)}px, ${y.toFixed(1)}px)`)
-      const height = pr.height * growHeight * easeOut(pr.t)
+      const a = laneAnchors[i]
+      const height = pr.height * growHeight * growOf(pr.t)
       const mark = project(V(gx + 0.16, tide + height, gaugeZ), w, h)
-      const midY = y + 30
       write(
         leaderPaths[i],
         'points',
-        pr.shown ? `${(laneX - 2).toFixed(1)},${midY.toFixed(1)} ${(laneX - 10).toFixed(1)},${midY.toFixed(1)} ${(mark.x + 2).toFixed(1)},${mark.y.toFixed(1)}` : '',
+        a && pr.t >= 1 ? `${(a.x - 2).toFixed(1)},${a.y.toFixed(1)} ${(a.x - 10).toFixed(1)},${a.y.toFixed(1)} ${(mark.x + 2).toFixed(1)},${mark.y.toFixed(1)}` : '',
       )
     })
   }
@@ -951,21 +963,22 @@ export function createScene(opts: SceneOptions): MangroveScene {
     waterPlane.constant = -tide
     tideCallout.position.y = tide
 
-    proofs.forEach((p, i) => {
+    proofs.forEach((p) => {
       p.group.position.y = tide
-      if (p.active && p.t < 1) {
+      if (p.t < 1) {
         p.t = reducedMotion ? 1 : Math.min(1, p.t + dt / 1.4)
         busy = true
       }
-      if (p.active && p.t >= 1 && !p.shown) {
-        p.shown = true
-        opts.onProofShown(i)
-      }
-      const hgt = p.height * growHeight * easeOut(p.t)
+      const grow = growOf(p.t)
+      const draw = drawOf(p.t)
+      const hgt = p.height * growHeight * grow
       p.stem.scale.y = Math.max(0.001, hgt)
       p.tip.position.y = hgt
-      p.tip.scale.setScalar(Math.max(0.001, easeOut(p.t)))
-      p.leader.visible = p.active
+      p.tip.scale.setScalar(Math.max(0.001, grow))
+      // The dashes draw from the shoot toward the gauge; the mark lands last.
+      ;(p.dashes.geometry as LineSegmentsGeometry).instanceCount = Math.ceil(p.dashCount * draw)
+      p.mark.visible = draw >= 1
+      p.leader.visible = draw > 0
       p.leader.position.y = tide + hgt
     })
 
@@ -997,7 +1010,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
     idleUniforms.uTime.value = t
     waterDashes.position.x = Math.sin(t * 0.22) * 0.3
     waterlineMat.opacity = 0.82 + 0.18 * Math.sin(t * 1.3)
-    proofs.forEach((p, i) => p.ring.scale.setScalar(p.active ? 1 : 1 + 0.08 * Math.sin(t * 2.2 + i * 1.3)))
+    proofs.forEach((p, i) => p.ring.scale.setScalar(1 + 0.08 * Math.sin(t * 2.2 + i * 1.3)))
     halo.material.opacity = 0.45 + 0.08 * Math.sin(t * 1.2)
   }
 
@@ -1141,7 +1154,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
 
   resize()
-  if (reducedMotion) proofs.forEach((_, i) => activateProof(i))
   wake()
   startIdle()
 
@@ -1165,11 +1177,10 @@ export function createScene(opts: SceneOptions): MangroveScene {
     canvas.remove()
     annos.forEach((a) => a.el.remove())
     leaderSvg.remove()
-    opts.lane().forEach((el) => el?.style.removeProperty('transform'))
   }
 
   return {
-    activateProof,
+    replayProof,
     reset,
     setTheme: () => applyTheme(true),
     setLabels(next) {

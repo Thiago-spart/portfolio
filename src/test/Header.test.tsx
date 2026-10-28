@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '#/i18n/LanguageContext'
 import Header from '#/components/Header'
 
-async function renderHeader() {
+async function renderHeader(path = '/') {
   const rootRoute = createRootRoute({
     component: () => (
       <LanguageProvider>
@@ -20,7 +20,7 @@ async function renderHeader() {
   })
   const router = createRouter({
     routeTree: rootRoute,
-    history: createMemoryHistory({ initialEntries: ['/'] }),
+    history: createMemoryHistory({ initialEntries: [path] }),
   })
   await router.load()
   return render(<RouterProvider router={router} />)
@@ -38,11 +38,23 @@ describe('Header', () => {
     expect(brand).toHaveAttribute('href', '/')
   })
 
-  it('shows the lockup and the phone mark', async () => {
+  it('shows the wordmark on phones too: a smaller lockup below 768px', async () => {
     await renderHeader()
     const brand = screen.getByRole('link', { name: 'Thiago Souza, home' })
-    expect(within(brand).getByText('Thiago Souza')).toBeInTheDocument()
+    const [phone, desktop] = within(brand).getAllByText('Thiago Souza')
+    // Phone lockup: 36px mark, 18px wordmark; desktop: 44px mark, 22px.
+    expect(phone.closest('.md\\:hidden')).not.toBeNull()
+    expect(phone).toHaveStyle({ fontSize: '18px' })
+    expect(desktop.closest('.md\\:inline-flex')).not.toBeNull()
+    expect(desktop).toHaveStyle({ fontSize: '22px' })
     expect(brand.querySelectorAll('svg')).toHaveLength(2)
+  })
+
+  it('makes the theme toggle icon-only on phones, keeping its name', async () => {
+    await renderHeader()
+    const toggle = screen.getByRole('button', { name: 'Dark theme' })
+    expect(toggle).toHaveClass('max-md:w-8', 'max-md:px-0')
+    expect(within(toggle).getByText('Dark theme')).toHaveClass('max-md:sr-only')
   })
 
   it('has the locale switch and the theme toggle', async () => {
@@ -55,5 +67,15 @@ describe('Header', () => {
     await renderHeader()
     expect(screen.getAllByRole('link')).toHaveLength(1)
     expect(screen.queryByText(/tanstack/i)).toBeNull()
+  })
+
+  it('has no "Get in touch" on the home page, where the hero and sheet index carry it', async () => {
+    await renderHeader()
+    expect(screen.queryByRole('link', { name: 'Get in touch' })).not.toBeInTheDocument()
+  })
+
+  it('links "Get in touch" to the closing Contact block off the home page', async () => {
+    await renderHeader('/projects/some-case')
+    expect(screen.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '#contact')
   })
 })

@@ -1,3 +1,4 @@
+import { useId, type CSSProperties } from 'react'
 import { useTranslation } from '#/i18n/useTranslation'
 
 // The poster: the Figma "Hero drawing" (19:1096, Idle, 1440 frame) as one
@@ -11,6 +12,17 @@ import { useTranslation } from '#/i18n/useTranslation'
 
 const W = 827.2
 const H = 451.2
+
+// Tide gauge: 0.0 m sits on the waterline, 60.16 units to the metre.
+const WATERLINE = 298.9
+const PER_METRE = 60.16
+const GAUGE_LEFT = 590.32
+// Major ticks (3.0 down to 0.0), every 0.5 m.
+export const GAUGE_TICKS = ['3.0', '2.5', '2.0', '1.5', '1.0', '0.5', '0.0'].map((label, i) => ({ label, y: 118.43 + i * 30.08 }))
+// A result's shoot reads up to 2.2 m on the gauge (as in the 3D scene).
+export const markY = (height: number) => WATERLINE - height * 2.2 * PER_METRE
+// The three marked seeds, left edge of each seed's box.
+const SEED_X = [441.8, 475.64, 509.48]
 
 const ROOT_LONG = 'M1.88 1.88C31.96 20.68 90.24 48.88 110.92 148.52M83.66 76.14C90.24 101.52 90.24 127.84 84.6 148.52'
 const ROOT_SHORT = 'M1.88 1.88C11.28 15.04 24.44 37.6 31.96 92.12'
@@ -74,9 +86,10 @@ function Canopy({ x, y, shape }: { x: number; y: number; shape: { stroke: string
   )
 }
 
-function Seed({ x }: { x: number }) {
+function Seed({ x, onClick }: { x: number; onClick?: () => void }) {
   return (
     <g transform={`translate(${x} 278.24)`}>
+      {onClick && <circle cx="18.8" cy="17" r="16" onClick={onClick} className="pointer-events-auto cursor-pointer fill-transparent" />}
       <ellipse
         cx="18.8"
         cy="22.56"
@@ -90,14 +103,50 @@ function Seed({ x }: { x: number }) {
   )
 }
 
-function Callout({ x, y, label, number }: { x: number; y: number; label: string; number?: number }) {
-  const textX = number != null ? x + 24.44 : x + 3.76
+// A result drawn on the sheet: the shoot from its seed, a dashed dimension
+// line across to the gauge and the mark it reads there. A mask draws them
+// in order on first view (and again on replay, by remounting).
+function Proof({ index, x, height, maskId }: { index: number; x: number; height: number; maskId: string }) {
+  const sx = x + 18.8
+  const top = 289.52
+  const my = markY(height)
+  const base = 200 + index * 200
+  const stem = `M${sx} ${top}V${my}`
+  const dim = `M${sx + 3} ${my}H${GAUGE_LEFT}`
+  const mark = `M586 ${my}H602`
+  const step = (delay: number, dur: number) => ({ '--delay': `${base + delay}ms`, '--dur': `${dur}ms` }) as CSSProperties
   return (
     <g>
+      <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+        <path d={stem} pathLength={1} stroke="#fff" strokeWidth={12} className="mangrove-draw fill-none" style={step(0, 450)} />
+        <path d={dim} pathLength={1} stroke="#fff" strokeWidth={6} className="mangrove-draw fill-none" style={step(350, 400)} />
+        <path d={mark} pathLength={1} stroke="#fff" strokeWidth={6} className="mangrove-draw fill-none" style={step(700, 150)} />
+      </mask>
+      <g mask={`url(#${maskId})`}>
+        <path d={stem} className="fill-none stroke-mangrove [stroke-width:1.41] [stroke-linecap:round] dark:[stroke-dasharray:0_3.4] dark:[stroke-width:2.2]" />
+        <path
+          d={`M${sx} ${my}C${sx - 2.5} ${my - 1.5} ${sx - 4.5} ${my - 4} ${sx - 5.5} ${my - 6.5}M${sx} ${my}C${sx + 2.5} ${my - 1.5} ${sx + 4.5} ${my - 4} ${sx + 5.5} ${my - 6.5}`}
+          className="fill-none stroke-mangrove [stroke-width:1.1] [stroke-linecap:round]"
+        />
+        <path d={dim} className="fill-none stroke-mangrove [stroke-dasharray:3_3] [stroke-width:0.94]" />
+        <path d={mark} className="fill-none stroke-mangrove [stroke-width:1.88]" />
+      </g>
+    </g>
+  )
+}
+
+// Annotation text is drawn at 10.34 units; mangrove-anno (hero.css) scales
+// each annotation about its anchor so it renders at 11px at every drawing
+// scale.
+function Callout({ x, y, label, number }: { x: number; y: number; label: string; number?: number }) {
+  const textX = number != null ? x + 24.44 : x + 3.76
+  const anchor = number != null ? x + 11.28 : x
+  return (
+    <g className="mangrove-anno" style={{ transformOrigin: `${anchor}px ${y + 9.4}px` }}>
       {number != null && (
         <>
           <circle cx={x + 11.28} cy={y + 9.4} r="7.05" className="fill-ground stroke-ink-muted [stroke-width:0.94]" />
-          <text x={x + 11.28} y={y + 12.3} textAnchor="middle" fontSize="8.46" className="fill-ink-muted font-mono font-medium">
+          <text x={x + 11.28} y={y + 12.3} textAnchor="middle" fontSize="10.34" className="fill-ink-muted font-mono font-medium">
             {number}
           </text>
         </>
@@ -109,9 +158,18 @@ function Callout({ x, y, label, number }: { x: number; y: number; label: string;
   )
 }
 
-export function MangrovePoster({ className }: { className?: string }) {
+interface PosterProps {
+  className?: string
+  // Shoot heights (0–1), one per result, in order.
+  results: number[]
+  // Bumped to replay a result's draw.
+  replays: number[]
+  onSeed?: (index: number) => void
+}
+
+export function MangrovePoster({ className, results, replays, onSeed }: PosterProps) {
   const { t } = useTranslation()
-  const ticks = ['3.0', '2.5', '2.0', '1.5', '1.0', '0.5', '0.0']
+  const id = useId()
 
   return (
     <svg
@@ -140,12 +198,18 @@ export function MangrovePoster({ className }: { className?: string }) {
         <path d={WATER_MARKS} transform="translate(827 0)" className={`${DIM} dark:[stroke-dasharray:0_4]`} />
       </g>
 
-      {/* Tide gauge: ticks and labels left of the post. */}
+      {/* The results: shoots and dimension lines, under the gauge's numbers. */}
+      {results.slice(0, SEED_X.length).map((height, i) => (
+        <Proof key={`${i}-${replays[i] ?? 0}`} index={i} x={SEED_X[i]} height={height} maskId={`${id}-proof-${i}-${replays[i] ?? 0}`} />
+      ))}
+
+      {/* Tide gauge: ticks and labels left of the post. From 900px the
+          numbers are HTML (HeroSection), legible at every drawing scale. */}
       <g transform="translate(545.2 118.44)">
         <rect x="45.12" y="3.76" width="7.52" height="180.48" className={DRAW} />
         <path d={TICKS} transform="translate(-0.35 -0.36)" className="fill-none stroke-ink [stroke-width:0.705] [stroke-linecap:round] dark:stroke-mangrove" />
-        {ticks.map((label, i) => (
-          <text key={label} x="16.92" y={i * 30.08 + 7.6} fontSize="10.34" letterSpacing="0.62" className="fill-ink-muted font-mono font-medium">
+        {GAUGE_TICKS.map(({ label }, i) => (
+          <text key={label} x="16.92" y={i * 30.08 + 7.6} fontSize="10.34" letterSpacing="0.62" className={`${TEXT} mangrove-anno hero:hidden`} style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}>
             {label}
           </text>
         ))}
@@ -181,9 +245,9 @@ export function MangrovePoster({ className }: { className?: string }) {
       </g>
 
       {/* The three marked seeds at the waterline. */}
-      <Seed x={441.8} />
-      <Seed x={475.64} />
-      <Seed x={509.48} />
+      {SEED_X.map((x, i) => (
+        <Seed key={x} x={x} onClick={onSeed && i < results.length ? () => onSeed(i) : undefined} />
+      ))}
 
       {/* Annotations: dimensions and callouts, off on phones. */}
       <g className="max-sm:hidden">
@@ -198,7 +262,8 @@ export function MangrovePoster({ className }: { className?: string }) {
           textAnchor="middle"
           fontSize="10.34"
           letterSpacing="0.62"
-          className={TEXT}
+          className={`${TEXT} mangrove-anno`}
+          style={{ transformOrigin: '403px 182px' }}
         >
           {t('hero.drawing.height').replace('{value}', '4.6')}
         </text>
@@ -207,7 +272,15 @@ export function MangrovePoster({ className }: { className?: string }) {
           transform="translate(101.05 379.41)"
           className={DIM}
         />
-        <text x={284.35} y={376} textAnchor="middle" fontSize="10.34" letterSpacing="0.62" className={TEXT}>
+        <text
+          x={284.35}
+          y={376}
+          textAnchor="middle"
+          fontSize="10.34"
+          letterSpacing="0.62"
+          className={`${TEXT} mangrove-anno`}
+          style={{ transformOrigin: '284.35px 379px' }}
+        >
           {t('hero.drawing.rootSpread').replace('{value}', '6.5')}
         </text>
 

@@ -56,7 +56,7 @@ function Question({
         </button>
       </h3>
       <div id={answerId} role="region" aria-labelledby={buttonId} hidden={!open} className={COLUMNS}>
-        <RichText value={item.answer[lang]} className="col-start-2 max-w-[65ch] type-body text-ink-muted" />
+        <RichText value={item.answer[lang]} className="col-start-2 max-w-measure type-body text-ink-muted" />
       </div>
     </li>
   )
@@ -79,7 +79,7 @@ export default function HowIWorkSection({ items, lang }: Props) {
   }
 
   return (
-    <section id="how-i-work" aria-labelledby="how-i-work-heading" className="scroll-mt-4 py-16 md:py-24">
+    <section id="how-i-work" aria-labelledby="how-i-work-heading" className="scroll-mt-16 py-16 md:py-24">
       <Container className="flex flex-col gap-8 md:gap-12 lg:flex-row lg:items-start lg:gap-6">
         <div className="flex flex-col gap-3 lg:w-88 lg:shrink-0">
           <h2 id="how-i-work-heading" className="m-0 type-heading text-ink">

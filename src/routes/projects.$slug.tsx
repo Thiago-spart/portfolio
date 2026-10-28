@@ -1,11 +1,15 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, getRouteApi, notFound, rootRouteId } from '@tanstack/react-router'
 import { fetchCaseStudies, fetchCaseStudyBySlug } from '#/lib/queries/caseStudies'
 import { nextCaseStudy } from '#/lib/caseStudy'
 import { useLanguage } from '#/i18n/LanguageContext'
 import { useTranslation } from '#/i18n/useTranslation'
 import { DEFAULT_DESCRIPTION, routeHead } from '#/lib/seo'
 import CaseStudyPage from '#/components/CaseStudyPage'
+import ContactSection from '#/components/ContactSection'
 import { Button } from '#/components/ui/Button'
+
+// siteSettings is loaded once by the root route (see routes/index.tsx).
+const rootRoute = getRouteApi(rootRouteId)
 
 export const Route = createFileRoute('/projects/$slug')({
   // The list query is the reading order (featured, then archive); only the
@@ -47,11 +51,15 @@ function ProjectNotFound() {
 
 function ProjectPage() {
   const { project, next } = Route.useLoaderData()
+  const settings = rootRoute.useLoaderData()
   const { lang } = useLanguage()
 
+  // The case study closes on the same Contact block as the home page: the
+  // reader who got this far is the one most likely to write.
   return (
     <main>
       <CaseStudyPage caseStudy={project} next={next} lang={lang} />
+      <ContactSection settings={settings} />
     </main>
   )
 }

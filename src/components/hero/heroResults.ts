@@ -14,7 +14,8 @@ export interface HeroResult {
   // "40 → 95", for accessible names and plain text.
   text: string
   band: ScoreBand | null
-  // How tall the proof shoot grows, 0–1 of the tallest shoot.
+  // How tall the proof shoot grows, 0–1 of the tallest shoot, spaced so no
+  // two gauge marks overlap and leaders never cross (stackHeights).
   height: number
 }
 
@@ -34,11 +35,35 @@ function shootHeight({ before, after, unit }: MetricValue): number {
   return Math.min(1, Math.max(0.15, h))
 }
 
+// The gauge reads a full shoot (height 1) as 2.2 m. The marks stack in the
+// lane's order, top to bottom, so no two leaders cross: the first result
+// takes the highest mark (the tallest height), and each next one sits at
+// its own height or at least MIN_GAP_M under the previous mark, whichever
+// is lower. Every mark stays between FLOOR (above the waterline) and 1.
+const GAUGE_SPAN_M = 2.2
+const MIN_GAP_M = 0.35
+const FLOOR = 0.15
+
+export function stackHeights(heights: number[], minGap = MIN_GAP_M / GAUGE_SPAN_M): number[] {
+  if (heights.length === 0) return []
+  const out = [...heights]
+  out[0] = Math.min(1, Math.max(...heights))
+  for (let i = 1; i < out.length; i++) out[i] = Math.min(heights[i], out[i - 1] - minGap)
+  // Bottom up: nothing under the floor; push the stack up if needed.
+  for (let i = out.length - 1; i >= 0; i--) {
+    const below = i === out.length - 1 ? FLOOR - minGap : out[i + 1]
+    out[i] = Math.min(1, Math.max(out[i], below + minGap))
+  }
+  return out.map((h) => Math.round(h * 1000) / 1000)
+}
+
 // The hero results from siteSettings.heroResults, in their Sanity order,
 // localized. Rows whose metric no longer resolves are dropped.
 export function toHeroResults(rows: HERO_RESULTS_QUERY_RESULT | undefined, lang: Lang): HeroResult[] {
   if (!rows) return []
-  return rows.flatMap((row) => {
+  // The lane shows three; their marks are spaced on the gauge, the same in
+  // the poster, the CSS leaders and the 3D scene.
+  const results = rows.flatMap((row) => {
     const result = row.result
     if (!result) return []
     const value: MetricValue = {
@@ -62,5 +87,7 @@ export function toHeroResults(rows: HERO_RESULTS_QUERY_RESULT | undefined, lang:
         height: shootHeight(value),
       },
     ]
-  })
+  }).slice(0, 3)
+  const spaced = stackHeights(results.map((r) => r.height))
+  return results.map((r, i) => ({ ...r, height: spaced[i] }))
 }

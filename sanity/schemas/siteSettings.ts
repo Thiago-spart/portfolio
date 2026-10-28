@@ -31,7 +31,7 @@ export const siteSettings = defineType({
       title: 'Availability',
       type: 'localeString',
       group: 'hero',
-      description: 'Badge text, e.g. "Open to senior and lead roles".',
+      description: 'One line under the Contact heading, contracts first, e.g. "Taking on contract work. Open to senior and lead roles."',
     }),
     defineField({
       name: 'heroResults',

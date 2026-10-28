@@ -109,7 +109,7 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
           </p>
         )}
         <h1 className="m-0 max-w-240 type-display-l text-ink md:type-display-xl">{caseStudy.title[lang]}</h1>
-        {summary && <p className="m-0 max-w-180 type-lede text-ink-muted">{summary}</p>}
+        {summary && <p className="m-0 max-w-152 type-lede text-ink-muted">{summary}</p>}
         {(caseStudy.liveUrl || caseStudy.githubUrl) && (
           <div className="flex flex-wrap gap-3">
             {caseStudy.liveUrl && (
@@ -165,7 +165,7 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
               <h2 id={`part-${part.id}`} className="m-0 shrink-0 md:w-58">
                 <Callout number={i + 1} label={part.label} />
               </h2>
-              <div className="min-w-0 flex-1 md:max-w-180">{part.content}</div>
+              <div className="min-w-0 flex-1 md:max-w-measure">{part.content}</div>
             </section>
           ))}
         </div>
