@@ -135,14 +135,18 @@ function Proof({ index, x, height, maskId }: { index: number; x: number; height:
   )
 }
 
+// Annotation text is drawn at 10.34 units; mangrove-anno (hero.css) scales
+// each annotation about its anchor so it renders at 11px at every drawing
+// scale.
 function Callout({ x, y, label, number }: { x: number; y: number; label: string; number?: number }) {
   const textX = number != null ? x + 24.44 : x + 3.76
+  const anchor = number != null ? x + 11.28 : x
   return (
-    <g>
+    <g className="mangrove-anno" style={{ transformOrigin: `${anchor}px ${y + 9.4}px` }}>
       {number != null && (
         <>
           <circle cx={x + 11.28} cy={y + 9.4} r="7.05" className="fill-ground stroke-ink-muted [stroke-width:0.94]" />
-          <text x={x + 11.28} y={y + 12.3} textAnchor="middle" fontSize="8.46" className="fill-ink-muted font-mono font-medium">
+          <text x={x + 11.28} y={y + 12.3} textAnchor="middle" fontSize="10.34" className="fill-ink-muted font-mono font-medium">
             {number}
           </text>
         </>
@@ -205,7 +209,7 @@ export function MangrovePoster({ className, results, replays, onSeed }: PosterPr
         <rect x="45.12" y="3.76" width="7.52" height="180.48" className={DRAW} />
         <path d={TICKS} transform="translate(-0.35 -0.36)" className="fill-none stroke-ink [stroke-width:0.705] [stroke-linecap:round] dark:stroke-mangrove" />
         {GAUGE_TICKS.map(({ label }, i) => (
-          <text key={label} x="16.92" y={i * 30.08 + 7.6} fontSize="10.34" letterSpacing="0.62" className={`${TEXT} hero:hidden`}>
+          <text key={label} x="16.92" y={i * 30.08 + 7.6} fontSize="10.34" letterSpacing="0.62" className={`${TEXT} mangrove-anno hero:hidden`} style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}>
             {label}
           </text>
         ))}
@@ -258,7 +262,8 @@ export function MangrovePoster({ className, results, replays, onSeed }: PosterPr
           textAnchor="middle"
           fontSize="10.34"
           letterSpacing="0.62"
-          className={TEXT}
+          className={`${TEXT} mangrove-anno`}
+          style={{ transformOrigin: '403px 182px' }}
         >
           {t('hero.drawing.height').replace('{value}', '4.6')}
         </text>
@@ -267,7 +272,15 @@ export function MangrovePoster({ className, results, replays, onSeed }: PosterPr
           transform="translate(101.05 379.41)"
           className={DIM}
         />
-        <text x={284.35} y={376} textAnchor="middle" fontSize="10.34" letterSpacing="0.62" className={TEXT}>
+        <text
+          x={284.35}
+          y={376}
+          textAnchor="middle"
+          fontSize="10.34"
+          letterSpacing="0.62"
+          className={`${TEXT} mangrove-anno`}
+          style={{ transformOrigin: '284.35px 379px' }}
+        >
           {t('hero.drawing.rootSpread').replace('{value}', '6.5')}
         </text>
 

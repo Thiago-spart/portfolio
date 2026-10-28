@@ -67,20 +67,43 @@
       pointer-events: none;
     }
 
-    /* Tick numbers in HTML from 900px: 10px at every drawing scale (9px
-       where the drawing is smallest, to fit between the ticks and the post). */
+    /* Tick numbers in HTML from 900px: 11px at every drawing scale (the
+       type floor), 10px only where the drawing is smallest, to fit between
+       the ticks and the post. */
     .mangrove-tick {
       position: absolute;
       right: calc(100cqw - 589.5 * var(--k) + 1px);
-      font-size: 10px;
+      font-size: 11px;
       top: calc(var(--oy) + var(--y) * var(--k));
       translate: 0 -50%;
     }
 
     @container (width < 560px) {
       .mangrove-tick {
-        font-size: 9px;
+        font-size: 10px;
       }
+    }
+  }
+
+  /* The poster's annotations (callouts, dimensions, gauge numbers) are
+     drawn at 10.34 units, so their rendered size follows the drawing's
+     scale. Each is scaled about its anchor to land at 11px, the type floor.
+     The drawing's scale is its rendered width over 827.2 units: 147.35% of
+     the sheet on phones, the full sheet to 900px, then --k; tan(atan2())
+     turns the length ratio into a number. */
+  .mangrove-anno {
+    scale: calc(1.064 / tan(atan2(147.35cqw, 827.2px)));
+  }
+
+  @media (min-width: 640px) {
+    .mangrove-anno {
+      scale: calc(1.064 / tan(atan2(100cqw, 827.2px)));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .mangrove-anno {
+      scale: calc(1.064 / tan(atan2(var(--k), 1px)));
     }
   }
 

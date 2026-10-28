@@ -90,7 +90,7 @@ export default function TimelineEntry({ entry, lang, last = false, compact = fal
   // all of it behind "Details".
   const details = [
     summary && (
-      <p key="summary" className="m-0 max-w-180 type-body text-ink-muted">
+      <p key="summary" className="m-0 max-w-measure type-body text-ink-muted">
         {summary}
       </p>
     ),

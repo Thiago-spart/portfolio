@@ -37,7 +37,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
       {(role || years) && (
         <div className="flex w-full items-baseline justify-between gap-4 text-ink-muted">
           <span className="type-label">{role}</span>
-          <span className="shrink-0 whitespace-nowrap type-small">{years}</span>
+          <span className="shrink-0 whitespace-nowrap type-code">{years}</span>
         </div>
       )}
       <h3 className="m-0 type-title text-ink">

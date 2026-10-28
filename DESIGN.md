@@ -86,7 +86,7 @@ typography:
     letterSpacing: "-0.02em"
   label:
     fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace"
-    fontSize: "11px"
+    fontSize: "12px"
     fontWeight: 500
     lineHeight: "16px"
     letterSpacing: "0.06em"
@@ -219,12 +219,13 @@ A restrained green-neutral palette from a mangrove at the tide line, with a sing
 - **Display L** (600, 52px, 56px): case-study titles on phones, the contact heading.
 - **Heading** (600, 32px, 38px): section titles (Projects, Experience, Stack, How I work).
 - **Title** (600, 22px, 28px): case-card titles, role titles, questions.
-- **Lede** (400, 19px, 30px): section intros and case-study summaries, max about 720px.
-- **Body** (400, 16px, 26px): reading text, max about 65–75ch.
-- **Small** (400, 14px, 20px): years, secondary notes.
+- **Lede** (400, 19px, 30px): section intros and case-study summaries, max about 608px (about 67 characters).
+- **Body** (400, 16px, 26px): reading text, capped at the measure, 34rem (`max-w-measure`, about 70 characters).
+- **Small** (400, 14px, 20px): secondary notes.
 - **Metric** (mono 500, 48px, line-height 1, −0.03em) and **Metric S** (mono 500, 24px): results.
-- **Label** (mono 500, 11px, 0.06em, uppercase): roles, metric labels, callouts, category names.
-- **Code** (mono 400, 13px, 22px): dates, emails, archive results.
+- **Label** (mono 500, 12px, 0.06em, uppercase): roles, metric labels, callouts, category names.
+- Nothing is set below 11px. Drawing annotations (ticks, callout numbers, the title block) use 11px mono; only the hero's gauge ticks drop to 10px where the drawing is smallest.
+- **Code** (mono 400, 13px, 22px): dates and years, emails, archive results.
 
 ### Named Rules
 **The Mono Measures Rule.** Every number, date, label and tick is mono. Prose is never mono.
@@ -237,7 +238,7 @@ A single 1120px content column (`--content-max`), centered, with 16px gutters on
 
 - Hero: copy left and drawing right from 900px; copy above and drawing below under 900px. The drawing bleeds past the right edge of the column on wide screens.
 - Projects: featured case cards in two equal columns from 768px, one column below; the archive is a full-width ruled list.
-- Case study and Experience: a 232px label column (numbered callout or dates) beside a reading column capped near 720px; the label moves above the text on phones.
+- Case study and Experience: a 232px label column (numbered callout or dates) beside a reading column capped at the measure (34rem); the label moves above the text on phones.
 - How I work: a 352px heading column beside the questions from 1024px.
 - Breakpoints: 640px (compact → wide rows), 768px (gutters, grids), 900px (hero split), 1024px (two-column sections).
 

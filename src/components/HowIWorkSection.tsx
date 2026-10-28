@@ -56,7 +56,7 @@ function Question({
         </button>
       </h3>
       <div id={answerId} role="region" aria-labelledby={buttonId} hidden={!open} className={COLUMNS}>
-        <RichText value={item.answer[lang]} className="col-start-2 max-w-[65ch] type-body text-ink-muted" />
+        <RichText value={item.answer[lang]} className="col-start-2 max-w-measure type-body text-ink-muted" />
       </div>
     </li>
   )

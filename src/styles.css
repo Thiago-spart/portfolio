@@ -51,6 +51,8 @@
   --spacing: var(--space-1);
 
   --container-content: var(--content-max);
+  /* Reading measure: about 70 characters of 16px body (max-w-measure). */
+  --container-measure: 34rem;
 }
 
 /* Static tokens. These names are the Figma variables' CSS names and also
@@ -160,7 +162,7 @@
 }
 @utility type-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 16px;
   font-weight: 500;
   letter-spacing: 0.06em;

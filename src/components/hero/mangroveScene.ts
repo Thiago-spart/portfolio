@@ -475,7 +475,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   const annos: Anno[] = []
   const CALLOUT = 'absolute left-0 top-0 inline-flex items-center gap-1.5 whitespace-nowrap bg-ground/90 px-1 py-0.5 type-label text-ink-muted will-change-transform'
-  const NUMBER = 'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-ink-muted font-mono text-[9px] leading-4'
+  const NUMBER = 'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-ink-muted font-mono text-[11px] leading-4'
   function anno(className: string, getPos: () => V3, o: { align?: Align; minWidth?: number } = {}) {
     const el = document.createElement('div')
     el.className = className
@@ -496,7 +496,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   for (let i = 0; i <= 6; i++) {
     const y = GAUGE_ZERO + i * 0.5
-    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[10px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
+    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[11px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
     a.el.textContent = (i * 0.5).toFixed(1)
   }
   const tideAnno = anno(CALLOUT, () => V(gx - 0.88, tide - 0.95, gaugeZ), { align: 'right', minWidth: 640 })

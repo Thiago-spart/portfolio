@@ -287,7 +287,7 @@ function TitleBlock() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-1 bottom-1 z-10 hidden grid-cols-[auto_auto] border border-ink bg-ground font-mono text-[10px] leading-[15px] font-medium tracking-[0.06em] text-ink uppercase md:max-hero:grid xl:grid"
+      className="pointer-events-none absolute right-1 bottom-1 z-10 hidden grid-cols-[auto_auto] border border-ink bg-ground font-mono text-[11px] leading-[16px] font-medium tracking-[0.06em] text-ink uppercase md:max-hero:grid xl:grid"
     >
       <span className={cn(cell, 'border-r border-b')}>{t('hero.drawing.sheet')}</span>
       <span className={cn(cell, 'border-b')}>{t('hero.drawing.scale')}</span>
