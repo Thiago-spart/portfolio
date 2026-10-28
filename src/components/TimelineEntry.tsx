@@ -142,7 +142,7 @@ export default function TimelineEntry({ entry, lang, last = false, compact = fal
             className={cn('stroke-mangrove', current ? 'fill-mangrove' : 'fill-ground')}
           />
         </svg>
-        {!last && <span data-testid="rail-line" className="w-px flex-1 bg-line-strong" />}
+        {!last && <span data-testid="rail-line" className="rail-draw w-px flex-1 bg-line-strong" />}
       </div>
 
       <div

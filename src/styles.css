@@ -2,6 +2,7 @@
 @import './styles/fonts.css';
 @import './styles/tokens.css';
 @import './styles/hero.css';
+@import './styles/motion.css';
 
 /* Dark utilities follow the same rule as the tokens: the system preference,
    unless the theme toggle set data-theme. Prefer tokens over dark: — every

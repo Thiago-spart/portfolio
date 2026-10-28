@@ -63,7 +63,8 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
         </div>
       )}
       {results.length > 0 && (
-        <div className="flex w-full items-end gap-6">
+        // case-tide: the before → after wipe as the card scrolls in (motion.css).
+        <div className="case-tide flex w-full items-end gap-6">
           {results.map((result, i) => (
             <Metric
               key={result._key}

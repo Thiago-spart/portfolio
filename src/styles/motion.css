@@ -1,0 +1,79 @@
+/* Scroll-linked motion, CSS only. Both run on a view() timeline that ends
+   as the element finishes entering the viewport, so anything fully in view
+   is always in its final state. Without scroll-driven animations, or with
+   reduced motion, nothing animates: the server render is the final state. */
+
+@layer components {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Experience: each rail segment draws down from its marker as the
+         role scrolls in. */
+      .rail-draw {
+        transform-origin: top;
+        animation: rail-draw linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 45%;
+      }
+
+      /* Case cards: a tide line runs under the results and the after value
+         is uncovered behind it; the line then ebbs away. */
+      .case-tide {
+        position: relative;
+        view-timeline: --tide block;
+      }
+
+      .case-tide::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 -8px;
+        height: 1px;
+        background: var(--mangrove);
+        transform-origin: left;
+        animation: tide-line linear both;
+        animation-timeline: --tide;
+        animation-range: entry 40% entry 100%;
+        pointer-events: none;
+      }
+
+      .case-tide .metric-after {
+        animation: tide-reveal linear both;
+        animation-timeline: --tide;
+        animation-range: entry 40% entry 100%;
+      }
+    }
+  }
+}
+
+@keyframes rail-draw {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes tide-line {
+  0% {
+    scale: 0 1;
+    opacity: 1;
+  }
+  70% {
+    scale: 1 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1 1;
+    opacity: 0;
+  }
+}
+
+@keyframes tide-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  70%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}

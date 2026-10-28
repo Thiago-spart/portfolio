@@ -287,6 +287,9 @@ Precise and quiet: one primary action per view.
 ### The Mangrove (signature)
 The hero drawing: an SVG poster of a mangrove at the tide line on a drafting grid (line art by day, points by night), with a tide gauge, dimension lines, numbered callouts and a title block. A three.js version replaces it on the visitor's first interaction; clicking the water grows roots, clicking a seed reveals a result in the lane beside the gauge, and the mango leads to Contact.
 
+### Scroll motion
+Two drawings, both tied to scroll position in CSS (`src/styles/motion.css`) and finished by the time their element is fully in view: the Experience rail draws down from each marker, and a Mangrove tide line runs under each case card's results, uncovering the after value, then fades. Nothing else moves on scroll. Browsers without scroll-driven animations, and reduced motion, get the finished drawing.
+
 ## Do's and Don'ts
 
 ### Do:
