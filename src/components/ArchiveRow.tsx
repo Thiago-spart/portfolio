@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { formatResultPhrase, startYear, type CaseStudyRow } from '#/lib/caseStudy'
 import { cn } from '#/lib/utils'
 import type { Lang } from '#/i18n/LanguageContext'
@@ -59,7 +59,7 @@ export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
       >
         {result}
       </span>
-      <ArrowUpRight
+      <ArrowRight
         aria-hidden="true"
         size={18}
         strokeWidth={1.5}
