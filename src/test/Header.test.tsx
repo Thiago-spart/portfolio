@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '#/i18n/LanguageContext'
 import Header from '#/components/Header'
 
-async function renderHeader() {
+async function renderHeader(path = '/') {
   const rootRoute = createRootRoute({
     component: () => (
       <LanguageProvider>
@@ -20,7 +20,7 @@ async function renderHeader() {
   })
   const router = createRouter({
     routeTree: rootRoute,
-    history: createMemoryHistory({ initialEntries: ['/'] }),
+    history: createMemoryHistory({ initialEntries: [path] }),
   })
   await router.load()
   return render(<RouterProvider router={router} />)
@@ -67,5 +67,15 @@ describe('Header', () => {
     await renderHeader()
     expect(screen.getAllByRole('link')).toHaveLength(1)
     expect(screen.queryByText(/tanstack/i)).toBeNull()
+  })
+
+  it('has no "Get in touch" on the home page, where the hero and sheet index carry it', async () => {
+    await renderHeader()
+    expect(screen.queryByRole('link', { name: 'Get in touch' })).not.toBeInTheDocument()
+  })
+
+  it('links "Get in touch" to the closing Contact block off the home page', async () => {
+    await renderHeader('/projects/some-case')
+    expect(screen.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '#contact')
   })
 })
