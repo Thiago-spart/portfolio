@@ -132,13 +132,21 @@ export const Route = createRootRoute({
         rel: 'preconnect',
         href: SANITY_CDN_ORIGIN,
       },
+      // The SVG follows the browser's color scheme; the .ico is for
+      // browsers without SVG favicons.
       {
         rel: 'icon',
         href: '/favicon.ico',
+        sizes: '32x32',
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
       },
       {
         rel: 'apple-touch-icon',
-        href: '/logo192.png',
+        href: '/apple-touch-icon.png',
       },
       {
         rel: 'manifest',
