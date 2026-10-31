@@ -44,9 +44,9 @@ The record lives inside the result it describes, so it is keyed to `results[_key
 
 `{ resultKey, method, tool, from, to, source }` items, like `heroResult`. Editors write all notes in one place, in story order. But the key can dangle or be duplicated (needs a custom validator against `document.results`), deleting or re-keying a result leaves an orphan, and the query has to join by key (`results[]{ ..., "measurement": ^.measurements[resultKey == ^._key][0] }`). More moving parts for the same output.
 
-**Recommendation: A.** It satisfies #73's "keyed to `results[_key]`" without a key field, and #67's Result part is then a rendering of `results[].measurement`, not a separate localeBlock to keep in sync **[confirm Q1]**.
+**Recommendation: A.** It satisfies #73's "keyed to `results[_key]`" without a key field, and #67's Result part is then a rendering of `results[].measurement`, not a separate localeBlock to keep in sync. **Q1 answered: A.**
 
-Dates: Sanity `date` stores a day. Most answers below will be a month, so store the 1st and render month and year ("Mar 2023", "mar. 2023") **[confirm Q2]**.
+Dates: `from` and `to` stay Sanity `date` fields holding the real date. When only the month is known, store its 1st. The front end shows month and year only ("Mar 2023", "mar. 2023"). When neither date is set, the row shows no dates. **Q2 answered.**
 
 ### Approach rule (#67)
 
@@ -64,25 +64,29 @@ Order as on the site (featured first, then archive by date). Hero results are ma
 
 Supported: tool Lighthouse (label); 40 was the score before the migration (Problem: "a Lighthouse score of 40"); within Feb 2023 – Jan 2025. Live URL https://redacaoonline.com.br/.
 
-**[confirm Q3]** Lighthouse mobile or desktop? Lab run (DevTools or CLI) or PageSpeed Insights? On the home page only? Which month was the 40 run, and which month the 95 run?
+**Q3 answered:** mobile, Lighthouse CLI, home page only. The owner doesn't remember the months, so `from` and `to` stay empty.
 
-**en:** Lighthouse, performance category, [mobile/desktop] [lab run / PageSpeed Insights] on the home page: 40 before the migration ([month year]), 95 after launch ([month year]).
+Record: tool `Lighthouse CLI`, no dates, no source.
 
-**pt:** Lighthouse, categoria performance, [mobile/desktop] [execução em laboratório / PageSpeed Insights] na página inicial: 40 antes da migração ([mês ano]), 95 depois do lançamento ([mês ano]).
+**en:** Lighthouse CLI, performance category, mobile, on the home page: 40 before the migration, 95 after launch.
 
-**es:** Lighthouse, categoría de rendimiento, [móvil/escritorio] [ejecución de laboratorio / PageSpeed Insights] en la página de inicio: 40 antes de la migración ([mes año]), 95 después del lanzamiento ([mes año]).
+**pt:** Lighthouse CLI, categoria performance, mobile, na página inicial: 40 antes da migração, 95 depois do lançamento.
+
+**es:** Lighthouse CLI, categoría de rendimiento, móvil, en la página de inicio: 40 antes de la migración, 95 después del lanzamiento.
 
 #### +40% · Organic search traffic growth (`1603fde3c8f0`)
 
 Supported: nothing about the method; within Feb 2023 – Jan 2025. Problem says the page was "ranking poorly on search" and "the migration couldn't break existing search rankings".
 
-**[confirm Q4]** Which tool: Google Search Console (clicks) or Google Analytics (organic sessions)? Which two windows were compared (for example the 3 months before launch against the 3 months after), and which months?
+**Q4 partly answered:** organic sessions in Google Analytics. **[confirm Q4b]** Which two windows were compared? If you don't remember, the line ends after "Google Analytics" and the dates stay empty.
 
-**en:** [Organic clicks / organic sessions] in [Google Search Console / Google Analytics], [n] months after launch ([months]) against the [n] months before ([months]).
+Record: tool `Google Analytics`.
 
-**pt:** [Cliques orgânicos / sessões orgânicas] no [Google Search Console / Google Analytics], [n] meses depois do lançamento ([meses]) contra os [n] meses anteriores ([meses]).
+**en:** Organic sessions in Google Analytics, [n] months after launch against the [n] months before.
 
-**es:** [Clics orgánicos / sesiones orgánicas] en [Google Search Console / Google Analytics], [n] meses después del lanzamiento ([meses]) frente a los [n] meses anteriores ([meses]).
+**pt:** Sessões orgânicas no Google Analytics, [n] meses depois do lançamento contra os [n] meses anteriores.
+
+**es:** Sesiones orgánicas en Google Analytics, [n] meses después del lanzamiento frente a los [n] meses anteriores.
 
 ### Capitual, internal banking tools (featured 2 · Oct 2021 – Nov 2022)
 
@@ -90,13 +94,15 @@ Supported: nothing about the method; within Feb 2023 – Jan 2025. Problem says 
 
 Supported: nothing about the method; within Oct 2021 – Nov 2022. Summary: tests went in "before adding more features".
 
-**[confirm Q5]** Where were bugs counted (Jira, Sentry, support tickets)? What counted as a production bug (reported by the admin and support teams, or any error in monitoring)? Which two periods were compared, and which months?
+**Q5 answered:** counted in Jira. Both error monitoring and support team reports count as production bugs. Compared: the Jira history before the owner joined, against the first 3 months of their work (Oct–Dec 2021). **[confirm Q5b]** The history before is longer than 3 months, so the −96% is presumably per month (the average monthly rate before, against the rate in those 3 months). Is that right?
 
-**en:** Production bugs on the admin tools logged in [tool], [period after the test pipeline] against [period before] ([months]).
+Record: tool `Jira`, from `2021-10-01`, to `2021-12-31`.
 
-**pt:** Bugs em produção nas ferramentas de administração registrados no [ferramenta], [período depois do pipeline de testes] contra [período antes] ([meses]).
+**en:** Production bugs on the admin tools logged in Jira, from error monitoring and support team reports: bugs per month in the first 3 months of the work (Oct–Dec 2021) against the monthly average before.
 
-**es:** Bugs en producción en las herramientas de administración registrados en [herramienta], [periodo después del pipeline de pruebas] frente a [periodo antes] ([meses]).
+**pt:** Bugs em produção nas ferramentas de administração registrados no Jira, vindos do monitoramento de erros e de relatos das equipes de suporte: bugs por mês nos 3 primeiros meses do trabalho (out.–dez. 2021) contra a média mensal anterior.
+
+**es:** Bugs en producción en las herramientas de administración registrados en Jira, a partir del monitoreo de errores y de los reportes de los equipos de soporte: bugs por mes en los primeros 3 meses del trabajo (oct.–dic. 2021) frente al promedio mensual anterior.
 
 #### 80% · Test coverage on critical flows (`f60a96d09d4a`)
 
@@ -444,14 +450,14 @@ Hero results first: Q3, Q5, Q18 back the three numbers on the home page.
 
 Schema
 
-1. **Q1.** Measurement as a field on each result (option A), not a separate array? Any field to add or drop (method, tool, from, to, source)?
-2. **Q2.** Dates to the month ("Mar 2023"), stored as the 1st?
+1. **Q1. Answered:** measurement as a field on each result (option A), with method, tool, from, to and source.
+2. **Q2. Answered:** `from` and `to` hold real `date` values (the 1st when only the month is known); the front end shows month and year.
 
 Results
 
-3. **Q3.** Redação landing, Lighthouse 40 → 95 (hero): mobile or desktop? Lab run or PageSpeed Insights? Home page only? Month of the 40 run and of the 95 run?
-4. **Q4.** Redação landing, organic search +40%: Search Console clicks or Analytics organic sessions? Which two windows, which months?
-5. **Q5.** Capitual internal tools, production bugs −96% (hero): counted where (Jira, Sentry, support tickets)? What counted as a production bug? Which two periods, which months?
+3. **Q3. Answered:** Redação landing, Lighthouse 40 → 95 (hero): mobile, Lighthouse CLI, home page only. Months unknown, so no dates.
+4. **Q4. Partly answered:** Redação landing, organic search +40%: organic sessions in Google Analytics. **Q4b:** which two windows were compared?
+5. **Q5. Answered:** Capitual internal tools, production bugs −96% (hero): Jira, from error monitoring and support team reports; the history before against Oct–Dec 2021. **Q5b:** a per-month rate?
 6. **Q6.** Capitual internal tools, 80% coverage on critical flows: which tool (Jest, Cypress, a count of flows)? Line, branch or flow coverage? Which flows, which month?
 7. **Q7.** Capitual crypto app, App Store 3.5 → 4.8: iOS only or Google Play too? Overall or current version? Months of both readings? Is the live URL (Capital.com's app id 1487443266) the right app?
 8. **Q8.** Capitual crypto app, mobile bugs −60%: counted where (Jira, Crashlytics, Sentry, reviews)? Bugs or crashes? Which periods, which months?
