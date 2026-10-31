@@ -4,7 +4,7 @@ import { fetchCaseStudies }  from '#/lib/queries/caseStudies'
 import { fetchFaq }          from '#/lib/queries/faq'
 import { fetchStack }        from '#/lib/queries/stack'
 import { fetchHeroResults } from '#/lib/queries/siteSettings'
-import { findTech, groupStack, techSearch, techSlug } from '#/lib/stack'
+import { filterByTech, findTech, groupStack, techSearch, techSlug } from '#/lib/stack'
 import { revealSection }     from '#/lib/inPage'
 import { useLanguage }       from '#/i18n/LanguageContext'
 import { routeHead, DEFAULT_TITLE, DEFAULT_DESCRIPTION } from '#/lib/seo'
@@ -76,14 +76,10 @@ function HomePage() {
   const navigate = Route.useNavigate()
 
   // The Stack filter. Selecting a tech dims the case studies that don't use
-  // it and marks the roles that do (their own stack, or a case study's);
+  // it and marks the roles behind the ones that do (filterByTech);
   // selecting it again clears. Work comes into view unless it's on screen.
   const tech = findTech(stack.groups, search.tech)
-  const using = tech ? caseStudies.filter((c) => (c.stack ?? []).includes(tech)) : []
-  const marked = new Set([
-    ...using.flatMap((c) => (c.roleId ? [c.roleId] : [])),
-    ...(tech ? roles.filter((r) => (r.stack ?? []).includes(tech)).map((r) => r._id) : []),
-  ])
+  const { using, marked } = filterByTech(caseStudies, tech)
   const selectTech = (name: string) => {
     const next = name === tech ? undefined : techSlug(name)
     void navigate({ search: (prev) => ({ ...prev, tech: next }), replace: true, resetScroll: false })

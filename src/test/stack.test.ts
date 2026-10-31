@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { findTech, groupStack, techSearch, techSlug } from '../lib/stack'
+import { filterByTech, findTech, groupStack, techSearch, techSlug } from '../lib/stack'
 import type { STACK_QUERY_RESULT } from '../types/sanity.generated'
 
 type Tech = STACK_QUERY_RESULT['techs'][number]
@@ -100,5 +100,27 @@ describe('findTech', () => {
     expect(findTech(groups, 'jquery')).toBeNull()
     expect(findTech(groups, 'cobol')).toBeNull()
     expect(findTech(groups, undefined)).toBeNull()
+  })
+})
+
+describe('filterByTech', () => {
+  const cases = [
+    { _id: 'a', stack: ['React', 'React Native'], roleId: 'capitual' },
+    { _id: 'b', stack: ['React Native'], roleId: 'capitual' },
+    { _id: 'c', stack: ['React'], roleId: 'c6' },
+    { _id: 'd', stack: null, roleId: 'redacao' },
+    { _id: 'e', stack: ['React Native'], roleId: null },
+  ]
+
+  it('keeps the case studies that use the tech, and marks their roles once each', () => {
+    const { using, marked } = filterByTech(cases, 'React Native')
+    expect(using.map((c) => c._id)).toEqual(['a', 'b', 'e'])
+    expect([...marked]).toEqual(['capitual'])
+  })
+
+  it('selects nothing without a tech', () => {
+    const { using, marked } = filterByTech(cases, null)
+    expect(using).toEqual([])
+    expect(marked.size).toBe(0)
   })
 })

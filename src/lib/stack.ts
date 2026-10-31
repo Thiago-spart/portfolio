@@ -95,3 +95,16 @@ export function findTech(groups: StackGroup[], param: string | undefined): strin
   }
   return null
 }
+
+/**
+ * The case studies that use the selected tech, and the roles they belong
+ * to. A role's own stack doesn't mark it: those lists are long (React
+ * Native was on five of six), and a mark should lead to work you can open.
+ */
+export function filterByTech<C extends { stack: string[] | null; roleId: string | null }>(
+  caseStudies: C[],
+  tech: string | null,
+): { using: C[]; marked: Set<string> } {
+  const using = tech ? caseStudies.filter((c) => (c.stack ?? []).includes(tech)) : []
+  return { using, marked: new Set(using.flatMap((c) => (c.roleId ? [c.roleId] : []))) }
+}
