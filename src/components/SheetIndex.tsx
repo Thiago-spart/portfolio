@@ -1,8 +1,9 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { Button } from '#/components/ui/Button'
 import { Container } from '#/components/ui/Section'
 import { useTranslation } from '#/i18n/useTranslation'
+import { formatMetric, type MetricValue } from '#/lib/metric'
 import { cn } from '#/lib/utils'
 import { useReadingSection } from '#/lib/useReadingSection'
 
@@ -18,6 +19,69 @@ const SHEET_SECTIONS = [
 type SectionId = (typeof SHEET_SECTIONS)[number]['id']
 
 const number = (i: number) => String(i + 1).padStart(2, '0')
+
+// What each section holds, from data the home loader already has (counted
+// in src/routes/index.tsx): the previews under the index entries.
+export interface SheetStats {
+  caseStudies: number
+  // The first featured case study's headline result (the mango card's).
+  best: MetricValue | null
+  roles: number
+  // The first role's start year.
+  since: number | null
+  // The tools the Stack rows show.
+  techs: number
+  questions: number
+}
+
+type T = ReturnType<typeof useTranslation>['t']
+type Key = Parameters<T>[0]
+
+const counted = (t: T, n: number, many: Key, one: Key) =>
+  (n === 1 ? t(one) : t(many)).replace('{count}', String(n))
+
+// One line per section: "13 case studies · best 40 → 95", "6 roles since
+// 2019". A part without data is left out.
+function sectionPreviews(stats: SheetStats, t: T): Record<SectionId, string> {
+  const best = stats.best && t('index.preview.best').replace('{result}', formatMetric(stats.best))
+  const since = stats.since && t('index.preview.since').replace('{year}', String(stats.since))
+  return {
+    projects: [counted(t, stats.caseStudies, 'index.preview.cases', 'index.preview.casesOne'), best]
+      .filter(Boolean)
+      .join(' · '),
+    experience: [counted(t, stats.roles, 'index.preview.roles', 'index.preview.rolesOne'), since]
+      .filter(Boolean)
+      .join(' '),
+    stack: counted(t, stats.techs, 'index.preview.tools', 'index.preview.toolsOne'),
+    'how-i-work': counted(t, stats.questions, 'index.preview.questions', 'index.preview.questionsOne'),
+    contact: t('index.preview.contact'),
+  }
+}
+
+// The current-section rule under the desktop index: one element that
+// slides to the current entry's cell (its offset and width, measured), so
+// the eye follows the move instead of seeing two rules swap. Without a
+// current section it fades out in place.
+function useMarker(current: string | null, lang: string) {
+  const listRef = useRef<HTMLOListElement>(null)
+  const [box, setBox] = useState<{ left: number; width: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const list = listRef.current
+    if (!list) return
+    const measure = () => {
+      const cell = current ? list.querySelector<HTMLElement>(`a[href="#${current}"]`)?.closest('li') : null
+      setBox(cell ? { left: cell.offsetLeft, width: cell.offsetWidth } : null)
+    }
+    measure()
+    // Cells change width when the fonts load or the language changes.
+    const observer = new ResizeObserver(measure)
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [current, lang])
+
+  return { listRef, box }
+}
 
 // Whether the hero has left the screen. The index stays off the first
 // screen: it appears once the hero has scrolled out above the viewport. The
@@ -54,21 +118,28 @@ const SECTION_IDS = SHEET_SECTIONS.map((s) => s.id)
 // stays: one 48px strip instead of the 72px header plus an index.
 //
 // From 768px: every section, the one being read marked with ink and a 2px
-// mangrove rule (aria-current="location"), and a Small Primary "Get in
-// touch" at the right end. Phones: the current section as a disclosure that
-// opens the full list, plus the same button.
+// mangrove rule that slides between entries (aria-current="location"), and
+// a Small Primary "Get in touch" at the right end. Hovering or focusing an
+// entry drops a one-line preview of the section under it (its description;
+// Escape hides it, WCAG 1.4.13). Phones: the current section as a
+// disclosure that opens the full list, previews included, plus the same
+// button.
 //
 // It's fixed, not in the flow, so showing it shifts nothing. Hidden, it sits
 // above the viewport; keyboard focus brings it in (it comes right after the
 // header in tab order), like a skip link.
-export default function SheetIndex() {
-  const { t } = useTranslation()
+export default function SheetIndex({ stats }: { stats: SheetStats }) {
+  const { t, lang } = useTranslation()
   const shown = useHeroGone()
   const current = useReadingSection(SECTION_IDS)
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const toggleRef = useRef<HTMLButtonElement>(null)
   const navRef = useRef<HTMLElement>(null)
+  const previewId = useId()
+  // Escape hides the desktop previews until the pointer or focus moves on.
+  const [quiet, setQuiet] = useState(false)
+  const previews = sectionPreviews(stats, t)
 
   // The phone list closes when the bar hides, and on a tap outside it.
   useEffect(() => {
@@ -84,12 +155,23 @@ export default function SheetIndex() {
     return () => document.removeEventListener('pointerdown', onPointerDown)
   }, [open])
 
+  // On the document: a preview opened by hover has no focus in the nav.
+  useEffect(() => {
+    const onEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') setQuiet(true)
+    }
+    document.addEventListener('keydown', onEscape)
+    return () => document.removeEventListener('keydown', onEscape)
+  }, [])
+
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && open) {
       setOpen(false)
       toggleRef.current?.focus()
     }
   }
+
+  const { listRef, box } = useMarker(current, lang)
 
   const currentIndex = SHEET_SECTIONS.findIndex((s) => s.id === current)
   const currentSection = SHEET_SECTIONS[currentIndex] as (typeof SHEET_SECTIONS)[number] | undefined
@@ -106,9 +188,10 @@ export default function SheetIndex() {
       ref={navRef}
       aria-label={t('index.label')}
       data-shown={shown}
+      data-quiet={quiet || undefined}
       onKeyDown={onKeyDown}
       className={cn(
-        'fixed inset-x-0 top-0 z-40 border-b border-line bg-ground',
+        'group/nav fixed inset-x-0 top-0 z-40 border-b border-line bg-ground',
         'transition-[translate,opacity] duration-200 ease-out motion-reduce:transition-none',
         '-translate-y-full opacity-0 focus-within:translate-y-0 focus-within:opacity-100',
         'data-[shown=true]:translate-y-0 data-[shown=true]:opacity-100',
@@ -116,18 +199,46 @@ export default function SheetIndex() {
     >
       <Container className="flex h-12 items-stretch justify-between gap-3">
         {/* From 768px: the full index, one hairline cell per section. */}
-        <ol className="m-0 hidden list-none border-x border-line p-0 md:flex">
+        <ol ref={listRef} className="relative m-0 hidden list-none border-x border-line p-0 md:flex">
           {SHEET_SECTIONS.map(({ id, label }, i) => (
-            <li key={id} className="flex border-l border-line first:border-l-0">
+            <li
+              key={id}
+              onPointerEnter={() => setQuiet(false)}
+              className="group relative flex border-l border-line first:border-l-0"
+            >
               <a
                 {...linkProps(id)}
-                className="flex items-center gap-2 px-2 type-label whitespace-nowrap text-ink-muted no-underline transition-colors duration-150 ease-out hover:text-ink focus-visible:-outline-offset-2 aria-[current=location]:text-ink aria-[current=location]:shadow-[inset_0_-2px_0_var(--mangrove)] lg:px-4"
+                aria-describedby={`${previewId}-${id}`}
+                onFocus={() => setQuiet(false)}
+                className="flex items-center gap-2 px-2 type-label whitespace-nowrap text-ink-muted no-underline transition-colors duration-150 ease-out hover:text-ink focus-visible:-outline-offset-2 aria-[current=location]:text-ink lg:px-4"
               >
                 <span className="tabular-nums">{number(i)}</span>{' '}
                 <span>{t(label)}</span>
               </a>
+              {/* Inside the cell, so the pointer can move onto it. */}
+              <p
+                id={`${previewId}-${id}`}
+                className={cn(
+                  'absolute top-full left-0 m-0 -ml-px border border-line bg-ground px-3 py-2 type-small whitespace-nowrap text-ink-muted',
+                  'invisible opacity-0 transition-opacity duration-150 ease-out motion-reduce:transition-none',
+                  'group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100',
+                  'group-data-[quiet=true]/nav:invisible! group-data-[quiet=true]/nav:opacity-0!',
+                )}
+              >
+                {previews[id]}
+              </p>
             </li>
           ))}
+          <span
+            aria-hidden="true"
+            data-testid="index-marker"
+            style={box ? { translate: `${box.left}px`, width: `${box.width}px` } : undefined}
+            className={cn(
+              'pointer-events-none absolute bottom-0 left-0 h-0.5 bg-mangrove',
+              'transition-[translate,width] duration-300 ease-out motion-reduce:transition-none',
+              !box && 'opacity-0',
+            )}
+          />
         </ol>
 
         {/* Phones: the section being read; it opens the full list. */}
@@ -175,10 +286,12 @@ export default function SheetIndex() {
                   className="flex min-h-11 items-center gap-3 type-label whitespace-nowrap text-ink-muted no-underline focus-visible:-outline-offset-2 aria-[current=location]:text-ink"
                 >
                   <span className="tabular-nums">{number(i)}</span>{' '}
-                  <span>{t(label)}</span>
-                  {current === id && (
-                    <span aria-hidden="true" className="ml-auto size-2 rounded-full bg-mangrove" />
-                  )}
+                  <span>{t(label)}</span>{' '}
+                  <span className="ml-auto min-w-0 truncate type-small normal-case tracking-normal text-ink-muted">{previews[id]}</span>
+                  <span
+                    aria-hidden="true"
+                    className={cn('size-2 shrink-0 rounded-full', current === id ? 'bg-mangrove' : 'bg-transparent')}
+                  />
                 </a>
               </li>
             ))}
