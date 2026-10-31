@@ -45,6 +45,31 @@
   }
 }
 
+/* goTo (src/lib/inPage.ts): the card or row a link led to, outlined in
+   mangrove for a moment. With reduced motion the outline holds, then goes. */
+@layer components {
+  [data-pulse] {
+    outline: 2px solid var(--mangrove);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-pulse] {
+      animation: pulse-out 1600ms ease-out both;
+    }
+  }
+}
+
+@keyframes pulse-out {
+  0%,
+  60% {
+    outline-color: var(--mangrove);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
 @keyframes rail-draw {
   from {
     scale: 1 0;

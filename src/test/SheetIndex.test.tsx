@@ -1,46 +1,8 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import SheetIndex from '../components/SheetIndex'
-
-// A controllable IntersectionObserver: each instance remembers its callback,
-// options and targets, and `fire` delivers entries to whoever observes them.
-class FakeObserver {
-  static instances: FakeObserver[] = []
-  targets = new Set<Element>()
-  constructor(
-    public callback: IntersectionObserverCallback,
-    public options: IntersectionObserverInit = {},
-  ) {
-    FakeObserver.instances.push(this)
-  }
-  observe(el: Element) {
-    this.targets.add(el)
-  }
-  unobserve(el: Element) {
-    this.targets.delete(el)
-  }
-  disconnect() {
-    this.targets.clear()
-  }
-  takeRecords() {
-    return []
-  }
-}
-
-function fire(target: Element, isIntersecting: boolean, top = 0) {
-  act(() => {
-    for (const observer of FakeObserver.instances) {
-      if (!observer.targets.has(target)) continue
-      const entry = {
-        target,
-        isIntersecting,
-        boundingClientRect: { top } as DOMRectReadOnly,
-      } as IntersectionObserverEntry
-      observer.callback([entry], observer as unknown as IntersectionObserver)
-    }
-  })
-}
+import { FakeObserver, fire } from './fakeObserver'
 
 const IDS = ['projects', 'experience', 'stack', 'how-i-work', 'contact']
 

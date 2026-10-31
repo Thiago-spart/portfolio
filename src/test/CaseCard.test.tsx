@@ -91,4 +91,10 @@ describe('CaseCard', () => {
     )
     expect(screen.getByRole('link', { name: /^On the App Store/ })).toBeInTheDocument()
   })
+  it('carries the case study\'s in-page anchor, clear of the sheet index', async () => {
+    const { container } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard()} lang="en" />)
+    const card = container.querySelector('#case-portfolio-site')
+    expect(card).not.toBeNull()
+    expect(card).toHaveClass('scroll-mt-16')
+  })
 })

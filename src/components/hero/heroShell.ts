@@ -23,9 +23,9 @@ export function writeStore(key: string, value: string | null) {
   }
 }
 
-export function prefersReducedMotion(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
+import { prefersReducedMotion } from '#/lib/inPage'
+
+export { prefersReducedMotion }
 
 // The mango (and its keyboard twin, "Get in touch") lead to the contact
 // block. #contact-heading has tabIndex -1 (ContactSection contract).

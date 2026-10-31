@@ -38,4 +38,10 @@ describe('ArchiveRow', () => {
     expect(slots).toHaveLength(4)
     expect(container.querySelectorAll('div > span')[2]).toBeEmptyDOMElement()
   })
+  it('carries the case study\'s in-page anchor, clear of the sheet index', async () => {
+    const { container } = await renderWithRouter(<ArchiveRow caseStudy={caseStudyCard()} lang="en" />)
+    const row = container.querySelector('#case-portfolio-site')
+    expect(row).not.toBeNull()
+    expect(row).toHaveClass('scroll-mt-16')
+  })
 })
