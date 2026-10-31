@@ -13,12 +13,11 @@ import { useTranslation } from '#/i18n/useTranslation'
 const W = 827.2
 const H = 451.2
 
-// Tide gauge: 0.0 m sits on the waterline, 60.16 units to the metre.
+// Tide gauge: its ticks are unnumbered; the results are what it measures.
+// The base sits on the waterline, 60.16 units to a major step.
 const WATERLINE = 298.9
 const PER_METRE = 60.16
 const GAUGE_LEFT = 590.32
-// Major ticks (3.0 down to 0.0), every 0.5 m.
-export const GAUGE_TICKS = ['3.0', '2.5', '2.0', '1.5', '1.0', '0.5', '0.0'].map((label, i) => ({ label, y: 118.43 + i * 30.08 }))
 // A result's shoot reads up to 2.2 m on the gauge (as in the 3D scene).
 export const markY = (height: number) => WATERLINE - height * 2.2 * PER_METRE
 // The three marked seeds, left edge of each seed's box.
@@ -104,9 +103,11 @@ function Seed({ x, onClick }: { x: number; onClick?: () => void }) {
 }
 
 // A result drawn on the sheet: the shoot from its seed, a dashed dimension
-// line across to the gauge and the mark it reads there. A mask draws them
-// in order on first view (and again on replay, by remounting).
-function Proof({ index, x, height, maskId }: { index: number; x: number; height: number; maskId: string }) {
+// line across to the gauge and the mark it reads there, and the result
+// itself written on that line, against the gauge (off on phones, where the
+// drawing is smallest and the labels sit right under it). A mask draws the lines in
+// order on first view (and again on replay, by remounting).
+function Proof({ index, x, height, label, maskId }: { index: number; x: number; height: number; label?: string; maskId: string }) {
   const sx = x + 18.8
   const top = 289.52
   const my = markY(height)
@@ -131,6 +132,19 @@ function Proof({ index, x, height, maskId }: { index: number; x: number; height:
         <path d={dim} className="fill-none stroke-mangrove [stroke-dasharray:3_3] [stroke-width:0.94]" />
         <path d={mark} className="fill-none stroke-mangrove [stroke-width:1.88]" />
       </g>
+      {label && (
+        <text
+          x={GAUGE_LEFT - 6}
+          y={my - 4}
+          textAnchor="end"
+          fontSize="10.34"
+          letterSpacing="0.62"
+          className="mangrove-anno fill-mangrove font-mono font-medium [paint-order:stroke] stroke-ground [stroke-width:4px] [stroke-linejoin:round] max-sm:hidden"
+          style={{ transformOrigin: `${GAUGE_LEFT - 6}px ${my - 4}px` }}
+        >
+          {label}
+        </text>
+      )}
     </g>
   )
 }
@@ -162,12 +176,14 @@ interface PosterProps {
   className?: string
   // Shoot heights (0–1), one per result, in order.
   results: number[]
+  // Each result as text ("40 → 95"), written above its shoot.
+  labels?: string[]
   // Bumped to replay a result's draw.
   replays: number[]
   onSeed?: (index: number) => void
 }
 
-export function MangrovePoster({ className, results, replays, onSeed }: PosterProps) {
+export function MangrovePoster({ className, results, labels = [], replays, onSeed }: PosterProps) {
   const { t } = useTranslation()
   const id = useId()
 
@@ -198,21 +214,22 @@ export function MangrovePoster({ className, results, replays, onSeed }: PosterPr
         <path d={WATER_MARKS} transform="translate(827 0)" className={`${DIM} dark:[stroke-dasharray:0_4]`} />
       </g>
 
-      {/* The results: shoots and dimension lines, under the gauge's numbers. */}
+      {/* The results: shoots, dimension lines and their values. */}
       {results.slice(0, SEED_X.length).map((height, i) => (
-        <Proof key={`${i}-${replays[i] ?? 0}`} index={i} x={SEED_X[i]} height={height} maskId={`${id}-proof-${i}-${replays[i] ?? 0}`} />
+        <Proof
+          key={`${i}-${replays[i] ?? 0}`}
+          index={i}
+          x={SEED_X[i]}
+          height={height}
+          label={labels[i]}
+          maskId={`${id}-proof-${i}-${replays[i] ?? 0}`}
+        />
       ))}
 
-      {/* Tide gauge: ticks and labels left of the post. From 900px the
-          numbers are HTML (HeroSection), legible at every drawing scale. */}
+      {/* Tide gauge: the post and its ticks, unnumbered. */}
       <g transform="translate(545.2 118.44)">
         <rect x="45.12" y="3.76" width="7.52" height="180.48" className={DRAW} />
         <path d={TICKS} transform="translate(-0.35 -0.36)" className="fill-none stroke-ink [stroke-width:0.705] [stroke-linecap:round] dark:stroke-mangrove" />
-        {GAUGE_TICKS.map(({ label }, i) => (
-          <text key={label} x="16.92" y={i * 30.08 + 7.6} fontSize="10.34" letterSpacing="0.62" className={`${TEXT} mangrove-anno hero:hidden`} style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}>
-            {label}
-          </text>
-        ))}
       </g>
 
       {/* Tree 1 */}
@@ -249,41 +266,9 @@ export function MangrovePoster({ className, results, replays, onSeed }: PosterPr
         <Seed key={x} x={x} onClick={onSeed && i < results.length ? () => onSeed(i) : undefined} />
       ))}
 
-      {/* Annotations: dimensions and callouts, off on phones. */}
+      {/* Annotations: callouts, off on phones. The drawing measures the
+          results, not the tree. */}
       <g className="max-sm:hidden">
-        <g transform="translate(413.25 6.57)">
-          <path
-            d="M5.9925 0.956103V237.956M5.9925 0.956103H0.3525M5.9925 0.956103H11.6325M5.9925 0.956103L3.1725 8.0661M5.9925 0.956103L8.8125 8.0661M5.9925 237.956H0.3525M5.9925 237.956H11.6325M5.9925 237.956L3.1725 230.846M5.9925 237.956L8.8125 230.846"
-            className={DIM}
-          />
-        </g>
-        <text
-          transform="translate(403 182) rotate(90)"
-          textAnchor="middle"
-          fontSize="10.34"
-          letterSpacing="0.62"
-          className={`${TEXT} mangrove-anno`}
-          style={{ transformOrigin: '403px 182px' }}
-        >
-          {t('hero.drawing.height').replace('{value}', '4.6')}
-        </text>
-        <path
-          d="M1.40978 5.9925H365.41M1.40978 5.9925V0.3525M1.40978 5.9925V11.6325M1.40978 5.9925L12.3298 3.1725M1.40978 5.9925L12.3298 8.8125M365.41 5.9925V0.3525M365.41 5.9925V11.6325M365.41 5.9925L354.49 3.1725M365.41 5.9925L354.49 8.8125"
-          transform="translate(101.05 379.41)"
-          className={DIM}
-        />
-        <text
-          x={284.35}
-          y={376}
-          textAnchor="middle"
-          fontSize="10.34"
-          letterSpacing="0.62"
-          className={`${TEXT} mangrove-anno`}
-          style={{ transformOrigin: '284.35px 379px' }}
-        >
-          {t('hero.drawing.rootSpread').replace('{value}', '6.5')}
-        </text>
-
         <g transform="translate(155.1 198) scale(-1 1)">
           <path d="M0.352519 54.5925L41.5925 0.352519" className={DIM} />
           <circle cx="2.23252" cy="56.4725" r="1.88" className="fill-ink-muted" />

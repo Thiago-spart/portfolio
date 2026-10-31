@@ -66,26 +66,9 @@
       background-image: repeating-linear-gradient(90deg, var(--mangrove) 0 3px, transparent 3px 6px);
       pointer-events: none;
     }
-
-    /* Tick numbers in HTML from 900px: 11px at every drawing scale (the
-       type floor), 10px only where the drawing is smallest, to fit between
-       the ticks and the post. */
-    .mangrove-tick {
-      position: absolute;
-      right: calc(100cqw - 589.5 * var(--k) + 1px);
-      font-size: 11px;
-      top: calc(var(--oy) + var(--y) * var(--k));
-      translate: 0 -50%;
-    }
-
-    @container (width < 560px) {
-      .mangrove-tick {
-        font-size: 10px;
-      }
-    }
   }
 
-  /* The poster's annotations (callouts, dimensions, gauge numbers) are
+  /* The poster's annotations (callouts and the results on the shoots) are
      drawn at 10.34 units, so their rendered size follows the drawing's
      scale. Each is scaled about its anchor to land at 11px, the type floor.
      The drawing's scale is its rendered width over 827.2 units: 147.35% of

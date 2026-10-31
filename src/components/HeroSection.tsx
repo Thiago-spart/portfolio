@@ -5,7 +5,7 @@ import { Container } from '#/components/ui/Section'
 import { useTranslation } from '#/i18n/useTranslation'
 import { subscribeTheme, resolvedTheme } from '#/lib/theme'
 import { cn } from '#/lib/utils'
-import { GAUGE_TICKS, MangrovePoster, markY } from './hero/MangrovePoster'
+import { MangrovePoster, markY } from './hero/MangrovePoster'
 import { ResultLabel } from './hero/ResultLabel'
 import { toHeroResults, type HeroResult } from './hero/heroResults'
 import {
@@ -77,9 +77,6 @@ function useSceneLabels(): SceneLabels {
         propRoot: t('hero.drawing.propRoot'),
         canopy: t('hero.drawing.canopy'),
         contact: t('hero.drawing.contact'),
-        tide: t('hero.drawing.tide'),
-        rootSpread: t('hero.drawing.rootSpread'),
-        height: t('hero.drawing.height'),
       },
     }
   }
@@ -125,7 +122,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
             overlay,
             hero,
             lane: () => laneRefs.current,
-            results: latest.current.results.map((r) => ({ height: r.height })),
+            results: latest.current.results.map((r) => ({ height: r.height, text: r.text })),
             labels: latest.current.labels,
             reducedMotion: reduced,
             isDark: () => resolvedTheme() === 'dark',
@@ -192,6 +189,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
       >
         <MangrovePoster
           results={shown.map((r) => r.height)}
+          labels={shown.map((r) => r.text)}
           replays={replays}
           onSeed={replay}
           className={cn(
@@ -202,22 +200,6 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
         <div ref={overlayRef} aria-hidden="true" className="pointer-events-none absolute inset-0 z-10" />
         <TitleBlock />
       </div>
-
-      {/* Gauge numbers from 900px: HTML, so they stay legible at every
-          drawing scale. The 3D scene draws its own. */}
-      {shown.length > 0 && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 max-hero:hidden group-data-[mode=scene]/sheet:hidden">
-          {GAUGE_TICKS.map(({ label, y }) => (
-            <span
-              key={label}
-              style={{ '--y': y } as CSSProperties}
-              className="mangrove-tick bg-ground px-px font-mono leading-[14px] font-medium text-ink-muted"
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-      )}
 
       {shown.length > 0 && (
         <ol

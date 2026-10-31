@@ -16,9 +16,6 @@ export interface SceneLabels {
   canopy: string
   contact: string
   // Templates with a {value} placeholder.
-  tide: string
-  rootSpread: string
-  height: string
 }
 
 export interface SceneOptions {
@@ -33,7 +30,7 @@ export interface SceneOptions {
   // from each to its mark on the gauge.
   lane: () => Array<HTMLElement | null>
   // One proof seed per result; height is 0–1 of the tallest shoot.
-  results: Array<{ height: number }>
+  results: Array<{ height: number; text: string }>
   labels: SceneLabels
   reducedMotion: boolean
   isDark: () => boolean
@@ -60,7 +57,7 @@ const LANE_MIN_WIDTH = 900
 // Space kept between the gauge and the lane's labels.
 const LANE_GAP = 28
 const TIDE = { light: 0.0, dark: 0.5 }
-const GAUGE_ZERO = -0.6 // the gauge reads 0.0 m here
+const GAUGE_ZERO = -0.6 // the gauge's base
 const ROOT_FLOOR = -0.45 // where roots disappear into the water
 
 function mulberry32(seed: number) {
@@ -76,8 +73,6 @@ function mulberry32(seed: number) {
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 const easeIn = (t: number) => t * t
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t))
-const MINUS = '−'
-const fmtSigned = (v: number) => `${v < -0.05 ? MINUS : '+'}${Math.abs(v).toFixed(1)}`
 const V = (x: number, y: number, z = 0) => new THREE.Vector3(x, y, z)
 
 // Positions are flat [x1,y1,z1, x2,y2,z2, ...] segment pairs.
@@ -461,9 +456,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
   }
   scene.add(segs(gaugeLines, M.ink2), segs(gaugeTicks, M.ink1))
 
-  // Tide callout: a leader from the waterline at the gauge down-left.
-  const tideCallout = segs([gx - 0.1, 0, gaugeZ, gx - 0.5, -0.95, gaugeZ, gx - 0.5, -0.95, gaugeZ, gx - 0.85, -0.95, gaugeZ], M.muted1)
-  scene.add(tideCallout)
 
   // ---- DOM annotations, projected from 3D every frame ----
   type Align = 'left' | 'right' | 'center-above'
@@ -494,32 +486,10 @@ export function createScene(opts: SceneOptions): MangroveScene {
     }
     el.appendChild(document.createTextNode(text))
   }
-  for (let i = 0; i <= 6; i++) {
-    const y = GAUGE_ZERO + i * 0.5
-    const a = anno('absolute left-0 top-0 whitespace-nowrap px-1 font-mono text-[11px] leading-[14px] text-ink-muted will-change-transform', () => V(gx - 0.2, y, gaugeZ), { align: 'right', minWidth: i % 2 ? 640 : 0 })
-    a.el.textContent = (i * 0.5).toFixed(1)
-  }
-  const tideAnno = anno(CALLOUT, () => V(gx - 0.88, tide - 0.95, gaugeZ), { align: 'right', minWidth: 640 })
-
-  // Dimensions and numbered callouts (the drawing's measurements).
+  // Numbered callouts. The gauge is unnumbered: the drawing measures the
+  // results (written on their shoots below), not the tree.
   const dimLines: number[] = []
-  const arrow = (p: V3, dx: number, dy: number) => {
-    const s = 0.1
-    dimLines.push(p.x, p.y, p.z, p.x + dx * s - dy * s * 0.5, p.y + dy * s + dx * s * 0.5, p.z)
-    dimLines.push(p.x, p.y, p.z, p.x + dx * s + dy * s * 0.5, p.y + dy * s - dx * s * 0.5, p.z)
-  }
-  const xs = landings.map((a) => a.x)
-  const spreadL = Math.min(...xs)
-  const spreadR = Math.max(...xs)
-  const dimY = -1.2
-  dimLines.push(spreadL, dimY, 0.6, spreadR, dimY, 0.6)
-  dimLines.push(spreadL, dimY - 0.08, 0.6, spreadL, -0.55, 0.6, spreadR, dimY - 0.08, 0.6, spreadR, -0.55, 0.6)
-  arrow(V(spreadL, dimY, 0.6), 1, 0)
-  arrow(V(spreadR, dimY, 0.6), -1, 0)
   const hx = treeRight + 0.35
-  dimLines.push(hx, 0, 0, hx, canopyTop, 0, hx - 0.1, canopyTop, 0, hx + 0.1, canopyTop, 0, hx - 0.1, 0, 0, hx + 0.1, 0, 0)
-  arrow(V(hx, canopyTop, 0), 0, -1)
-  arrow(V(hx, 0, 0), 0, 1)
   // (1) Prop root: label on the left, leader down to a root.
   const rootLabelAt = V(treeLeft - 0.2, calloutRoot.y + 0.9, calloutRoot.z)
   dimLines.push(calloutRoot.x, calloutRoot.y, calloutRoot.z, rootLabelAt.x + 0.04, rootLabelAt.y - 0.04, rootLabelAt.z)
@@ -533,18 +503,13 @@ export function createScene(opts: SceneOptions): MangroveScene {
   const dims = segs(dimLines, M.muted1)
   scene.add(dims)
 
-  const spreadAnno = anno(CALLOUT, () => V((spreadL + spreadR) / 2, dimY + 0.08, 0.6), { align: 'center-above', minWidth: 640 })
-  const heightAnno = anno(`${CALLOUT} [writing-mode:vertical-rl]`, () => V(hx + 0.08, canopyTop / 2, 0), { minWidth: 640 })
   const rootAnno = anno(CALLOUT, () => rootLabelAt, { align: 'right', minWidth: 640 })
   const canopyAnno = anno(CALLOUT, () => canopyLabelAt, { minWidth: 640 })
   const contactAnno = anno(CALLOUT.replace('text-ink-muted', 'text-ink'), () => contactAt, { minWidth: 640 })
   function writeLabels() {
-    setCallout(spreadAnno.el, labels.rootSpread.replace('{value}', (spreadR - spreadL).toFixed(1)))
-    setCallout(heightAnno.el, labels.height.replace('{value}', canopyTop.toFixed(1)))
     setCallout(rootAnno.el, labels.propRoot, 1)
     setCallout(canopyAnno.el, labels.canopy, 2)
     setCallout(contactAnno.el, labels.contact)
-    tideShown = ''
   }
 
   // ---- Proof seeds, between the trees and the gauge ----
@@ -601,6 +566,17 @@ export function createScene(opts: SceneOptions): MangroveScene {
     return { height: def.height, group: g, ring, stem, tip, hit, leader, dashes, mark, dashCount: dashPos.length / 6, t: 1 }
   })
   const seedHits = proofs.map((p) => p.hit)
+  // Each result written on its dimension line, against the gauge, following
+  // the line as the shoot grows.
+  opts.results.slice(0, 3).forEach((def, i) => {
+    const pr = proofs[i]
+    const a = anno(
+      'absolute left-0 top-0 whitespace-nowrap bg-ground/90 px-1 font-mono text-[11px] leading-[14px] font-medium text-mangrove will-change-transform',
+      () => V(gx - 0.18, tide + pr.height * growHeight * growOf(pr.t) + 0.13, gaugeZ),
+      { align: 'right', minWidth: 640 },
+    )
+    a.el.textContent = def.text
+  })
 
   // Leaders from each lane label to its mark on the gauge.
   const svgNS = 'http://www.w3.org/2000/svg'
@@ -891,7 +867,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
     v3.copy(p).project(camera)
     return { x: ((v3.x + 1) / 2) * w, y: ((1 - v3.y) / 2) * h, ok: v3.z < 1 && Math.abs(v3.x) < 1.15 && Math.abs(v3.y) < 1.15 }
   }
-  let tideShown = ''
   // DOM writes only when a value changed: rewriting every label each frame
   // costs a style and layout pass per frame.
   const written = new WeakMap<Element, string>()
@@ -906,11 +881,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
   function placeLabels() {
     const w = size.w
     const h = size.h
-    const tideText = labels.tide.replace('{value}', fmtSigned(tide - GAUGE_ZERO))
-    if (tideText !== tideShown) {
-      tideAnno.el.textContent = tideText
-      tideShown = tideText
-    }
     for (const a of annos) {
       const p = project(a.getPos(), w, h)
       const show = p.ok && w >= a.minWidth
@@ -924,7 +894,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
       write(a.el, 'transform', `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) ${shift}`)
     }
     dims.visible = w >= 640
-    tideCallout.visible = w >= 640
 
     // The lane: a leader from each label (placed by React) to its mark on
     // the gauge, once the mark has landed.
@@ -961,7 +930,6 @@ export function createScene(opts: SceneOptions): MangroveScene {
     if (Math.abs(tideTarget - tide) > 1e-3) busy = true
     water.position.y = tide
     waterPlane.constant = -tide
-    tideCallout.position.y = tide
 
     proofs.forEach((p) => {
       p.group.position.y = tide

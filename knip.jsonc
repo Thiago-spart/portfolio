@@ -33,6 +33,9 @@
       // instead of flagging tailwindcss/tw-animate-css as unused.
       "project": ["src/**/*.{ts,tsx,css}", "api/**/*.ts"]
     },
-    "sanity": {}
+    "sanity": {
+      // One-off content scripts, run with `sanity exec`.
+      "entry": ["migrations/*/apply.ts"]
+    }
   }
 }
