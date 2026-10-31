@@ -22,15 +22,23 @@ describe('groupStack', () => {
     tech('jQuery', 'frontend', 0),
   ]
 
-  it('orders rows Frontend, Mobile, Testing, Backend & data, Tooling, Practice, leaving empty ones and AI out', () => {
-    expect(groupStack(techs).map((g) => g.key)).toEqual(['frontend', 'testing', 'backend'])
+  it('orders rows Frontend, Mobile, Testing, Backend & data, leaving empty ones, AI, tooling and practice out', () => {
+    const rows = groupStack([...techs, tech('Git', 'tooling', 12), tech('BFF', 'practice', 3)])
+    // Node.js and PostgreSQL are used once each, so Backend & data is empty.
+    expect(rows.map((g) => g.key)).toEqual(['frontend', 'testing'])
     expect(groupStack([])).toEqual([])
   })
 
   it('merges backend and data into one "Backend & data" row', () => {
-    const backend = groupStack(techs).find((g) => g.key === 'backend')
-    expect(backend?.techs.map((t) => t.name)).toEqual(['Node.js', 'PostgreSQL'])
+    const backend = groupStack([...techs, tech('GraphQL', 'backend', 2), tech('Firebase', 'data', 2)]).find((g) => g.key === 'backend')
+    expect(backend?.techs.map((t) => t.name)).toEqual(['Firebase', 'GraphQL'])
     expect(backend?.label).toEqual({ en: 'Backend & data', pt: 'Backend e dados', es: 'Backend y datos' })
+  })
+
+  it('keeps techs two or more case studies use, core techs at any count, five per row at most', () => {
+    const many = Array.from({ length: 8 }, (_, i) => tech(`Lib ${i}`, 'frontend', 9 - i))
+    const frontend = groupStack([...many, tech('TypeScript', 'frontend', 1)]).find((g) => g.key === 'frontend')
+    expect(frontend?.techs.map((t) => t.name)).toEqual(['Lib 0', 'Lib 1', 'Lib 2', 'Lib 3', 'TypeScript'])
   })
 
   it('sorts by case-study count, most used first, then by name', () => {
@@ -38,16 +46,7 @@ describe('groupStack', () => {
       ['React', 8],
       ['Astro', 5],
       ['Next.js', 5],
-      ['jQuery', 0],
     ])
-  })
-
-  it('features techs three or more case studies use, and core techs at any count', () => {
-    const featured = groupStack([...techs, tech('TypeScript', 'frontend', 1), tech('Vue', 'frontend', 2)])
-      .flatMap((g) => g.techs)
-      .filter((t) => t.featured)
-      .map((t) => t.name)
-    expect(featured).toEqual(['React', 'Astro', 'Next.js', 'TypeScript'])
   })
 
   it('marks React, React Native and TypeScript as core', () => {

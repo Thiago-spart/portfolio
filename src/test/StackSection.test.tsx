@@ -1,4 +1,4 @@
-import { render, screen, within, fireEvent } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import StackSection from '../components/StackSection'
@@ -40,14 +40,11 @@ describe('StackSection', () => {
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Frontend', 'Mobile', 'Backend & data'])
   })
 
-  it('shows the techs three or more case studies use, most-used first, each with its count; core tags marked', () => {
+  it('shows up to five techs per row, most-used first, each with its count; core tags marked', () => {
     renderSection()
     const tags = within(row('Frontend')).getAllByRole('listitem')
-    expect(tags).toHaveLength(10)
-    expect(tags.at(-1)).toHaveTextContent('Tech I3')
-    expect(tags[0]).toHaveTextContent('React20')
+    expect(tags.map((t) => t.textContent)).toEqual(['React20', 'Tech A11', 'Tech B10', 'Tech C9', 'Tech D8'])
     expect(tags[0].firstElementChild).toHaveAttribute('data-core', 'true')
-    expect(tags[1]).toHaveTextContent('Tech A11')
     expect(tags[1].firstElementChild).not.toHaveAttribute('data-core')
   })
 
@@ -56,31 +53,9 @@ describe('StackSection', () => {
     expect(within(row('Mobile')).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['React Native1'])
   })
 
-  it('hides the count when no case study uses the tech', () => {
+  it('leaves out techs fewer than two case studies use, and has no "+N more"', () => {
     renderSection()
-    const backend = row('Backend & data')
-    fireEvent.click(within(backend).getByRole('button', { name: '+1 more' }))
-    expect(within(backend).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['WebSockets3', 'PostgreSQL'])
-  })
-
-  it('expands the rest in place with "+N more" and collapses with "Show less"', () => {
-    renderSection()
-    const frontend = row('Frontend')
-    const toggle = within(frontend).getByRole('button', { name: '+2 more' })
-    expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(toggle).toHaveAttribute('aria-controls', within(frontend).getByRole('list').id)
-
-    fireEvent.click(toggle)
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    expect(toggle).toHaveTextContent('Show less')
-    expect(within(frontend).getAllByRole('listitem')).toHaveLength(12)
-
-    fireEvent.click(toggle)
-    expect(within(frontend).getAllByRole('listitem')).toHaveLength(10)
-  })
-
-  it('has no toggle when everything fits', () => {
-    renderSection()
-    expect(within(row('Mobile')).queryByRole('button')).not.toBeInTheDocument()
+    expect(within(row('Backend & data')).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['WebSockets3'])
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })
