@@ -78,15 +78,15 @@ Record: tool `Lighthouse CLI`, no dates, no source.
 
 Supported: nothing about the method; within Feb 2023 – Jan 2025. Problem says the page was "ranking poorly on search" and "the migration couldn't break existing search rankings".
 
-**Q4 partly answered:** organic sessions in Google Analytics. **[confirm Q4b]** Which two windows were compared? If you don't remember, the line ends after "Google Analytics" and the dates stay empty.
+**Q4 answered:** organic sessions in Google Analytics. The owner doesn't remember the windows, so the dates stay empty.
 
 Record: tool `Google Analytics`.
 
-**en:** Organic sessions in Google Analytics, [n] months after launch against the [n] months before.
+**en:** Organic sessions in Google Analytics, after launch against before the migration.
 
-**pt:** Sessões orgânicas no Google Analytics, [n] meses depois do lançamento contra os [n] meses anteriores.
+**pt:** Sessões orgânicas no Google Analytics, depois do lançamento contra antes da migração.
 
-**es:** Sesiones orgánicas en Google Analytics, [n] meses después del lanzamiento frente a los [n] meses anteriores.
+**es:** Sesiones orgánicas en Google Analytics, después del lanzamiento frente a antes de la migración.
 
 ### Capitual, internal banking tools (featured 2 · Oct 2021 – Nov 2022)
 
@@ -94,7 +94,7 @@ Record: tool `Google Analytics`.
 
 Supported: nothing about the method; within Oct 2021 – Nov 2022. Summary: tests went in "before adding more features".
 
-**Q5 answered:** counted in Jira. Both error monitoring and support team reports count as production bugs. Compared: the Jira history before the owner joined, against the first 3 months of their work (Oct–Dec 2021). **[confirm Q5b]** The history before is longer than 3 months, so the −96% is presumably per month (the average monthly rate before, against the rate in those 3 months). Is that right?
+**Q5 answered:** counted in Jira. Both error monitoring and support team reports count as production bugs. Compared: the Jira history before the owner joined, against the first 3 months of their work (Oct–Dec 2021). The −96% compares bugs per month: the monthly average before, against the rate in those 3 months (Q5b confirmed).
 
 Record: tool `Jira`, from `2021-10-01`, to `2021-12-31`.
 
@@ -456,8 +456,8 @@ Schema
 Results
 
 3. **Q3. Answered:** Redação landing, Lighthouse 40 → 95 (hero): mobile, Lighthouse CLI, home page only. Months unknown, so no dates.
-4. **Q4. Partly answered:** Redação landing, organic search +40%: organic sessions in Google Analytics. **Q4b:** which two windows were compared?
-5. **Q5. Answered:** Capitual internal tools, production bugs −96% (hero): Jira, from error monitoring and support team reports; the history before against Oct–Dec 2021. **Q5b:** a per-month rate?
+4. **Q4. Answered:** Redação landing, organic search +40%: organic sessions in Google Analytics; windows unknown, so no dates.
+5. **Q5. Answered:** Capitual internal tools, production bugs −96% (hero): Jira, from error monitoring and support team reports; bugs per month in Oct–Dec 2021 against the monthly average before.
 6. **Q6.** Capitual internal tools, 80% coverage on critical flows: which tool (Jest, Cypress, a count of flows)? Line, branch or flow coverage? Which flows, which month?
 7. **Q7.** Capitual crypto app, App Store 3.5 → 4.8: iOS only or Google Play too? Overall or current version? Months of both readings? Is the live URL (Capital.com's app id 1487443266) the right app?
 8. **Q8.** Capitual crypto app, mobile bugs −60%: counted where (Jira, Crashlytics, Sentry, reviews)? Bugs or crashes? Which periods, which months?
