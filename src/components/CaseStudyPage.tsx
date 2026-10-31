@@ -26,8 +26,9 @@ const PROSE =
 
 // Figma: Sections / Case study (32:573, 32:699, 32:823). Intro (back link,
 // meta, title, summary, live site), results strip, numbered parts (problem,
-// decision, approach, stack, then gallery and video when present), the
-// cover, and the next case study.
+// decision, approach, stack, then gallery and video when present), and the
+// next case study. The cover stays in Sanity but isn't shown: the covers are
+// promo cards until real screenshots replace them (#66).
 export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPageProps) {
   const { t } = useTranslation()
   const dates = formatMonthRange(caseStudy.startDate, caseStudy.endDate, t('work.present'), lang)
@@ -163,18 +164,6 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
             </section>
           ))}
         </div>
-      )}
-
-      {/* After the reading, not between the results and the story: the
-          covers are promo cards until real screenshots replace them. */}
-      {caseStudy.cover?.url && (
-        <img
-          src={caseStudy.cover.url}
-          alt={caseStudy.cover.alt[lang]}
-          width={2240}
-          height={1120}
-          className="aspect-2/1 h-auto w-full rounded-md border border-line bg-surface-sunken object-cover"
-        />
       )}
 
       {next && (

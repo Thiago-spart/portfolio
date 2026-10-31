@@ -43,19 +43,11 @@ describe('CaseStudyPage', () => {
     ])
   })
 
-  it('renders the cover with its alt, and leaves it out without one', async () => {
+  // #66: the covers are promo cards; they stay in Sanity but aren't shown
+  // until real screenshots replace them.
+  it('does not render the cover, even when Sanity has one', async () => {
     await renderPage()
-    expect(screen.getByRole('img', { name: 'Home page on a laptop' })).toHaveAttribute(
-      'src',
-      'https://cdn.sanity.io/images/p/d/cover.jpg?w=2240',
-    )
-  })
-
-  it('puts the cover after the parts, not between the results and the story', async () => {
-    await renderPage()
-    const cover = screen.getByRole('img', { name: 'Home page on a laptop' })
-    const stack = screen.getByRole('region', { name: 'Stack' })
-    expect(stack.compareDocumentPosition(cover) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.queryByRole('img', { name: 'Home page on a laptop' })).not.toBeInTheDocument()
   })
 
   it('shows the decision between the problem and the approach when there is one', async () => {
@@ -63,11 +55,6 @@ describe('CaseStudyPage', () => {
     const parts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(parts).toEqual(['Results', '1Problem', '2Decision', '3Approach', '4Stack', 'Next case study'])
     expect(screen.getByText('Kept WordPress as a headless CMS.')).toBeInTheDocument()
-  })
-
-  it('omits the cover entirely when there is none', async () => {
-    await renderPage(caseStudyDetail({ cover: null }))
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 
   it('numbers the parts: problem, approach, stack', async () => {
