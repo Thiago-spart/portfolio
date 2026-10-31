@@ -243,7 +243,8 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
             </Button>
           </div>
         )}
-        {!fallback && (
+        {/* Only once there is something to reset. */}
+        {!fallback && hintSeen && (
           <button
             type="button"
             aria-label={t('hero.reset')}

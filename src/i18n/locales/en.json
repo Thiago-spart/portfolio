@@ -67,5 +67,6 @@
   "index.label": "Sections",
   "index.contact": "Contact",
   "a11y.skip": "Skip to content",
-  "work.live": "Live at {site}"
+  "work.live": "Live at {site}",
+  "work.liveStore": "On the {site}"
 }

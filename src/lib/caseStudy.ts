@@ -18,11 +18,11 @@ const STORE_HOSTS: Record<string, string> = {
   'play.google.com': 'Google Play',
 }
 
-/** Where a live link goes, short: "capitual.com", "App Store"; null if the URL is invalid. */
-export function liveLabel(url: string): string | null {
+/** Where a live link goes: a site ("capitual.com") or a store ("App Store"); null if the URL is invalid. */
+export function liveLink(url: string): { store: boolean; name: string } | null {
   try {
     const host = new URL(url).hostname.replace(/^www\./, '')
-    return STORE_HOSTS[host] ?? host
+    return STORE_HOSTS[host] ? { store: true, name: STORE_HOSTS[host] } : { store: false, name: host }
   } catch {
     return null
   }

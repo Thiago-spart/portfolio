@@ -18,6 +18,8 @@ const H = 451.2
 const WATERLINE = 298.9
 const PER_METRE = 60.16
 const GAUGE_LEFT = 590.32
+// Results on the dimension lines end here, clear of the gauge's ticks.
+const LABEL_RIGHT = 541
 // A result's shoot reads up to 2.2 m on the gauge (as in the 3D scene).
 export const markY = (height: number) => WATERLINE - height * 2.2 * PER_METRE
 // The three marked seeds, left edge of each seed's box.
@@ -134,13 +136,13 @@ function Proof({ index, x, height, label, maskId }: { index: number; x: number; 
       </g>
       {label && (
         <text
-          x={GAUGE_LEFT - 6}
+          x={LABEL_RIGHT}
           y={my - 4}
           textAnchor="end"
           fontSize="10.34"
           letterSpacing="0.62"
           className="mangrove-anno fill-mangrove font-mono font-medium [paint-order:stroke] stroke-ground [stroke-width:4px] [stroke-linejoin:round] max-sm:hidden"
-          style={{ transformOrigin: `${GAUGE_LEFT - 6}px ${my - 4}px` }}
+          style={{ transformOrigin: `${LABEL_RIGHT}px ${my - 4}px` }}
         >
           {label}
         </text>
