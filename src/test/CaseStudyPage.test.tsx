@@ -1,6 +1,8 @@
 import { screen, within } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import CaseStudyPage from '../components/CaseStudyPage'
+import { READING_BAND } from '../lib/useReadingSection'
+import { FakeObserver, fire } from './fakeObserver'
 import { renderWithRouter } from './renderWithRouter'
 import { caseStudyCard, caseStudyDetail, localeBlock, localeString, paragraphs } from './fixtures'
 
@@ -94,5 +96,71 @@ describe('CaseStudyPage', () => {
   it('has no next link when it is the only case study', async () => {
     await renderPage(caseStudyDetail(), 'en', null as unknown as typeof next)
     expect(screen.queryByRole('navigation', { name: 'Next case study' })).not.toBeInTheDocument()
+  })
+
+  // #75: from 1024px, a sticky list of the numbered parts beside them.
+  describe('contents', () => {
+    let original: typeof IntersectionObserver
+
+    beforeEach(() => {
+      original = window.IntersectionObserver
+      FakeObserver.instances = []
+      window.IntersectionObserver = FakeObserver as unknown as typeof IntersectionObserver
+    })
+
+    afterEach(() => {
+      window.IntersectionObserver = original
+    })
+
+    const contents = () => screen.getByRole('navigation', { name: 'Contents' })
+    const part = (id: string) => document.getElementById(`part-${id}`) as HTMLElement
+
+    it('lists the parts that render, numbered like their callouts, linking to each part', async () => {
+      await renderPage()
+      const links = within(contents()).getAllByRole('link')
+      expect(links.map((a) => a.textContent)).toEqual(['1Problem', '2Approach', '3Stack'])
+      expect(links.map((a) => a.getAttribute('href'))).toEqual(['#part-problem', '#part-approach', '#part-stack'])
+      for (const href of links.map((a) => a.getAttribute('href')!)) {
+        expect(document.querySelector(href)?.tagName).toBe('SECTION')
+      }
+      // The parts keep their accessible names.
+      expect(screen.getByRole('region', { name: 'Approach' })).toBe(part('approach'))
+    })
+
+    it('follows the parts when some are added or empty', async () => {
+      await renderPage(
+        caseStudyDetail({
+          approach: null,
+          decision: localeBlock(paragraphs('Kept WordPress as a headless CMS.')),
+          videoUrl: 'https://cdn.sanity.io/files/p/d/demo.mp4',
+        }),
+      )
+      expect(within(contents()).getAllByRole('link').map((a) => a.textContent)).toEqual([
+        '1Problem',
+        '2Decision',
+        '3Stack',
+        '4Gallery',
+      ])
+    })
+
+    it('marks the part crossing the reading band as the current location', async () => {
+      await renderPage()
+      const band = FakeObserver.instances.find((o) => o.targets.has(part('problem')))
+      expect(band?.options.rootMargin).toBe(READING_BAND)
+      const link = (name: string) => within(contents()).getByRole('link', { name })
+      expect(within(contents()).getAllByRole('link').some((a) => a.hasAttribute('aria-current'))).toBe(false)
+      fire(part('approach'), true)
+      expect(link('Approach')).toHaveAttribute('aria-current', 'location')
+      expect(link('Problem')).not.toHaveAttribute('aria-current')
+      fire(part('approach'), false)
+      fire(part('stack'), true)
+      expect(link('Stack')).toHaveAttribute('aria-current', 'location')
+      expect(link('Approach')).not.toHaveAttribute('aria-current')
+    })
+
+    it('has no contents when there are no parts', async () => {
+      await renderPage(caseStudyDetail({ problem: null, approach: null, stack: [] }))
+      expect(screen.queryByRole('navigation', { name: 'Contents' })).not.toBeInTheDocument()
+    })
   })
 })
