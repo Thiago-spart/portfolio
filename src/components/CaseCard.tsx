@@ -4,6 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
 import { formatYearRange, isCoreTech, liveLink, type CaseStudyRow } from '#/lib/caseStudy'
 import { caseAnchor } from '#/lib/inPage'
+import { caseMorph, caseViewTransition } from '#/lib/caseTransition'
 import { Metric } from './ui/Metric'
 import { Tag } from './ui/Tag'
 import type { Lang } from '#/i18n/LanguageContext'
@@ -25,7 +26,8 @@ interface CaseCardProps {
 // the whole card is clickable while the link's name stays its visible text
 // (WCAG 2.5.3). Hover draws the border in mangrove; the card carries the
 // focus ring while the link is focused. Its id is the case study's in-page
-// anchor (src/lib/inPage.ts).
+// anchor (src/lib/inPage.ts). Title and first result morph into the case
+// page's (src/lib/caseTransition.ts).
 export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const { t } = useTranslation()
   const summaryId = useId()
@@ -51,6 +53,8 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
         <Link
           to="/projects/$slug"
           params={{ slug: caseStudy.slug }}
+          viewTransition={caseViewTransition}
+          style={caseMorph(caseStudy.slug, 'title')}
           aria-describedby={summary ? summaryId : undefined}
           className="text-ink no-underline outline-none after:absolute after:inset-0 after:rounded-md after:content-['']"
         >
@@ -67,6 +71,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
               value={result}
               label={result.label[lang]}
               emphasis={accent && i === 0 ? 'accent' : 'plain'}
+              style={i === 0 ? caseMorph(caseStudy.slug, 'result') : undefined}
               // Content-sized, so two wide values wrap instead of colliding.
               className="flex-[1_1_auto]"
             />

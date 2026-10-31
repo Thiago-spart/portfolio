@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { CaseCard } from '../components/CaseCard'
 import { renderWithRouter } from './renderWithRouter'
 import { caseStudyCard, metric } from './fixtures'
+import { fakeViewTransition } from './fakeViewTransition'
 
 describe('CaseCard', () => {
   it('is one link to the case study, named by its title', async () => {
@@ -96,5 +97,31 @@ describe('CaseCard', () => {
     const card = container.querySelector('#case-portfolio-site')
     expect(card).not.toBeNull()
     expect(card).toHaveClass('scroll-mt-16')
+  })
+
+  // #77: the title and first result morph into the case page's.
+  it('names its title and first result for the view transition to its case page', async () => {
+    const { container } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard()} lang="en" />)
+    expect(screen.getByRole('link', { name: 'Portfolio Site' })).toHaveStyle({ viewTransitionName: 'case-title-portfolio-site' })
+    const named = [...container.querySelectorAll<HTMLElement>('[style*="view-transition-name"]')]
+    expect(named.map((el) => el.style.viewTransitionName)).toEqual(['case-title-portfolio-site', 'case-result-portfolio-site'])
+    expect(named[1]).toHaveTextContent(/^Lighthouse score/)
+  })
+
+  it('opens its case page in a view transition, but not under reduced motion', async () => {
+    for (const reducedMotion of [false, true]) {
+      const vt = fakeViewTransition({ reducedMotion })
+      try {
+        const { unmount } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard()} lang="en" />)
+        const link = screen.getByRole('link', { name: 'Portfolio Site' })
+        fireEvent.click(link)
+        // Active once the router is on the case page.
+        await waitFor(() => expect(link).toHaveAttribute('data-status', 'active'))
+        expect(vt.calls).toHaveLength(reducedMotion ? 0 : 1)
+        unmount()
+      } finally {
+        vt.restore()
+      }
+    }
   })
 })

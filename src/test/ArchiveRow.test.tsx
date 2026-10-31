@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { ArchiveRow } from '../components/ArchiveRow'
 import { renderWithRouter } from './renderWithRouter'
 import { caseStudyCard, localeString, metric } from './fixtures'
+import { fakeViewTransition } from './fakeViewTransition'
 
 const row = caseStudyCard({
   title: localeString({ en: 'Skydiet, web app and UI library' }),
@@ -43,5 +44,30 @@ describe('ArchiveRow', () => {
     const row = container.querySelector('#case-portfolio-site')
     expect(row).not.toBeNull()
     expect(row).toHaveClass('scroll-mt-16')
+  })
+
+  // #77: the title and headline result morph into the case page's.
+  it('names its title and headline result for the view transition to its case page', async () => {
+    await renderWithRouter(<ArchiveRow caseStudy={row} lang="en" />)
+    expect(screen.getByRole('link')).toHaveStyle({ viewTransitionName: 'case-title-skydiet' })
+    expect(screen.getByText('90% test coverage')).toHaveStyle({ viewTransitionName: 'case-result-skydiet' })
+  })
+
+  it('can leave the names off, for a row on a case page', async () => {
+    const { container } = await renderWithRouter(<ArchiveRow caseStudy={row} lang="en" morph={false} />)
+    expect(container.querySelector('[style*="view-transition-name"]')).toBeNull()
+  })
+
+  it('opens its case page in a view transition', async () => {
+    const vt = fakeViewTransition()
+    try {
+      await renderWithRouter(<ArchiveRow caseStudy={row} lang="en" />)
+      const link = screen.getByRole('link')
+      fireEvent.click(link)
+      await waitFor(() => expect(link).toHaveAttribute('data-status', 'active'))
+      expect(vt.calls).toHaveLength(1)
+    } finally {
+      vt.restore()
+    }
   })
 })

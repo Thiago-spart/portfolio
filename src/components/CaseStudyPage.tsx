@@ -1,11 +1,14 @@
 import type { ReactNode } from 'react'
+import { Link } from '@tanstack/react-router'
 import { Code, ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
 import { formatMonthRange, isCoreTech, type CaseStudyRow } from '#/lib/caseStudy'
+import { caseMorph, caseViewTransition } from '#/lib/caseTransition'
+import { caseAnchor } from '#/lib/inPage'
 import { ArchiveRow } from './ArchiveRow'
 import RichText from './RichText'
 import { CaseContents } from './CaseContents'
-import { Button } from './ui/Button'
+import { Button, buttonVariants } from './ui/Button'
 import { Callout } from './ui/Callout'
 import { Container } from './ui/Section'
 import { Metric } from './ui/Metric'
@@ -28,9 +31,10 @@ const PROSE =
 // Figma: Sections / Case study (32:573, 32:699, 32:823). Intro (back link,
 // meta, title, summary, live site), results strip, numbered parts (problem,
 // decision, approach, stack, then gallery and video when present) with their
-// contents beside them from 1024px, and the next case study. The cover
-// stays in Sanity but isn't shown: the covers are promo cards until real
-// screenshots replace them (#66).
+// contents beside them from 1024px, and the next case study. The title and
+// first metric are where a case card's title and first result morph to
+// (src/lib/caseTransition.ts). The cover stays in Sanity but isn't shown:
+// the covers are promo cards until real screenshots replace them (#66).
 export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPageProps) {
   const { t } = useTranslation()
   const dates = formatMonthRange(caseStudy.startDate, caseStudy.endDate, t('work.present'), lang)
@@ -106,16 +110,26 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
   return (
     <Container className="flex flex-col gap-8 pt-8 pb-16 md:gap-12 md:pt-12 md:pb-24">
       <header className="flex flex-col items-start gap-6">
-        <Button variant="ghost" size="small" href="/#projects">
+        {/* A router link, so the morph from the card plays back home, and
+            to the card itself (caseAnchor), so the morph ends in view. */}
+        <Link
+          to="/"
+          hash={caseAnchor(caseStudy.slug)}
+          viewTransition={caseViewTransition}
+          className={buttonVariants({ variant: 'ghost', size: 'small' })}
+        >
           {t('caseStudy.back')}
-        </Button>
+        </Link>
         {(role || dates) && (
           <p className="m-0 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-ink-muted">
             {role && <span className="type-label">{role}</span>}
             {dates && <span className="type-code">{dates}</span>}
           </p>
         )}
-        <h1 className="m-0 max-w-240 type-display-l text-ink md:type-display-xl">{caseStudy.title[lang]}</h1>
+        <h1
+          className="m-0 max-w-240 type-display-l text-ink md:type-display-xl"
+          style={caseMorph(caseStudy.slug, 'title')}
+        >{caseStudy.title[lang]}</h1>
         {summary && <p className="m-0 max-w-152 type-lede text-ink-muted">{summary}</p>}
         {(caseStudy.liveUrl || caseStudy.githubUrl) && (
           <div className="flex flex-wrap gap-3">
@@ -145,6 +159,7 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
                 value={result}
                 label={result.label[lang]}
                 emphasis={i === 0 ? 'accent' : 'plain'}
+                style={i === 0 ? caseMorph(caseStudy.slug, 'result') : undefined}
               />
             ))}
           </div>
@@ -182,7 +197,7 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
           <h2 id="next-heading" className="m-0 type-label text-ink-muted">
             {t('caseStudy.next')}
           </h2>
-          <ArchiveRow caseStudy={next} lang={lang} />
+          <ArchiveRow caseStudy={next} lang={lang} morph={false} />
         </nav>
       )}
     </Container>
