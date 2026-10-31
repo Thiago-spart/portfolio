@@ -6,7 +6,7 @@ import { useTranslation } from '#/i18n/useTranslation'
 import { subscribeTheme, resolvedTheme } from '#/lib/theme'
 import { cn } from '#/lib/utils'
 import { GAUGE_TICKS, MangrovePoster, markY } from './hero/MangrovePoster'
-import { ResultLabel, ResultValue } from './hero/ResultLabel'
+import { ResultLabel } from './hero/ResultLabel'
 import { toHeroResults, type HeroResult } from './hero/heroResults'
 import {
   HINT_KEY,
@@ -45,13 +45,13 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
             {`${t('hero.headline.line1')} ${t('hero.headline.line2')}`}
           </h1>
           <p className="m-0 type-lede text-ink">{t('hero.subtitle')}</p>
-          {/* Phones and tablets: the headline result above the actions (from
-              900px it stands in the lane beside the drawing). */}
+          {/* Phones and tablets: the headline result above the actions, in
+              place of the lane's first label (from 900px it stands in the
+              lane beside the drawing). */}
           {headline && (
-            <p data-testid="hero-headline-result" className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 hero:hidden">
-              <span className="type-label text-ink-muted">{headline.label}</span>
-              <ResultValue result={headline} />
-            </p>
+            <div data-testid="hero-headline-result" className="hero:hidden">
+              <ResultLabel result={headline} />
+            </div>
           )}
           <div className="flex flex-wrap gap-3">
             <Button href="#contact">{t('hero.cta.contact')}</Button>
@@ -231,7 +231,8 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
                 laneRefs.current[i] = el
               }}
               style={{ '--i': i, '--my': markY(result.height) } as CSSProperties}
-              className="mangrove-lane-item"
+              // The first result already stands above the actions below 900px.
+              className={cn('mangrove-lane-item hero:pointer-events-auto', i === 0 && 'max-hero:hidden')}
             >
               <span
                 key={replays[i] ?? 0}

@@ -7,6 +7,9 @@ export type ScoreBand = 'good' | 'average' | 'poor'
 
 export interface HeroResult {
   key: string
+  // The product the result belongs to, and its case study's slug.
+  product: string
+  slug: string
   label: string
   value: MetricValue
   before: string | null
@@ -57,6 +60,12 @@ export function stackHeights(heights: number[], minGap = MIN_GAP_M / GAUGE_SPAN_
   return out.map((h) => Math.round(h * 1000) / 1000)
 }
 
+// Case-study titles read "Product, what changed": the product is the part
+// before the first comma.
+function productOf(title: string): string {
+  return title.split(',')[0].trim()
+}
+
 // The hero results from siteSettings.heroResults, in their Sanity order,
 // localized. Rows whose metric no longer resolves are dropped.
 export function toHeroResults(rows: HERO_RESULTS_QUERY_RESULT | undefined, lang: Lang): HeroResult[] {
@@ -78,6 +87,8 @@ export function toHeroResults(rows: HERO_RESULTS_QUERY_RESULT | undefined, lang:
     return [
       {
         key: row._key,
+        product: productOf(row.caseStudy.title[lang] ?? row.caseStudy.title.en ?? ''),
+        slug: row.caseStudy.slug,
         label: result.label[lang] ?? result.label.en ?? '',
         value,
         before: parts.before,
