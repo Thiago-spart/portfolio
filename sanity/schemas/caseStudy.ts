@@ -67,6 +67,13 @@ export const caseStudy = defineType({
     }),
     defineField({ name: 'summary', title: 'Summary', type: 'localeString', group: 'overview' }),
     defineField({ name: 'problem',  title: 'Problem',  type: 'localeBlock', group: 'story' }),
+    defineField({
+      name: 'decision',
+      title: 'Decision',
+      type: 'localeBlock',
+      group: 'story',
+      description: 'The call that shaped the work: what you chose, what else was on the table, and what it cost. Shown between Problem and Approach.',
+    }),
     defineField({ name: 'approach', title: 'Approach', type: 'localeBlock', group: 'story' }),
     defineField({
       name: 'results',
