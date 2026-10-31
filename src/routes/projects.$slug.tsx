@@ -55,11 +55,12 @@ function ProjectPage() {
   const { lang } = useLanguage()
 
   // The case study closes on the same Contact block as the home page: the
-  // reader who got this far is the one most likely to write.
+  // reader who got this far is the one most likely to write, and the email
+  // says which case study they read.
   return (
     <main id="main" tabIndex={-1} className="focus:outline-none">
       <CaseStudyPage caseStudy={project} next={next} lang={lang} />
-      <ContactSection settings={settings} />
+      <ContactSection settings={settings} subject={project.title[lang]} />
     </main>
   )
 }

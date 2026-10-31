@@ -8,6 +8,9 @@ import type { SITE_SETTINGS_QUERY_RESULT } from '#/types/sanity.generated'
 
 interface Props {
   settings?: SITE_SETTINGS_QUERY_RESULT
+  // What the email is about, e.g. the case study the reader just finished;
+  // it pre-fills the subject line.
+  subject?: string
 }
 
 // Figma: Hero / Contact (23:3570, 23:3593). Email is the one Primary action;
@@ -20,10 +23,13 @@ interface Props {
 // Links come from siteSettings with the fallbacks in src/lib/contact.ts. The
 // availability line under the heading is siteSettings.availability (marked
 // like the current role on the timeline); it's left out until it's set.
-export default function ContactSection({ settings }: Props) {
+export default function ContactSection({ settings, subject }: Props) {
   const { t, lang } = useTranslation()
   const { email, linkedin, github } = contactLinks(settings)
   const availability = settings?.availability?.[lang]
+  const mailto = subject
+    ? `mailto:${email}?subject=${encodeURIComponent(t('contact.subject').replace('{subject}', subject))}`
+    : `mailto:${email}`
   const newTab = <span className="sr-only"> {t('contact.newTab')}</span>
 
   return (
@@ -47,7 +53,7 @@ export default function ContactSection({ settings }: Props) {
         <p className="m-0 max-w-160 type-lede text-ink-muted">{t('contact.subtitle')}</p>
         <p className="-mt-3 mb-0 type-small text-ink-muted">{t('contact.languages')}</p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-          <Button href={`mailto:${email}`} icon={Mail}>
+          <Button href={mailto} icon={Mail}>
             {t('contact.email')}
           </Button>
           <Button href={linkedin} variant="secondary" icon={LinkedinMark} target="_blank" rel="noopener noreferrer">
