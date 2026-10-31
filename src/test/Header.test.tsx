@@ -65,8 +65,17 @@ describe('Header', () => {
 
   it('has no nav links or the old scaffold links', async () => {
     await renderHeader()
-    expect(screen.getAllByRole('link')).toHaveLength(1)
+    // The skip link and the home link.
+    expect(screen.getAllByRole('link')).toHaveLength(2)
     expect(screen.queryByText(/tanstack/i)).toBeNull()
+  })
+
+  it('opens with a skip link to the page content', async () => {
+    await renderHeader()
+    const skip = screen.getAllByRole('link')[0]
+    expect(skip).toHaveAccessibleName('Skip to content')
+    expect(skip).toHaveAttribute('href', '#main')
+    expect(skip).toHaveClass('sr-only', 'focus:not-sr-only')
   })
 
   it('has no "Get in touch" on the home page, where the hero and sheet index carry it', async () => {

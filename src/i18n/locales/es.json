@@ -51,11 +51,11 @@
   "contact.github": "GitHub",
   "contact.newTab": "(se abre en una pestaña nueva)",
   "hero.hint": "Haz clic o toca el agua para que crezca una raíz. Haz clic en una semilla para repetir su resultado.",
-  "hero.hintKeys": "Con el teclado: usa Tab hasta un resultado y pulsa Enter para repetirlo.",
+  "hero.hintKeys": "Con el teclado: usa Tab hasta “Repetir los resultados” y pulsa Enter.",
   "hero.reset": "Reiniciar jardín",
   "hero.resetShort": "Reiniciar",
   "hero.results.label": "Resultados",
-  "hero.results.replay": "Repetir resultado: {label}, {value}",
+  "hero.results.replay": "Repetir los resultados",
   "hero.drawing.propRoot": "Raíz zanco",
   "hero.drawing.canopy": "Copa",
   "hero.drawing.contact": "Contacto",
@@ -68,5 +68,6 @@
   "hero.drawing.night": "Noche · Marea alta",
   "hero.drawing.rev": "Rev 0.2",
   "index.label": "Secciones",
-  "index.contact": "Contacto"
+  "index.contact": "Contacto",
+  "a11y.skip": "Saltar al contenido"
 }
