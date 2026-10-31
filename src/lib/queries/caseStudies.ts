@@ -5,8 +5,9 @@ import { METRIC_FIELDS }  from '#/lib/queryFragments'
 
 // Featured case studies first (by `order`), then the archive, newest first.
 // One row feeds both the Case card (featured) and the Archive row: the role
-// title and dates for the card head, the stack names, and the first two
-// results (the first is the archive row's headline result). This order is
+// title and dates for the card head, the stack names, the first two
+// results (the first is the archive row's headline result) and the live
+// URL the card links to. This order is
 // also the reading order behind "Next case study".
 export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined(slug.current)]
   | order(tier desc, order asc, startDate desc) {
@@ -19,7 +20,8 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined
   startDate,
   endDate,
   "stack": stack[]->name,
-  "results": results[0...2]{ ${METRIC_FIELDS} }
+  "results": results[0...2]{ ${METRIC_FIELDS} },
+  liveUrl
 }`)
 
 // Sanity's CORS allowlist rejects browser-origin requests, so this must run

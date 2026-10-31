@@ -65,6 +65,7 @@ export function caseStudyCard(overrides: Partial<CASE_STUDIES_QUERY_RESULT[numbe
       metric(95, 'Lighthouse score', { before: 40 }),
       metric(40, 'Organic search', { unit: '%', qualifier: 'change' }),
     ],
+    liveUrl: null,
     ...overrides,
   }
 }
