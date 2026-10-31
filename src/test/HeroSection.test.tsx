@@ -89,7 +89,9 @@ function mockMatchMedia(matching: string[]) {
   )
 }
 
-const resultItems = () => within(screen.getByRole('list', { name: 'Results', hidden: true })).getAllByRole('listitem', { hidden: true })
+// The lane beside the drawing (from 900px); below 900px the same labels
+// stand in a group under the lede (hero-results-group).
+const resultItems = () => within(screen.getByTestId('hero-lane')).getAllByRole('listitem', { hidden: true })
 
 beforeEach(() => {
   localStorage.clear()
@@ -152,11 +154,15 @@ describe('HeroSection', () => {
     expect(within(items[0]).getByRole('link', { name: 'Redação Online' })).toHaveAttribute('href', '/projects/redacao')
   })
 
-  it('shows the headline result once on phones: above the actions, not again in the lane', async () => {
+  it('keeps the three results together below 900px: one group under the actions, the lane only from 900px (#69)', async () => {
     await renderHero()
-    expect(resultItems()[0]).toHaveClass('max-hero:hidden')
-    expect(resultItems()[1]).not.toHaveClass('max-hero:hidden')
-    expect(within(screen.getByTestId('hero-headline-result')).getByRole('link', { name: 'Redação Online' })).toBeInTheDocument()
+    const group = screen.getByTestId('hero-results-group')
+    expect(group).toHaveClass('hero:hidden')
+    expect(group).toHaveAccessibleName('Results')
+    expect(within(group).getAllByRole('link').map((a) => a.textContent)).toEqual(['Redação Online', 'Capitual', 'Checkout'])
+    expect(screen.getByTestId('hero-lane')).toHaveClass('max-hero:hidden')
+    resultItems().forEach((li) => expect(li).not.toHaveClass('max-hero:hidden'))
+    expect(screen.queryByTestId('hero-headline-result')).toBeNull()
   })
 
   it('server-renders every result as text, each with its dimension line on the drawing', async () => {
@@ -201,22 +207,42 @@ describe('HeroSection', () => {
     resultItems().forEach((li) => expect(li).toBeVisible())
   })
 
-  it('puts the headline result under the subtitle on phones, above the actions', async () => {
+  it('puts the phone results group after the subtitle and the actions, and before the drawing', async () => {
     await renderHero()
-    const line = screen.getByTestId('hero-headline-result')
-    expect(line).toHaveTextContent('Lighthouse performance score')
-    expect(line).toHaveTextContent('40→ to 95')
-    expect(line).toHaveClass('hero:hidden')
+    const group = screen.getByTestId('hero-results-group')
+    expect(group).toHaveTextContent('Lighthouse performance score')
+    expect(group).toHaveTextContent('40→ to 95')
+    const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
     const subtitle = screen.getByText(/Senior mobile and web engineer/)
-    const contact = screen.getByRole('link', { name: 'Get in touch' })
-    expect(subtitle.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(line.compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const projects = screen.getByRole('link', { name: 'See my work' })
+    expect(follows(subtitle, projects)).toBe(true)
+    expect(follows(projects, group)).toBe(true)
+    expect(follows(group, screen.getByTestId('hero-poster'))).toBe(true)
+  })
+
+  it('marks a result\'s shoot from the phone group too', async () => {
+    await renderHero()
+    const label = within(screen.getByTestId('hero-results-group')).getByRole('link', { name: 'Capitual' }).closest('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(activeProofs()).toEqual(['1'])
+    expect(label).toHaveAttribute('data-active')
+    fireEvent.pointerLeave(label)
+    expect(activeProofs()).toEqual([])
+  })
+
+  it('keeps the hint out of the phone reading path until the drawing is tapped (#69)', async () => {
+    await renderHero()
+    const hint = screen.getByText(/Click or tap the water/)
+    expect(hint).toHaveClass('max-hero:hidden')
+    fireEvent.pointerDown(screen.getByTestId('hero-poster').parentElement!)
+    expect(hint).not.toHaveClass('max-hero:hidden')
+    expect(hint).not.toHaveClass('invisible')
   })
 
   it('still renders without results', async () => {
     await renderHero(null)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByRole('list', { name: 'Results', hidden: true })).toBeNull()
+    expect(screen.queryAllByRole('list', { name: 'Results', hidden: true })).toHaveLength(0)
   })
 
   it('shows the final grown state with all three results under reduced motion', async () => {
