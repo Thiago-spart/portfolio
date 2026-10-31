@@ -44,8 +44,6 @@
   "experience.stack": "Stack",
   "stack.title": "Stack",
   "stack.lede": "Con qué construyo, y cuántos de los {count} casos de estudio lo usan.",
-  "stack.more": "+{count} más",
-  "stack.less": "Mostrar menos",
   "howIWork.title": "Cómo trabajo",
   "howIWork.lede": "Preguntas que me hacen los responsables de ingeniería, respondidas con lo que de verdad hice.",
   "contact.github": "GitHub",
