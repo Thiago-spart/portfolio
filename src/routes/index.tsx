@@ -70,14 +70,17 @@ function HomePage() {
   const { lang } = useLanguage()
 
   return (
-    <main>
+    <>
+      {/* Navigation, so outside main: the skip link lands past it. */}
       <SheetIndex />
-      <HeroSection results={heroResults} />
-      <ProjectsSection projects={caseStudies} lang={lang} />
-      <TimelineSection roles={roles} lang={lang} />
-      <StackSection groups={stack.groups} caseStudyCount={stack.caseStudyCount} lang={lang} />
-      <HowIWorkSection items={faq} lang={lang} />
-      <ContactSection settings={settings} />
-    </main>
+      <main id="main" tabIndex={-1} className="focus:outline-none">
+        <HeroSection results={heroResults} />
+        <ProjectsSection projects={caseStudies} lang={lang} />
+        <TimelineSection roles={roles} lang={lang} />
+        <StackSection groups={stack.groups} caseStudyCount={stack.caseStudyCount} lang={lang} />
+        <HowIWorkSection items={faq} lang={lang} />
+        <ContactSection settings={settings} />
+      </main>
+    </>
   )
 }

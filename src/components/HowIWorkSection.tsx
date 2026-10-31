@@ -46,7 +46,7 @@ function Question({
           onClick={onToggle}
           className={`group ${COLUMNS} w-full cursor-pointer items-start rounded-sm border-0 bg-transparent p-0 text-left`}
         >
-          <span className="type-code text-ink-muted">{String(number).padStart(2, '0')}</span>
+          <span aria-hidden="true" className="type-code text-ink-muted">{String(number).padStart(2, '0')}</span>
           <span className="type-title text-ink transition-colors duration-150 ease-out group-hover:text-mangrove">
             {item.question[lang]}
           </span>
