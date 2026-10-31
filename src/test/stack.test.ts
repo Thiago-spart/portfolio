@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { groupStack } from '../lib/stack'
+import { findTech, groupStack, techSearch, techSlug } from '../lib/stack'
 import type { STACK_QUERY_RESULT } from '../types/sanity.generated'
 
 type Tech = STACK_QUERY_RESULT['techs'][number]
@@ -58,5 +58,47 @@ describe('groupStack', () => {
   it('labels each row in every language', () => {
     const testing = groupStack(techs).find((g) => g.key === 'testing')
     expect(testing?.label).toEqual({ en: 'Testing', pt: 'Testes', es: 'Pruebas' })
+  })
+})
+
+describe('techSlug', () => {
+  it('makes a URL-safe slug of a tech name', () => {
+    expect(techSlug('React Native')).toBe('react-native')
+    expect(techSlug('Next.js')).toBe('next-js')
+    expect(techSlug('Tailwind CSS')).toBe('tailwind-css')
+    expect(techSlug('Vue')).toBe('vue')
+  })
+})
+
+describe('techSearch', () => {
+  it('keeps a non-empty ?tech= string, trimmed and lower-cased', () => {
+    expect(techSearch({ tech: ' React-Native ' })).toEqual({ tech: 'react-native' })
+  })
+
+  it('drops anything else', () => {
+    expect(techSearch({})).toEqual({})
+    expect(techSearch({ tech: '' })).toEqual({})
+    expect(techSearch({ tech: 42 })).toEqual({})
+    expect(techSearch({ tech: ['react'] })).toEqual({})
+  })
+})
+
+describe('findTech', () => {
+  const groups = groupStack([
+    tech('React Native', 'mobile', 3),
+    tech('Next.js', 'frontend', 5),
+    tech('jQuery', 'frontend', 0),
+  ])
+
+  it('finds a tech shown in the Stack rows by its slug or its name', () => {
+    expect(findTech(groups, 'react-native')).toBe('React Native')
+    expect(findTech(groups, 'next.js')).toBe('Next.js')
+    expect(findTech(groups, 'next-js')).toBe('Next.js')
+  })
+
+  it('finds nothing for a tech the rows leave out, or no param', () => {
+    expect(findTech(groups, 'jquery')).toBeNull()
+    expect(findTech(groups, 'cobol')).toBeNull()
+    expect(findTech(groups, undefined)).toBeNull()
   })
 })

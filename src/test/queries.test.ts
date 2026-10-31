@@ -173,16 +173,16 @@ describe('STACK_QUERY', () => {
     expect(techs.map((t) => t.name)).toEqual(['Node.js', 'React', 'Vitest'])
   })
 
-  it('counts the case studies using each tech, and the case studies with a slug', async () => {
-    const stack = await run<{ caseStudyCount: number; techs: { name: string; caseStudies: number }[] }>(STACK_QUERY)
+  it('counts the case studies using each tech', async () => {
+    const stack = await run<{ caseStudyCount?: number; techs: { name: string; caseStudies: number }[] }>(STACK_QUERY)
     // React: cs-feat-1 only (roles don't count); Node.js: on a role only.
     expect(stack.techs.map((t) => [t.name, t.caseStudies])).toEqual([
       ['Node.js', 0],
       ['React', 1],
       ['Vitest', 1],
     ])
-    // cs-draft has no slug, so the site never shows it.
-    expect(stack.caseStudyCount).toBe(4)
+    // The total went with the per-tech counts on the page (#70).
+    expect(stack).not.toHaveProperty('caseStudyCount')
   })
 })
 

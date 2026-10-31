@@ -20,6 +20,8 @@ interface Props {
   last?: boolean
   // Older roles keep one line (title, company, dates); the rest opens on demand.
   compact?: boolean
+  // Uses the Stack filter's tech: its point on the rail is marked.
+  marked?: boolean
 }
 
 // Figma: Components / Role entry (33:481) caps both lists.
@@ -74,7 +76,7 @@ function Disclosure({ label, children }: { label: string; children: ReactNode })
 // One role on the Experience rail. Wide (640+): dates right-aligned in a
 // 160 column, then the rail, then the content. Compact: rail first, dates
 // above the title. The ongoing role (no end date) gets the filled marker.
-export default function TimelineEntry({ entry, lang, last = false, compact = false }: Props) {
+export default function TimelineEntry({ entry, lang, last = false, compact = false, marked = false }: Props) {
   const { t } = useTranslation()
   const current = !entry.endDate
   const summary = entry.summary?.[lang]
@@ -129,6 +131,7 @@ export default function TimelineEntry({ entry, lang, last = false, compact = fal
     <article
       data-current={current || undefined}
       data-role-entry={entry._id}
+      data-tech-match={marked || undefined}
       className="grid grid-cols-[--spacing(4)_minmax(0,1fr)] gap-x-4 gap-y-4 sm:grid-cols-[--spacing(40)_--spacing(4)_minmax(0,1fr)] sm:gap-x-6 sm:gap-y-0"
     >
       <p
@@ -146,7 +149,8 @@ export default function TimelineEntry({ entry, lang, last = false, compact = fal
         className="col-start-1 row-span-2 row-start-1 flex flex-col items-center gap-1 pt-1 sm:col-start-2 sm:row-span-1"
       >
         {/* role-point: grows and fills while one of the role's case studies
-            is hovered or focused in Work (TimelineSection). */}
+            is hovered or focused in Work (TimelineSection), or while the
+            role uses the Stack filter's tech (motion.css). */}
         <svg width="11" height="11" viewBox="0 0 11 11" className="role-point shrink-0">
           <circle
             data-testid="marker"
