@@ -5,7 +5,8 @@ import { METRIC_FIELDS }  from '#/lib/queryFragments'
 
 // Featured case studies first (by `order`), then the archive, newest first.
 // One row feeds both the Case card (featured) and the Archive row: the role
-// title and dates for the card head, the stack names, the first two
+// title and dates for the card head (and the role's id, which marks the
+// role on the timeline rail), the stack names, the first two
 // results (the first is the archive row's headline result) and the live
 // URL the card links to. This order is
 // also the reading order behind "Next case study".
@@ -17,6 +18,7 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy" && defined
   tier,
   summary,
   "roleTitle": role->title,
+  "roleId": role._ref,
   startDate,
   endDate,
   "stack": stack[]->name,

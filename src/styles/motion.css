@@ -60,6 +60,20 @@
   }
 }
 
+/* Experience: a role's point on the rail, grown and filled while one of its
+   case studies is hovered or focused in Work (TimelineSection). It eases in
+   and out; with reduced motion it just switches. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .role-point,
+    .role-point circle {
+      transition:
+        scale 150ms ease-out,
+        fill 150ms ease-out;
+    }
+  }
+}
+
 @keyframes pulse-out {
   0%,
   60% {

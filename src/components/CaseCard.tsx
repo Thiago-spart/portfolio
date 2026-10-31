@@ -25,7 +25,8 @@ interface CaseCardProps {
 // the whole card is clickable while the link's name stays its visible text
 // (WCAG 2.5.3). Hover draws the border in mangrove; the card carries the
 // focus ring while the link is focused. Its id is the case study's in-page
-// anchor (src/lib/inPage.ts).
+// anchor (src/lib/inPage.ts); data-role marks its role on the timeline rail
+// while the card is hovered or focused (TimelineSection).
 export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const { t } = useTranslation()
   const summaryId = useId()
@@ -39,6 +40,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   return (
     <article
       id={caseAnchor(caseStudy.slug)}
+      data-role={caseStudy.roleId ?? undefined}
       className="relative flex h-full scroll-mt-16 flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink transition-colors duration-150 ease-out has-[h3_a:hover]:border-mangrove has-[h3_a:focus-visible]:focus-ring"
     >
       {(role || years) && (
