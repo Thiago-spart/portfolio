@@ -69,5 +69,6 @@
   "hero.drawing.rev": "Rev 0.2",
   "index.label": "Sections",
   "index.contact": "Contact",
-  "a11y.skip": "Skip to content"
+  "a11y.skip": "Skip to content",
+  "work.live": "Live at {site}"
 }

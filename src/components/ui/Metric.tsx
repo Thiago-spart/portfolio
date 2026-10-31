@@ -22,13 +22,13 @@ export function Metric({ value, label, description, emphasis = 'plain', classNam
       <p className="m-0 type-label text-ink-muted">{label}</p>
       <p className="m-0 flex items-baseline gap-3 whitespace-nowrap">
         {before != null && (
-          <>
+          <span className="metric-before flex items-baseline gap-3">
             <s className="type-metric-s text-ink-muted decoration-1">{before}</s>
             <span aria-hidden="true" className="font-mono text-[20px] leading-7 font-medium tracking-[-0.02em] text-ink-muted">
               →
             </span>
             <span className="sr-only">{` ${t('metric.to')} `}</span>
-          </>
+          </span>
         )}
         <span
           data-emphasis={emphasis}

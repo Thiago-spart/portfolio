@@ -67,4 +67,28 @@ describe('CaseCard', () => {
     )
     expect(screen.getByRole('link', { name: 'Portfolio Site' })).toBeInTheDocument()
   })
+
+  it('puts the results right under the title, before the summary and tags', async () => {
+    const { container } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard()} lang="en" />)
+    const order = [...container.querySelector('article')!.children].map((el) =>
+      el.matches('h3') ? 'title' : el.classList.contains('case-tide') ? 'results' : el.id ? 'summary' : el.tagName,
+    )
+    expect(order.indexOf('results')).toBe(order.indexOf('title') + 1)
+    expect(order.indexOf('summary')).toBeGreaterThan(order.indexOf('results'))
+  })
+
+  it('links to the live product in a new tab, above the card link', async () => {
+    await renderWithRouter(<CaseCard caseStudy={caseStudyCard({ liveUrl: 'https://www.capitual.com/' })} lang="en" />)
+    const live = screen.getByRole('link', { name: 'Live at capitual.com (opens in a new tab)' })
+    expect(live).toHaveAttribute('href', 'https://www.capitual.com/')
+    expect(live).toHaveAttribute('target', '_blank')
+    expect(live).toHaveClass('relative', 'z-10')
+  })
+
+  it('names store listings by store', async () => {
+    await renderWithRouter(
+      <CaseCard caseStudy={caseStudyCard({ liveUrl: 'https://apps.apple.com/app/id1' })} lang="en" />,
+    )
+    expect(screen.getByRole('link', { name: /Live at App Store/ })).toBeInTheDocument()
+  })
 })

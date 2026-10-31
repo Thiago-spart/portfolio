@@ -68,10 +68,12 @@ describe('Metric', () => {
   it('reads "40 to 95" to assistive tech', () => {
     const { container } = render(<Metric label="Lighthouse" value={{ before: 40, after: 95 }} />)
     const values = container.querySelectorAll('p')[1]
-    const spoken = [...values.childNodes]
-      .filter((n) => !(n instanceof HTMLElement && n.getAttribute('aria-hidden') === 'true'))
-      .map((n) => n.textContent)
-      .join('')
+    // Every text node not inside an aria-hidden element.
+    const walker = document.createTreeWalker(values, NodeFilter.SHOW_TEXT)
+    let spoken = ''
+    while (walker.nextNode()) {
+      if (!walker.currentNode.parentElement?.closest('[aria-hidden="true"]')) spoken += walker.currentNode.textContent
+    }
     expect(spoken.replace(/\s+/g, ' ')).toBe('40 to 95')
   })
 
