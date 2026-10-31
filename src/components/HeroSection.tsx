@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction } from 'react'
 import type { HERO_RESULTS_QUERY_RESULT } from '#/types/sanity.generated'
 import { Button } from '#/components/ui/Button'
 import { Container } from '#/components/ui/Section'
@@ -36,6 +36,9 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
   const { t, lang } = useTranslation()
   const results = useMemo(() => toHeroResults(rows ?? undefined, lang), [rows, lang])
   const headline = results[0]
+  // The result whose label, or shoot, is hovered or focused: the label and
+  // its shoot and dimension line are marked together.
+  const [active, setActive] = useState<number | null>(null)
 
   return (
     <section aria-labelledby="hero-heading" className="group/section overflow-x-clip">
@@ -60,7 +63,7 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
             </Button>
           </div>
         </div>
-        <HeroDrawing results={results} />
+        <HeroDrawing results={results} active={active} onActive={setActive} />
       </Container>
     </section>
   )
@@ -83,7 +86,13 @@ function useSceneLabels(): SceneLabels {
   return ref.current.labels
 }
 
-function HeroDrawing({ results }: { results: HeroResult[] }) {
+interface HeroDrawingProps {
+  results: HeroResult[]
+  active: number | null
+  onActive: Dispatch<SetStateAction<number | null>>
+}
+
+function HeroDrawing({ results, active, onActive }: HeroDrawingProps) {
   const { t } = useTranslation()
   const labels = useSceneLabels()
   const [mode, setMode] = useState<Mode>('poster')
@@ -96,8 +105,8 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const laneRefs = useRef<Array<HTMLLIElement | null>>([])
   const sceneRef = useRef<MangroveScene | null>(null)
-  const latest = useRef({ labels, results })
-  latest.current = { labels, results }
+  const latest = useRef({ labels, results, onActive })
+  latest.current = { labels, results, onActive }
 
   useEffect(() => {
     setHintSeen(readStore(HINT_KEY) === '1')
@@ -122,11 +131,12 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
             overlay,
             hero,
             lane: () => laneRefs.current,
-            results: latest.current.results.map((r) => ({ height: r.height, text: r.text })),
+            results: latest.current.results.map((r) => ({ height: r.height, text: r.text, product: r.product })),
             labels: latest.current.labels,
             reducedMotion: reduced,
             isDark: () => resolvedTheme() === 'dark',
             onMango: goToContact,
+            onHover: (i) => latest.current.onActive(i),
             onPlant: () => {
               setHintSeen(true)
               writeStore(HINT_KEY, '1')
@@ -157,6 +167,17 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
   useEffect(() => {
     sceneRef.current?.setLabels(labels)
   }, [labels])
+
+  useEffect(() => {
+    sceneRef.current?.setHighlight(active)
+  }, [active, mode])
+
+  // A label leaves the highlight only if it still holds it (moving from one
+  // label to the next can fire the next one's enter first).
+  const labelActive = (i: number) => (on: boolean) => {
+    if (on) onActive(i)
+    else onActive((current) => (current === i ? null : current))
+  }
 
   const resetGarden = () => {
     sceneRef.current?.reset()
@@ -190,8 +211,11 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
         <MangrovePoster
           results={shown.map((r) => r.height)}
           labels={shown.map((r) => r.text)}
+          products={shown.map((r) => r.product)}
+          active={active}
           replays={replays}
           onSeed={replay}
+          onHover={onActive}
           className={cn(
             'mangrove-poster absolute transition-opacity duration-400 ease-out max-hero:top-0 max-hero:h-full max-sm:left-[-16.07%] max-sm:w-[147.35%] sm:max-hero:inset-0 sm:max-hero:w-full',
             mode === 'scene' && 'opacity-0',
@@ -210,6 +234,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
           {shown.map((result, i) => (
             <li
               key={result.key}
+              data-active={active === i || undefined}
               ref={(el) => {
                 laneRefs.current[i] = el
               }}
@@ -220,10 +245,11 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
               <span
                 key={replays[i] ?? 0}
                 aria-hidden="true"
+                data-active={active === i || undefined}
                 style={{ '--delay': `${950 + i * 200}ms` } as CSSProperties}
-                className="mangrove-leader max-hero:hidden group-data-[mode=scene]/sheet:hidden"
+                className="mangrove-leader max-hero:hidden group-data-[mode=scene]/sheet:hidden data-active:h-0.5"
               />
-              <ResultLabel result={result} className="w-full hero:p-2" />
+              <ResultLabel result={result} active={active === i} onActive={labelActive(i)} className="w-full hero:p-2" />
             </li>
           ))}
         </ol>

@@ -105,11 +105,29 @@ function Seed({ x, onClick }: { x: number; onClick?: () => void }) {
 }
 
 // A result drawn on the sheet: the shoot from its seed, a dashed dimension
-// line across to the gauge and the mark it reads there, and the result
-// itself written on that line, against the gauge (off on phones, where the
-// drawing is smallest and the labels sit right under it). A mask draws the lines in
-// order on first view (and again on replay, by remounting).
-function Proof({ index, x, height, label, maskId }: { index: number; x: number; height: number; label?: string; maskId: string }) {
+// line across to the gauge and the mark it reads there, and a note written
+// on that line, against the gauge (off on phones, where the drawing is
+// smallest). From 900px its label stands right beside the gauge with the
+// number, so the line names the product instead and each number is read
+// once; below 900px the labels sit away from the drawing and the line keeps
+// the number. A mask draws the lines in order on first view (and again on
+// replay, by remounting).
+//
+// data-active: its label is hovered or focused; the shoot, the line and the
+// mark thicken and the note turns bold. Hovering the shoot itself marks its
+// label (onHover), through a wider invisible hit line along the stem.
+interface ProofProps {
+  index: number
+  x: number
+  height: number
+  label?: string
+  product?: string
+  active: boolean
+  onHover?: (index: number | null) => void
+  maskId: string
+}
+
+function Proof({ index, x, height, label, product, active, onHover, maskId }: ProofProps) {
   const sx = x + 18.8
   const top = 289.52
   const my = markY(height)
@@ -118,34 +136,48 @@ function Proof({ index, x, height, label, maskId }: { index: number; x: number; 
   const dim = `M${sx + 3} ${my}H${GAUGE_LEFT}`
   const mark = `M586 ${my}H602`
   const step = (delay: number, dur: number) => ({ '--delay': `${base + delay}ms`, '--dur': `${dur}ms` }) as CSSProperties
+  const note = (text: string, className: string) => (
+    <text
+      x={LABEL_RIGHT}
+      y={my - 4}
+      textAnchor="end"
+      fontSize="10.34"
+      letterSpacing="0.62"
+      className={`mangrove-anno fill-mangrove font-mono font-medium [paint-order:stroke] stroke-ground [stroke-width:4px] [stroke-linejoin:round] group-data-active/proof:font-bold max-sm:hidden ${className}`}
+      style={{ transformOrigin: `${LABEL_RIGHT}px ${my - 4}px` }}
+    >
+      {text}
+    </text>
+  )
   return (
-    <g>
+    <g data-proof={index} data-active={active || undefined} className="group/proof">
       <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
         <path d={stem} pathLength={1} stroke="#fff" strokeWidth={12} className="mangrove-draw fill-none" style={step(0, 450)} />
         <path d={dim} pathLength={1} stroke="#fff" strokeWidth={6} className="mangrove-draw fill-none" style={step(350, 400)} />
         <path d={mark} pathLength={1} stroke="#fff" strokeWidth={6} className="mangrove-draw fill-none" style={step(700, 150)} />
       </mask>
       <g mask={`url(#${maskId})`}>
-        <path d={stem} className="fill-none stroke-mangrove [stroke-width:1.41] [stroke-linecap:round] dark:[stroke-dasharray:0_3.4] dark:[stroke-width:2.2]" />
+        <path
+          d={stem}
+          className="fill-none stroke-mangrove [stroke-width:1.41] [stroke-linecap:round] group-data-active/proof:[stroke-width:2.6]! dark:[stroke-dasharray:0_3.4] dark:[stroke-width:2.2]"
+        />
         <path
           d={`M${sx} ${my}C${sx - 2.5} ${my - 1.5} ${sx - 4.5} ${my - 4} ${sx - 5.5} ${my - 6.5}M${sx} ${my}C${sx + 2.5} ${my - 1.5} ${sx + 4.5} ${my - 4} ${sx + 5.5} ${my - 6.5}`}
           className="fill-none stroke-mangrove [stroke-width:1.1] [stroke-linecap:round]"
         />
-        <path d={dim} className="fill-none stroke-mangrove [stroke-dasharray:3_3] [stroke-width:0.94]" />
-        <path d={mark} className="fill-none stroke-mangrove [stroke-width:1.88]" />
+        <path d={dim} className="fill-none stroke-mangrove [stroke-dasharray:3_3] [stroke-width:0.94] group-data-active/proof:[stroke-width:1.9]" />
+        <path d={mark} className="fill-none stroke-mangrove [stroke-width:1.88] group-data-active/proof:[stroke-width:3.2]" />
       </g>
-      {label && (
-        <text
-          x={LABEL_RIGHT}
-          y={my - 4}
-          textAnchor="end"
-          fontSize="10.34"
-          letterSpacing="0.62"
-          className="mangrove-anno fill-mangrove font-mono font-medium [paint-order:stroke] stroke-ground [stroke-width:4px] [stroke-linejoin:round] max-sm:hidden"
-          style={{ transformOrigin: `${LABEL_RIGHT}px ${my - 4}px` }}
-        >
-          {label}
-        </text>
+      {label && note(label, product ? 'hero:hidden' : '')}
+      {product && note(product, 'uppercase max-hero:hidden')}
+      {onHover && (
+        <path
+          d={`M${sx} ${top}V${my - 6}`}
+          data-hit=""
+          onPointerEnter={() => onHover(index)}
+          onPointerLeave={() => onHover(null)}
+          className="pointer-events-auto fill-none stroke-transparent [stroke-width:14]"
+        />
       )}
     </g>
   )
@@ -178,14 +210,19 @@ interface PosterProps {
   className?: string
   // Shoot heights (0–1), one per result, in order.
   results: number[]
-  // Each result as text ("40 → 95"), written above its shoot.
+  // Each result as text ("40 → 95"), written on its dimension line below
+  // 900px; from 900px the line carries the product.
   labels?: string[]
+  products?: string[]
+  // The result whose label is hovered or focused.
+  active?: number | null
+  onHover?: (index: number | null) => void
   // Bumped to replay a result's draw.
   replays: number[]
   onSeed?: (index: number) => void
 }
 
-export function MangrovePoster({ className, results, labels = [], replays, onSeed }: PosterProps) {
+export function MangrovePoster({ className, results, labels = [], products = [], active = null, replays, onSeed, onHover }: PosterProps) {
   const { t } = useTranslation()
   const id = useId()
 
@@ -224,6 +261,9 @@ export function MangrovePoster({ className, results, labels = [], replays, onSee
           x={SEED_X[i]}
           height={height}
           label={labels[i]}
+          product={products[i]}
+          active={active === i}
+          onHover={onHover}
           maskId={`${id}-proof-${i}-${replays[i] ?? 0}`}
         />
       ))}

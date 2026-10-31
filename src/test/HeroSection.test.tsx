@@ -23,6 +23,7 @@ const scene = vi.hoisted(() => ({
   reset: vi.fn(),
   setTheme: vi.fn(),
   setLabels: vi.fn(),
+  setHighlight: vi.fn(),
   destroy: vi.fn(),
 }))
 vi.mock('../components/hero/mangroveScene', () => ({
@@ -405,6 +406,75 @@ describe('result labels lead to their case card (#71)', () => {
     fireEvent.click(laneLink('Capitual'), { button: 1 })
     expect(card.scrollIntoView).not.toHaveBeenCalled()
     expect(card).not.toHaveAttribute('data-pulse')
+  })
+})
+
+const proof = (i: number) => screen.getByTestId('hero-poster').querySelector(`[data-proof="${i}"]`)!
+const activeProofs = () => [...screen.getByTestId('hero-poster').querySelectorAll('[data-proof][data-active]')].map((g) => g.getAttribute('data-proof'))
+const activeItems = () => resultItems().flatMap((li, i) => (li.hasAttribute('data-active') ? [i] : []))
+
+describe('each result label and its shoot point at each other (#71, #68)', () => {
+  it('highlights the shoot and dimension line of a hovered or focused label, and the label itself', async () => {
+    await renderHero()
+    const item = laneLink('Capitual').closest('li')!
+    const label = item.querySelector('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(activeProofs()).toEqual(['1'])
+    expect(activeItems()).toEqual([1])
+    expect(label).toHaveAttribute('data-active')
+    expect(item.querySelector('.mangrove-leader')).toHaveAttribute('data-active')
+    fireEvent.pointerLeave(label)
+    expect(activeProofs()).toEqual([])
+    expect(activeItems()).toEqual([])
+
+    act(() => laneLink('Checkout').focus())
+    expect(activeProofs()).toEqual(['2'])
+    act(() => laneLink('Checkout').blur())
+    expect(activeProofs()).toEqual([])
+  })
+
+  it('highlights a label when its shoot is hovered on the poster', async () => {
+    await renderHero()
+    const hit = proof(2).querySelector('[data-hit]')!
+    fireEvent.pointerEnter(hit)
+    expect(activeItems()).toEqual([2])
+    expect(activeProofs()).toEqual(['2'])
+    fireEvent.pointerLeave(hit)
+    expect(activeItems()).toEqual([])
+  })
+
+  it('passes the highlight to the 3D scene and back', async () => {
+    await renderHero()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    const label = laneLink('Redação Online').closest('li')!.querySelector('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(scene.setHighlight).toHaveBeenLastCalledWith(0)
+    fireEvent.pointerLeave(label)
+    expect(scene.setHighlight).toHaveBeenLastCalledWith(null)
+
+    act(() => scene.options!.onHover(2))
+    expect(activeItems()).toEqual([2])
+    act(() => scene.options!.onHover(null))
+    expect(activeItems()).toEqual([])
+  })
+
+  it('writes the product on each dimension line from 900px and the number only below it', async () => {
+    await renderHero()
+    const texts = [...proof(1).querySelectorAll('text')]
+    const number = texts.find((t) => t.textContent === '−96%')!
+    const product = texts.find((t) => t.textContent === 'Capitual')!
+    expect(number).toHaveClass('hero:hidden')
+    expect(product).toHaveClass('max-hero:hidden')
+    expect(product).not.toHaveClass('hero:hidden')
+  })
+
+  it('gives the scene each result\'s product for its dimension line', async () => {
+    await renderHero()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    expect(scene.options!.results.map((r) => r.product)).toEqual(['Redação Online', 'Capitual', 'Checkout'])
+    expect(scene.options!.results[1].text).toBe('−96%')
   })
 })
 
