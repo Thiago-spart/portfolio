@@ -41,6 +41,7 @@ export const CASE_STUDY_DETAIL_QUERY = defineQuery(`*[_type == "caseStudy" && sl
   "slug": slug.current,
   summary,
   problem,
+  decision,
   approach,
   "results": results[]{ ${METRIC_FIELDS} },
   // The tools, not the practices (SEO, BFF, i18n…): the story carries those.

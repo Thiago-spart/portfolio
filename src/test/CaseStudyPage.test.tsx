@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import CaseStudyPage from '../components/CaseStudyPage'
 import { renderWithRouter } from './renderWithRouter'
-import { caseStudyCard, caseStudyDetail, localeString } from './fixtures'
+import { caseStudyCard, caseStudyDetail, localeBlock, localeString, paragraphs } from './fixtures'
 
 const next = caseStudyCard({ _id: 'cs-2', slug: 'banking-tools', title: localeString({ en: 'Banking Tools' }), tier: 'archive' })
 
@@ -49,6 +49,20 @@ describe('CaseStudyPage', () => {
       'src',
       'https://cdn.sanity.io/images/p/d/cover.jpg?w=2240',
     )
+  })
+
+  it('puts the cover after the parts, not between the results and the story', async () => {
+    await renderPage()
+    const cover = screen.getByRole('img', { name: 'Home page on a laptop' })
+    const stack = screen.getByRole('region', { name: 'Stack' })
+    expect(stack.compareDocumentPosition(cover) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('shows the decision between the problem and the approach when there is one', async () => {
+    await renderPage(caseStudyDetail({ decision: localeBlock(paragraphs('Kept WordPress as a headless CMS.')) }))
+    const parts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+    expect(parts).toEqual(['Results', '1Problem', '2Decision', '3Approach', '4Stack', 'Next case study'])
+    expect(screen.getByText('Kept WordPress as a headless CMS.')).toBeInTheDocument()
   })
 
   it('omits the cover entirely when there is none', async () => {
