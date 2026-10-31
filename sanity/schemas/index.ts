@@ -9,19 +9,12 @@ import { caseStudy }     from './caseStudy'
 import { role }          from './role'
 import { tech }          from './tech'
 import { faq }           from './faq'
-import { experience }    from './experience'
-import { qa }            from './qa'
-import { skillCategory } from './skillCategory'
-import { project }       from './project'
 
 // Singletons, pinned at the top of the Studio (document id = type name).
 export const SINGLETONS = ['siteSettings']
 
 // New content types, in Studio order.
 export const CONTENT_TYPES = ['caseStudy', 'role', 'tech', 'faq']
-
-// Legacy document types: the live site still queries these until #47.
-export const LEGACY_TYPES = ['experience', 'project', 'qa', 'skillCategory']
 
 export const schemaTypes = [
   // objects
@@ -37,9 +30,4 @@ export const schemaTypes = [
   role,
   tech,
   faq,
-  // legacy documents
-  experience,
-  qa,
-  skillCategory,
-  project,
 ]

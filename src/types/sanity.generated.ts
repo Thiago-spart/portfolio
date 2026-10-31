@@ -15,159 +15,6 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
-};
-
-export type Project = {
-  _id: string;
-  _type: "project";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: LocaleString;
-  slug: Slug;
-  shortDescription?: LocaleString;
-  longDescription: LocaleText;
-  highlights?: Array<
-    {
-      _key: string;
-    } & LocaleString
-  >;
-  challenges?: Array<
-    {
-      _key: string;
-    } & LocaleString
-  >;
-  coverImage?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  gallery?: Array<{
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-    _key: string;
-  }>;
-  video?: {
-    asset?: SanityFileAssetReference;
-    media?: unknown;
-    _type: "file";
-  };
-  techStack: Array<string>;
-  category?: "web" | "mobile" | "api" | "other";
-  liveUrl?: string;
-  githubUrl?: string;
-  startDate: string;
-  endDate?: string;
-  status?: "completed" | "in-progress" | "archived";
-  featured?: boolean;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-};
-
-export type LocaleText = {
-  _type: "localeText";
-  en: string;
-  pt: string;
-  es: string;
-};
-
-export type LocaleString = {
-  _type: "localeString";
-  en: string;
-  pt: string;
-  es: string;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
-};
-
-export type SkillCategory = {
-  _id: string;
-  _type: "skillCategory";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  category?: LocaleString;
-  skills?: Array<{
-    name?: string;
-    icon?: string;
-    _key: string;
-  }>;
-  order?: number;
-};
-
-export type Qa = {
-  _id: string;
-  _type: "qa";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  question?: LocaleString;
-  answer?: LocaleString;
-  order?: number;
-};
-
-export type Experience = {
-  _id: string;
-  _type: "experience";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  company?: string;
-  companyUrl?: string;
-  companyLogo?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  role?: LocaleString;
-  description?: LocaleString;
-  startDate?: string;
-  endDate?: string;
-  techStack?: Array<string>;
-  highlights?: Array<{
-    value?: string;
-    label?: LocaleString;
-    _key: string;
-  }>;
-};
-
 export type Faq = {
   _id: string;
   _type: "faq";
@@ -237,6 +84,13 @@ export type LocaleBlock = {
   }>;
 };
 
+export type LocaleString = {
+  _type: "localeString";
+  en: string;
+  pt: string;
+  es: string;
+};
+
 export type Tech = {
   _id: string;
   _type: "tech";
@@ -254,6 +108,13 @@ export type Tech = {
     | "ai"
     | "practice";
   url?: string;
+};
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
 };
 
 export type SiteSettings = {
@@ -283,6 +144,13 @@ export type SiteSettings = {
   };
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
 export type ImageWithAlt = {
   _type: "imageWithAlt";
   asset?: SanityImageAssetReference;
@@ -290,6 +158,13 @@ export type ImageWithAlt = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt: LocaleString;
+};
+
+export type LocaleText = {
+  _type: "localeText";
+  en: string;
+  pt: string;
+  es: string;
 };
 
 export type CaseStudyReference = {
@@ -377,6 +252,28 @@ export type Role = {
       _key: string;
     } & TechReference
   >;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type Metric = {
@@ -487,28 +384,24 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | SanityImageAssetReference
-  | SanityFileAssetReference
-  | Project
-  | SanityImageCrop
-  | SanityImageHotspot
-  | LocaleText
-  | LocaleString
-  | Slug
-  | SkillCategory
-  | Qa
-  | Experience
   | Faq
   | LocaleBlock
+  | LocaleString
   | Tech
+  | SanityFileAssetReference
   | SiteSettings
+  | SanityImageAssetReference
   | ImageWithAlt
+  | LocaleText
   | CaseStudyReference
   | HeroResult
   | RoleReference
   | TechReference
   | CaseStudy
   | Role
+  | Slug
+  | SanityImageCrop
+  | SanityImageHotspot
   | Metric
   | SanityImagePaletteSwatch
   | SanityImagePalette

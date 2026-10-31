@@ -1,6 +1,5 @@
-import { ArchiveIcon } from '@sanity/icons/Archive'
 import type { StructureBuilder, StructureResolver } from 'sanity/structure'
-import { CONTENT_TYPES, LEGACY_TYPES, SINGLETONS } from './schemas'
+import { CONTENT_TYPES, SINGLETONS } from './schemas'
 
 type Ordering = { field: string; direction: 'asc' | 'desc' }
 
@@ -24,8 +23,7 @@ function typeList(S: StructureBuilder, type: string) {
   return item.child(S.documentTypeList(type).defaultOrdering(ordering))
 }
 
-// Order: singletons pinned at the top, then the new content types, then the
-// pre-migration types the live site still reads (removed in #47).
+// Order: singletons pinned at the top, then the content types.
 export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
@@ -33,13 +31,4 @@ export const structure: StructureResolver = (S) =>
       ...SINGLETONS.map((type) => singleton(S, type)),
       S.divider(),
       ...CONTENT_TYPES.map((type) => typeList(S, type)),
-      S.divider(),
-      S.listItem()
-        .title('Legacy (pre-migration)')
-        .icon(ArchiveIcon)
-        .child(
-          S.list()
-            .title('Legacy (pre-migration)')
-            .items(LEGACY_TYPES.map((type) => S.documentTypeListItem(type))),
-        ),
     ])
