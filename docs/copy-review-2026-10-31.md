@@ -1,6 +1,8 @@
 # Copy review: critique round 3
 
-Drafts for Sanity and the UI strings, in en / pt / es, from the 2026-10-31 Impeccable critique (phases 4 and 5, plus the "working with me" note). Nothing is written to Sanity until approved. Every number below already exists in Sanity; anything I could not source is marked **[confirm]**.
+Drafts for Sanity and the UI strings, in en / pt / es, from the 2026-10-31 Impeccable critique (phases 4 and 5, plus the "working with me" note). Every number below already exists in Sanity; anything I could not source is marked **[confirm]**.
+
+**Status (2026-10-31):** approved. Sections 1–4 written to Sanity by `sanity/migrations/copy-review-2026-10-31/apply.ts` (transaction `c2Wd8tEkG0X6ayi5wJfTPd`, 18 documents; backup `~/sanity-backups/production-before-copy-round3-2026-10-31.tar.gz`). The **[confirm]** phrases were left out: no rebuild detail in the Decision, and section 5 ships as the languages line only. Section 6: option A.
 
 ## 1. Experience timeline: scope and leadership, not the same numbers again
 
