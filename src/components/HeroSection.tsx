@@ -203,6 +203,7 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
 
       {shown.length > 0 && (
         <ol
+          data-testid="hero-lane"
           aria-label={t('hero.results.label')}
           className="m-0 mt-6 flex list-none flex-col gap-3 p-0 sm:flex-row sm:flex-wrap hero:pointer-events-none hero:absolute hero:inset-x-0 hero:top-0 hero:z-20 hero:mt-0 hero:block hero:h-0"
         >

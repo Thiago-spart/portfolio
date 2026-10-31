@@ -1,7 +1,8 @@
-import { useId } from 'react'
+import { useId, type MouseEvent } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
+import { caseAnchor, goTo } from '#/lib/inPage'
 import { cn } from '#/lib/utils'
 import type { HeroResult, ScoreBand } from './heroResults'
 
@@ -49,8 +50,18 @@ function ResultValue({ result }: { result: HeroResult }) {
 // is clickable while the link's name stays its visible text (WCAG 2.5.3),
 // with the metric as its description. Hover: sunken surface, product and
 // arrow in mangrove, as on the archive rows.
+//
+// On the home page a click leads to the result's Case card in Work (goTo
+// scrolls there, marks it and moves focus to its link); the case page is
+// one more click, from the card. The href stays the case page, so without
+// script, with a modified click (new tab) or where no card is on the page,
+// it is an ordinary link.
 export function ResultLabel({ result, className }: { result: HeroResult; className?: string }) {
   const metricId = useId()
+  const toCard = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    if (goTo(caseAnchor(result.slug))) e.preventDefault()
+  }
   return (
     <div
       className={cn(
@@ -63,6 +74,7 @@ export function ResultLabel({ result, className }: { result: HeroResult; classNa
         to="/projects/$slug"
         params={{ slug: result.slug }}
         aria-describedby={metricId}
+        onClick={toCard}
         className="flex items-center gap-1 type-label text-ink no-underline outline-none group-hover:text-mangrove after:absolute after:inset-0 after:content-['']"
       >
         {result.product}

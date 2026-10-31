@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderToString } from 'react-dom/server'
@@ -10,7 +10,7 @@ import { goToContact, HINT_KEY, ROOTS_KEY } from '../components/hero/heroShell'
 import type { SceneOptions } from '../components/hero/mangroveScene'
 import { localeString, metric } from './fixtures'
 import { renderWithRouter } from './renderWithRouter'
-import { RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
+import { Outlet, RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 import en from '../i18n/locales/en.json'
 import pt from '../i18n/locales/pt.json'
 import es from '../i18n/locales/es.json'
@@ -331,6 +331,80 @@ describe('HeroSection', () => {
     await waitFor(() => expect(scene.options).not.toBeNull())
     unmount()
     expect(scene.destroy).toHaveBeenCalled()
+  })
+})
+
+// The home page around the hero: the hero, the Work cards it links to (when
+// given) and an outlet showing the case page if the router navigates there.
+async function renderHome(cards: string[]) {
+  const rootRoute = createRootRoute({
+    component: () => (
+      <LanguageProvider>
+        <HeroSection results={RESULTS} />
+        {cards.map((slug) => (
+          <article key={slug} id={`case-${slug}`}>
+            <h3>
+              <a href={`/projects/${slug}`}>{`Card ${slug}`}</a>
+            </h3>
+          </article>
+        ))}
+        <Outlet />
+      </LanguageProvider>
+    ),
+  })
+  const projectRoute = createRoute({ getParentRoute: () => rootRoute, path: '/projects/$slug', component: () => <p>Case page</p> })
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([projectRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  })
+  await router.load()
+  const view = render(<RouterProvider router={router} />)
+  for (const slug of cards) document.getElementById(`case-${slug}`)!.scrollIntoView = vi.fn()
+  return { ...view, router }
+}
+
+const laneLink = (name: string) => within(screen.getByTestId('hero-lane')).getByRole('link', { name, hidden: true })
+
+describe('result labels lead to their case card (#71)', () => {
+  it('keeps each label a real link to its case page', async () => {
+    await renderHome(['capitual'])
+    expect(laneLink('Capitual')).toHaveAttribute('href', '/projects/capitual')
+  })
+
+  it('scrolls to the case card, marks it and moves focus there instead of leaving the page', async () => {
+    const { router } = await renderHome(['capitual'])
+    const card = document.getElementById('case-capitual')!
+    fireEvent.click(laneLink('Capitual'))
+    expect(card.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    expect(card).toHaveAttribute('data-pulse')
+    expect(document.activeElement).toBe(within(card).getByRole('link'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(router.state.location.pathname).toBe('/')
+    expect(screen.queryByText('Case page')).toBeNull()
+  })
+
+  it('jumps without smooth scrolling under reduced motion', async () => {
+    mockMatchMedia(['prefers-reduced-motion'])
+    await renderHome(['capitual'])
+    fireEvent.click(laneLink('Capitual'))
+    expect(document.getElementById('case-capitual')!.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'center' })
+  })
+
+  it('opens the case page when its card is not on the page', async () => {
+    const { router } = await renderHome([])
+    fireEvent.click(laneLink('Capitual'))
+    expect(await screen.findByText('Case page')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/projects/capitual')
+  })
+
+  it('leaves modified clicks (new tab, new window) to the browser', async () => {
+    await renderHome(['capitual'])
+    const card = document.getElementById('case-capitual')!
+    fireEvent.click(laneLink('Capitual'), { ctrlKey: true })
+    fireEvent.click(laneLink('Capitual'), { metaKey: true })
+    fireEvent.click(laneLink('Capitual'), { button: 1 })
+    expect(card.scrollIntoView).not.toHaveBeenCalled()
+    expect(card).not.toHaveAttribute('data-pulse')
   })
 })
 
