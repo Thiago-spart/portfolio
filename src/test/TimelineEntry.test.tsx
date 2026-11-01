@@ -1,9 +1,10 @@
 // src/test/TimelineEntry.test.tsx
-import { screen, within } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { fireEvent, screen, within } from '@testing-library/react'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import TimelineEntry from '../components/TimelineEntry'
 import { renderWithRouter } from './renderWithRouter'
 import { localeString, localeText, metric } from './fixtures'
+import { caseAnchor } from '../lib/inPage'
 import type { Lang } from '../i18n/LanguageContext'
 import type { ROLES_QUERY_RESULT } from '../types/sanity.generated'
 
@@ -76,22 +77,69 @@ describe('TimelineEntry', () => {
 
   it('shows at most four case links', async () => {
     await render({ ...mockEntry, caseStudies: [1, 2, 3, 4, 5].map(study) })
-    expect(screen.getAllByRole('link')).toHaveLength(4)
+    expect(within(screen.getByRole('list', { name: 'Case studies' })).getAllByRole('link')).toHaveLength(4)
     expect(screen.queryByRole('link', { name: 'Study 5' })).not.toBeInTheDocument()
   })
 
-  it('keeps the case links behind a closed count, since Projects already shows them', async () => {
+  it('lists the case links openly on a full entry, each with its headline result', async () => {
     await render()
     const list = screen.getByRole('list', { name: 'Case studies' })
-    const details = list.closest('details')
-    expect(details).not.toHaveAttribute('open')
-    expect(within(details as HTMLElement).getByText('2 case studies').tagName).toBe('SUMMARY')
-    expect(screen.queryByText('23% → 9%')).not.toBeInTheDocument()
+    expect(list.closest('details')).toBeNull()
+    const [first, second] = within(list).getAllByRole('listitem')
+    expect(within(first).getByText('23% → 9% checkout drop-off')).toBeInTheDocument()
+    // The result sits beside the link, so the link stays named by its title.
+    expect(within(first).getByRole('link')).toHaveAccessibleName('Checkout rebuild')
+    expect(second.textContent).toBe('Design system')
+  })
+
+  it('counts a compact entry\'s case studies instead of listing them', async () => {
+    await render(mockEntry, { compact: true })
+    expect(screen.getByText('2 case studies')).toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Case studies' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 
   it('counts a single case study in the singular', async () => {
-    await render({ ...mockEntry, caseStudies: [study(1)] })
+    await render({ ...mockEntry, caseStudies: [study(1)] }, { compact: true })
     expect(screen.getByText('1 case study')).toBeInTheDocument()
+  })
+
+  it('counts every case study, past the four it would link', async () => {
+    await render({ ...mockEntry, caseStudies: [1, 2, 3, 4, 5].map(study) }, { compact: true })
+    expect(screen.getByText('5 case studies')).toBeInTheDocument()
+  })
+
+  it('carries the role id, so a Case card can mark it on the rail', async () => {
+    const { container } = await render()
+    expect(container.querySelector('article')).toHaveAttribute('data-role-entry', '1')
+  })
+
+  describe('a case link on the home page', () => {
+    afterEach(() => {
+      document.getElementById(caseAnchor('checkout-rebuild'))?.remove()
+    })
+
+    it('scrolls to the case study\'s card and marks it, instead of leaving the page', async () => {
+      await render()
+      const card = document.createElement('article')
+      card.id = caseAnchor('checkout-rebuild')
+      card.scrollIntoView = vi.fn()
+      document.body.append(card)
+      const link = screen.getByRole('link', { name: 'Checkout rebuild' })
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
+      fireEvent(link, click)
+      expect(card.scrollIntoView).toHaveBeenCalled()
+      expect(card).toHaveAttribute('data-pulse')
+      expect(click.defaultPrevented).toBe(true)
+    })
+
+    it('follows the link when the card isn\'t on the page', async () => {
+      await render()
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
+      // The router handles it as a navigation; goTo just declines.
+      fireEvent(screen.getByRole('link', { name: 'Checkout rebuild' }), click)
+      expect(document.querySelector('[data-pulse]')).toBeNull()
+    })
   })
 
   it('shows summary and stack openly on a full entry', async () => {
@@ -106,9 +154,7 @@ describe('TimelineEntry', () => {
     const details = screen.getByText('Built great things.').closest('details') as HTMLElement
     expect(details).not.toHaveAttribute('open')
     expect(within(details).getByText('Details').tagName).toBe('SUMMARY')
-    expect(within(details).getByRole('list', { name: 'Case studies' })).toBeInTheDocument()
     expect(within(details).getByRole('list', { name: 'Stack' })).toBeInTheDocument()
-    expect(within(details).queryByText('2 case studies')).not.toBeInTheDocument()
   })
 
   it('has no "Details" on a compact entry with nothing to show', async () => {

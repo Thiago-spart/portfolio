@@ -97,4 +97,14 @@ describe('CaseCard', () => {
     expect(card).not.toBeNull()
     expect(card).toHaveClass('scroll-mt-16')
   })
+
+  it("points at its role, so hovering or focusing it marks the role on the timeline", async () => {
+    const { container } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard({ roleId: 'role-1' })} lang="en" />)
+    expect(container.querySelector('#case-portfolio-site')).toHaveAttribute('data-role', 'role-1')
+  })
+
+  it('has no role to point at without one', async () => {
+    const { container } = await renderWithRouter(<CaseCard caseStudy={caseStudyCard({ roleId: null })} lang="en" />)
+    expect(container.querySelector('#case-portfolio-site')).not.toHaveAttribute('data-role')
+  })
 })

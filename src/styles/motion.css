@@ -60,6 +60,79 @@
   }
 }
 
+/* Experience: a role's point on the rail, grown and filled while one of its
+   case studies is hovered or focused in Work (TimelineSection). It eases in
+   and out; with reduced motion it just switches. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .role-point,
+    .role-point circle {
+      transition:
+        scale 150ms ease-out,
+        fill 150ms ease-out;
+    }
+  }
+}
+
+/* Experience: the roles that use the Stack filter's tech (?tech=), their
+   point marked like a hovered case study's. Unlayered, like the hover rule
+   TimelineSection writes, so it wins over the marker's fill utility. */
+[data-tech-match] .role-point {
+  scale: 1.6;
+}
+
+[data-tech-match] .role-point circle {
+  fill: var(--mangrove);
+}
+
+/* Stack: one mangrove outline glides between the tags of a row as the
+   pointer or focus moves along it (CSS anchor positioning). It rests,
+   hidden, on the row's first tag, so it glides in from there. Without
+   anchor positioning the tag's own border turns mangrove instead
+   (StackGroup); with reduced motion it moves without gliding. */
+@layer components {
+  @supports (anchor-scope: all) {
+    .tech-glide {
+      position: relative;
+      anchor-scope: --tech;
+    }
+
+    .tech-glide > li:first-child > button > span,
+    .tech-glide button:is(:hover, :focus-visible) > span {
+      anchor-name: --tech;
+    }
+
+    .tech-glide::after {
+      content: '';
+      position: absolute;
+      position-anchor: --tech;
+      top: calc(anchor(top) - 4px);
+      left: calc(anchor(left) - 4px);
+      right: calc(anchor(right) - 4px);
+      bottom: calc(anchor(bottom) - 4px);
+      border: 1px solid var(--mangrove);
+      border-radius: var(--radius-md);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tech-glide:has(button:is(:hover, :focus-visible))::after {
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .tech-glide::after {
+        transition:
+          top 200ms ease-out,
+          left 200ms ease-out,
+          right 200ms ease-out,
+          bottom 200ms ease-out,
+          opacity 150ms ease-out;
+      }
+    }
+  }
+}
+
 @keyframes pulse-out {
   0%,
   60% {
