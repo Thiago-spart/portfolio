@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
 import { formatYearRange, isCoreTech, liveLink, type CaseStudyRow } from '#/lib/caseStudy'
+import { caseAnchor } from '#/lib/inPage'
 import { Metric } from './ui/Metric'
 import { Tag } from './ui/Tag'
 import type { Lang } from '#/i18n/LanguageContext'
@@ -23,7 +24,8 @@ interface CaseCardProps {
 // to four Tags and, when the product is live, a link to it. The title is the link and its ::after stretches over the card, so
 // the whole card is clickable while the link's name stays its visible text
 // (WCAG 2.5.3). Hover draws the border in mangrove; the card carries the
-// focus ring while the link is focused.
+// focus ring while the link is focused. Its id is the case study's in-page
+// anchor (src/lib/inPage.ts).
 export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const { t } = useTranslation()
   const summaryId = useId()
@@ -35,7 +37,10 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const live = caseStudy.liveUrl ? liveLink(caseStudy.liveUrl) : null
 
   return (
-    <article className="relative flex h-full flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink transition-colors duration-150 ease-out has-[h3_a:hover]:border-mangrove has-[h3_a:focus-visible]:focus-ring">
+    <article
+      id={caseAnchor(caseStudy.slug)}
+      className="relative flex h-full scroll-mt-16 flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink transition-colors duration-150 ease-out has-[h3_a:hover]:border-mangrove has-[h3_a:focus-visible]:focus-ring"
+    >
       {(role || years) && (
         <div className="flex w-full items-baseline justify-between gap-4 text-ink-muted">
           <span className="type-label">{role}</span>
