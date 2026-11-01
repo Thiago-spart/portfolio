@@ -22,6 +22,7 @@ const mockProjects: CASE_STUDIES_QUERY_RESULT = [
     tier: 'archive',
     summary: null,
     roleTitle: null,
+    roleId: null,
     stack: null,
     results: null,
   }),

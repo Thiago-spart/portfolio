@@ -62,4 +62,20 @@ describe('TimelineSection', () => {
     expect(details).toHaveLength(1)
     expect(details[0].closest('article')).toHaveTextContent('Old Co role')
   })
+
+  it('marks a role on the rail while one of its case studies is hovered or focused', () => {
+    const { container } = render(<LanguageProvider><TimelineSection roles={mockRoles} lang="en" /></LanguageProvider>)
+    const css = container.querySelector('style')?.textContent ?? ''
+    for (const id of ['1', '2']) {
+      expect(css).toContain(`main:has([data-role="${id}"] a:is(:hover, :focus-visible)) [data-role-entry="${id}"] .role-point`)
+    }
+  })
+
+  it('writes no rule for an id that could break out of its selector', () => {
+    const { container } = render(
+      <LanguageProvider><TimelineSection roles={[role('x"] , * { color: red } [a="', 'Bad', '2020-01-01', null)]} lang="en" /></LanguageProvider>,
+    )
+    expect(container.querySelector('style')?.textContent ?? '').not.toContain('color: red')
+  })
 })
+

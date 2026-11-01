@@ -116,6 +116,12 @@ describe('CASE_STUDIES_QUERY', () => {
     expect(first.results.map((r: { _key: string }) => r._key)).toEqual(['lh', 'bugs'])
     expect(first.results[0]).toMatchObject({ before: 40, after: 95 })
   })
+
+  it("carries the role's id, so a card can point at its role on the timeline", async () => {
+    const rows = await run<{ slug: string; roleId: string | null }[]>(CASE_STUDIES_QUERY)
+    expect(rows.find((r) => r.slug === 'first')?.roleId).toBe('role-new')
+    expect(rows.find((r) => r.slug === 'solo')?.roleId).toBeNull()
+  })
 })
 
 describe('CASE_STUDY_DETAIL_QUERY', () => {
