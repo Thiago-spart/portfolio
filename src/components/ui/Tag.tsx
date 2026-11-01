@@ -4,13 +4,11 @@ interface TagProps {
   label: string
   // Core marks the main stack (React, React Native, TypeScript).
   core?: boolean
-  // How many case studies use the tech (Stack section only).
-  count?: number
   className?: string
 }
 
 // Figma: Components / Tag (9:45). One technology in a stack.
-export function Tag({ label, core = false, count, className }: TagProps) {
+export function Tag({ label, core = false, className }: TagProps) {
   return (
     <span
       data-core={core || undefined}
@@ -23,7 +21,6 @@ export function Tag({ label, core = false, count, className }: TagProps) {
       )}
     >
       {label}
-      {count != null && <span className="text-ink-muted">{count}</span>}
     </span>
   )
 }

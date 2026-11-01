@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderToString } from 'react-dom/server'
@@ -10,7 +10,7 @@ import { goToContact, HINT_KEY, ROOTS_KEY } from '../components/hero/heroShell'
 import type { SceneOptions } from '../components/hero/mangroveScene'
 import { localeString, metric } from './fixtures'
 import { renderWithRouter } from './renderWithRouter'
-import { RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
+import { Outlet, RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 import en from '../i18n/locales/en.json'
 import pt from '../i18n/locales/pt.json'
 import es from '../i18n/locales/es.json'
@@ -23,6 +23,7 @@ const scene = vi.hoisted(() => ({
   reset: vi.fn(),
   setTheme: vi.fn(),
   setLabels: vi.fn(),
+  setHighlight: vi.fn(),
   destroy: vi.fn(),
 }))
 vi.mock('../components/hero/mangroveScene', () => ({
@@ -88,7 +89,9 @@ function mockMatchMedia(matching: string[]) {
   )
 }
 
-const resultItems = () => within(screen.getByRole('list', { name: 'Results', hidden: true })).getAllByRole('listitem', { hidden: true })
+// The lane beside the drawing (from 900px); below 900px the same labels
+// stand in a group under the lede (hero-results-group).
+const resultItems = () => within(screen.getByTestId('hero-lane')).getAllByRole('listitem', { hidden: true })
 
 beforeEach(() => {
   localStorage.clear()
@@ -151,11 +154,15 @@ describe('HeroSection', () => {
     expect(within(items[0]).getByRole('link', { name: 'Redação Online' })).toHaveAttribute('href', '/projects/redacao')
   })
 
-  it('shows the headline result once on phones: above the actions, not again in the lane', async () => {
+  it('keeps the three results together below 900px: one group under the actions, the lane only from 900px (#69)', async () => {
     await renderHero()
-    expect(resultItems()[0]).toHaveClass('max-hero:hidden')
-    expect(resultItems()[1]).not.toHaveClass('max-hero:hidden')
-    expect(within(screen.getByTestId('hero-headline-result')).getByRole('link', { name: 'Redação Online' })).toBeInTheDocument()
+    const group = screen.getByTestId('hero-results-group')
+    expect(group).toHaveClass('hero:hidden')
+    expect(group).toHaveAccessibleName('Results')
+    expect(within(group).getAllByRole('link').map((a) => a.textContent)).toEqual(['Redação Online', 'Capitual', 'Checkout'])
+    expect(screen.getByTestId('hero-lane')).toHaveClass('max-hero:hidden')
+    resultItems().forEach((li) => expect(li).not.toHaveClass('max-hero:hidden'))
+    expect(screen.queryByTestId('hero-headline-result')).toBeNull()
   })
 
   it('server-renders every result as text, each with its dimension line on the drawing', async () => {
@@ -200,22 +207,42 @@ describe('HeroSection', () => {
     resultItems().forEach((li) => expect(li).toBeVisible())
   })
 
-  it('puts the headline result under the subtitle on phones, above the actions', async () => {
+  it('puts the phone results group after the subtitle and the actions, and before the drawing', async () => {
     await renderHero()
-    const line = screen.getByTestId('hero-headline-result')
-    expect(line).toHaveTextContent('Lighthouse performance score')
-    expect(line).toHaveTextContent('40→ to 95')
-    expect(line).toHaveClass('hero:hidden')
+    const group = screen.getByTestId('hero-results-group')
+    expect(group).toHaveTextContent('Lighthouse performance score')
+    expect(group).toHaveTextContent('40→ to 95')
+    const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
     const subtitle = screen.getByText(/Senior mobile and web engineer/)
-    const contact = screen.getByRole('link', { name: 'Get in touch' })
-    expect(subtitle.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(line.compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const projects = screen.getByRole('link', { name: 'See my work' })
+    expect(follows(subtitle, projects)).toBe(true)
+    expect(follows(projects, group)).toBe(true)
+    expect(follows(group, screen.getByTestId('hero-poster'))).toBe(true)
+  })
+
+  it('marks a result\'s shoot from the phone group too', async () => {
+    await renderHero()
+    const label = within(screen.getByTestId('hero-results-group')).getByRole('link', { name: 'Capitual' }).closest('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(activeProofs()).toEqual(['1'])
+    expect(label).toHaveAttribute('data-active')
+    fireEvent.pointerLeave(label)
+    expect(activeProofs()).toEqual([])
+  })
+
+  it('keeps the hint out of the phone reading path until the drawing is tapped (#69)', async () => {
+    await renderHero()
+    const hint = screen.getByText(/Click or tap the water/)
+    expect(hint).toHaveClass('max-hero:hidden')
+    fireEvent.pointerDown(screen.getByTestId('hero-poster').parentElement!)
+    expect(hint).not.toHaveClass('max-hero:hidden')
+    expect(hint).not.toHaveClass('invisible')
   })
 
   it('still renders without results', async () => {
     await renderHero(null)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByRole('list', { name: 'Results', hidden: true })).toBeNull()
+    expect(screen.queryAllByRole('list', { name: 'Results', hidden: true })).toHaveLength(0)
   })
 
   it('shows the final grown state with all three results under reduced motion', async () => {
@@ -331,6 +358,149 @@ describe('HeroSection', () => {
     await waitFor(() => expect(scene.options).not.toBeNull())
     unmount()
     expect(scene.destroy).toHaveBeenCalled()
+  })
+})
+
+// The home page around the hero: the hero, the Work cards it links to (when
+// given) and an outlet showing the case page if the router navigates there.
+async function renderHome(cards: string[]) {
+  const rootRoute = createRootRoute({
+    component: () => (
+      <LanguageProvider>
+        <HeroSection results={RESULTS} />
+        {cards.map((slug) => (
+          <article key={slug} id={`case-${slug}`}>
+            <h3>
+              <a href={`/projects/${slug}`}>{`Card ${slug}`}</a>
+            </h3>
+          </article>
+        ))}
+        <Outlet />
+      </LanguageProvider>
+    ),
+  })
+  const projectRoute = createRoute({ getParentRoute: () => rootRoute, path: '/projects/$slug', component: () => <p>Case page</p> })
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([projectRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  })
+  await router.load()
+  const view = render(<RouterProvider router={router} />)
+  for (const slug of cards) document.getElementById(`case-${slug}`)!.scrollIntoView = vi.fn()
+  return { ...view, router }
+}
+
+const laneLink = (name: string) => within(screen.getByTestId('hero-lane')).getByRole('link', { name, hidden: true })
+
+describe('result labels lead to their case card (#71)', () => {
+  it('keeps each label a real link to its case page', async () => {
+    await renderHome(['capitual'])
+    expect(laneLink('Capitual')).toHaveAttribute('href', '/projects/capitual')
+  })
+
+  it('scrolls to the case card, marks it and moves focus there instead of leaving the page', async () => {
+    const { router } = await renderHome(['capitual'])
+    const card = document.getElementById('case-capitual')!
+    fireEvent.click(laneLink('Capitual'))
+    expect(card.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    expect(card).toHaveAttribute('data-pulse')
+    expect(document.activeElement).toBe(within(card).getByRole('link'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(router.state.location.pathname).toBe('/')
+    expect(screen.queryByText('Case page')).toBeNull()
+  })
+
+  it('jumps without smooth scrolling under reduced motion', async () => {
+    mockMatchMedia(['prefers-reduced-motion'])
+    await renderHome(['capitual'])
+    fireEvent.click(laneLink('Capitual'))
+    expect(document.getElementById('case-capitual')!.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'center' })
+  })
+
+  it('opens the case page when its card is not on the page', async () => {
+    const { router } = await renderHome([])
+    fireEvent.click(laneLink('Capitual'))
+    expect(await screen.findByText('Case page')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/projects/capitual')
+  })
+
+  it('leaves modified clicks (new tab, new window) to the browser', async () => {
+    await renderHome(['capitual'])
+    const card = document.getElementById('case-capitual')!
+    fireEvent.click(laneLink('Capitual'), { ctrlKey: true })
+    fireEvent.click(laneLink('Capitual'), { metaKey: true })
+    fireEvent.click(laneLink('Capitual'), { button: 1 })
+    expect(card.scrollIntoView).not.toHaveBeenCalled()
+    expect(card).not.toHaveAttribute('data-pulse')
+  })
+})
+
+const proof = (i: number) => screen.getByTestId('hero-poster').querySelector(`[data-proof="${i}"]`)!
+const activeProofs = () => [...screen.getByTestId('hero-poster').querySelectorAll('[data-proof][data-active]')].map((g) => g.getAttribute('data-proof'))
+const activeItems = () => resultItems().flatMap((li, i) => (li.hasAttribute('data-active') ? [i] : []))
+
+describe('each result label and its shoot point at each other (#71, #68)', () => {
+  it('highlights the shoot and dimension line of a hovered or focused label, and the label itself', async () => {
+    await renderHero()
+    const item = laneLink('Capitual').closest('li')!
+    const label = item.querySelector('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(activeProofs()).toEqual(['1'])
+    expect(activeItems()).toEqual([1])
+    expect(label).toHaveAttribute('data-active')
+    expect(item.querySelector('.mangrove-leader')).toHaveAttribute('data-active')
+    fireEvent.pointerLeave(label)
+    expect(activeProofs()).toEqual([])
+    expect(activeItems()).toEqual([])
+
+    act(() => laneLink('Checkout').focus())
+    expect(activeProofs()).toEqual(['2'])
+    act(() => laneLink('Checkout').blur())
+    expect(activeProofs()).toEqual([])
+  })
+
+  it('highlights a label when its shoot is hovered on the poster', async () => {
+    await renderHero()
+    const hit = proof(2).querySelector('[data-hit]')!
+    fireEvent.pointerEnter(hit)
+    expect(activeItems()).toEqual([2])
+    expect(activeProofs()).toEqual(['2'])
+    fireEvent.pointerLeave(hit)
+    expect(activeItems()).toEqual([])
+  })
+
+  it('passes the highlight to the 3D scene and back', async () => {
+    await renderHero()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    const label = laneLink('Redação Online').closest('li')!.querySelector('[data-result-label]')!
+    fireEvent.pointerEnter(label)
+    expect(scene.setHighlight).toHaveBeenLastCalledWith(0)
+    fireEvent.pointerLeave(label)
+    expect(scene.setHighlight).toHaveBeenLastCalledWith(null)
+
+    act(() => scene.options!.onHover(2))
+    expect(activeItems()).toEqual([2])
+    act(() => scene.options!.onHover(null))
+    expect(activeItems()).toEqual([])
+  })
+
+  it('writes the product on each dimension line from 900px and the number only below it', async () => {
+    await renderHero()
+    const texts = [...proof(1).querySelectorAll('text')]
+    const number = texts.find((t) => t.textContent === '−96%')!
+    const product = texts.find((t) => t.textContent === 'Capitual')!
+    expect(number).toHaveClass('hero:hidden')
+    expect(product).toHaveClass('max-hero:hidden')
+    expect(product).not.toHaveClass('hero:hidden')
+  })
+
+  it('gives the scene each result\'s product for its dimension line', async () => {
+    await renderHero()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    expect(scene.options!.results.map((r) => r.product)).toEqual(['Redação Online', 'Capitual', 'Checkout'])
+    expect(scene.options!.results[1].text).toBe('−96%')
   })
 })
 

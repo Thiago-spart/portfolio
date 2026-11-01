@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import StackSection from '../components/StackSection'
 import { groupStack } from '../lib/stack'
@@ -19,20 +19,20 @@ const groups = groupStack([
   { _id: 'p', name: 'PostgreSQL', category: 'data', caseStudies: 0 },
 ])
 
-const renderSection = (lang: 'en' | 'pt' = 'en') =>
+const renderSection = ({ selected = null, matches = 0, onSelect = vi.fn() }: { selected?: string | null; matches?: number; onSelect?: (name: string) => void } = {}) =>
   render(
     <LanguageProvider>
-      <StackSection groups={groups} caseStudyCount={13} lang={lang} />
+      <StackSection groups={groups} lang="en" selected={selected} matches={matches} onSelect={onSelect} />
     </LanguageProvider>,
   )
 
 const row = (name: string) => screen.getByRole('heading', { level: 3, name }).closest('li') as HTMLElement
 
 describe('StackSection', () => {
-  it('is the #stack section with the case-study total in the lede', () => {
+  it('is the #stack section, its lede inviting a pick', () => {
     renderSection()
     expect(screen.getByRole('region', { name: 'Stack' })).toHaveAttribute('id', 'stack')
-    expect(screen.getByText('What I build with, and how many of the 13 case studies use it.')).toBeInTheDocument()
+    expect(screen.getByText('What I build with. Pick a tool to see the work that uses it.')).toBeInTheDocument()
   })
 
   it('renders one row per category, backend and data merged', () => {
@@ -40,22 +40,53 @@ describe('StackSection', () => {
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Frontend', 'Mobile', 'Backend & data'])
   })
 
-  it('shows up to five techs per row, most-used first, each with its count; core tags marked', () => {
+  it('shows up to five techs per row, most-used first, without counts; core tags marked', () => {
     renderSection()
-    const tags = within(row('Frontend')).getAllByRole('listitem')
-    expect(tags.map((t) => t.textContent)).toEqual(['React20', 'Tech A11', 'Tech B10', 'Tech C9', 'Tech D8'])
-    expect(tags[0].firstElementChild).toHaveAttribute('data-core', 'true')
-    expect(tags[1].firstElementChild).not.toHaveAttribute('data-core')
+    const tags = within(row('Frontend')).getAllByRole('button')
+    expect(tags.map((t) => t.textContent)).toEqual(['React', 'Tech A', 'Tech B', 'Tech C', 'Tech D'])
+    expect(tags[0].querySelector('[data-core]')).not.toBeNull()
+    expect(tags[1].querySelector('[data-core]')).toBeNull()
   })
 
   it('always shows a core tech, however few case studies use it', () => {
     renderSection()
-    expect(within(row('Mobile')).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['React Native1'])
+    expect(within(row('Mobile')).getAllByRole('button').map((t) => t.textContent)).toEqual(['React Native'])
   })
 
-  it('leaves out techs fewer than two case studies use, and has no "+N more"', () => {
+  it('leaves out techs fewer than two case studies use', () => {
     renderSection()
-    expect(within(row('Backend & data')).getAllByRole('listitem').map((t) => t.textContent)).toEqual(['WebSockets3'])
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(within(row('Backend & data')).getAllByRole('button').map((t) => t.textContent)).toEqual(['WebSockets'])
+  })
+
+  it('makes each tech a toggle button that selects it', () => {
+    const onSelect = vi.fn()
+    renderSection({ onSelect })
+    const react = screen.getByRole('button', { name: 'React' })
+    expect(react).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(react)
+    expect(onSelect).toHaveBeenCalledWith('React')
+  })
+
+  it('presses the selected tech only', () => {
+    renderSection({ selected: 'WebSockets', matches: 3 })
+    expect(screen.getByRole('button', { name: 'WebSockets' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(1)
+  })
+
+  it('announces how many case studies use the selected tech, politely', () => {
+    renderSection({ selected: 'WebSockets', matches: 3 })
+    const status = screen.getByRole('status')
+    expect(status).toHaveAttribute('aria-live', 'polite')
+    expect(status).toHaveTextContent('3 case studies use WebSockets')
+  })
+
+  it('says it in the singular for one', () => {
+    renderSection({ selected: 'React Native', matches: 1 })
+    expect(screen.getByRole('status')).toHaveTextContent('1 case study uses React Native')
+  })
+
+  it('keeps the live region empty with nothing selected', () => {
+    renderSection()
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 })

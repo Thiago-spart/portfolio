@@ -29,12 +29,16 @@ export interface SceneOptions {
   // React). From 900px the drawing makes room for them and draws a leader
   // from each to its mark on the gauge.
   lane: () => Array<HTMLElement | null>
-  // One proof seed per result; height is 0–1 of the tallest shoot.
-  results: Array<{ height: number; text: string }>
+  // One proof seed per result; height is 0–1 of the tallest shoot. The
+  // dimension line carries the text ("40 → 95") below 900px and the product
+  // from 900px, where the label beside it already has the number.
+  results: Array<{ height: number; text: string; product: string }>
   labels: SceneLabels
   reducedMotion: boolean
   isDark: () => boolean
   onMango: () => void
+  // The pointer moved onto a result's shoot or seed (its index), or off it.
+  onHover: (index: number | null) => void
   // A visitor grew a root.
   onPlant: () => void
   readStore: (key: string) => string | null
@@ -48,6 +52,9 @@ export interface MangroveScene {
   reset: () => void
   setTheme: () => void
   setLabels: (labels: SceneLabels) => void
+  // Marks a result's shoot, dimension line, gauge mark, note and leader
+  // (its label is hovered or focused); null clears it.
+  setHighlight: (index: number | null) => void
   destroy: () => void
 }
 
@@ -181,6 +188,9 @@ export function createScene(opts: SceneOptions): MangroveScene {
     hatch: lmat('muted', 1, 0.4),
     mangrove2: lmat('mangrove', 2),
     mangrove1: lmat('mangrove', 1.2),
+    // A highlighted result.
+    mangroveHi: lmat('mangrove', 4),
+    mangroveHiDash: lmat('mangrove', 2.6),
   }
   function segs(pairs: number[], mat: LineMaterial) {
     const geo = new LineSegmentsGeometry()
@@ -552,7 +562,11 @@ export function createScene(opts: SceneOptions): MangroveScene {
     const hit = new THREE.Mesh(new THREE.SphereGeometry(0.36, 8, 6), new THREE.MeshBasicMaterial())
     hit.visible = false
     hit.userData.proof = i
-    g.add(ring, seed, stem, tip, hit)
+    // The shoot's own hit area, scaled with the stem as it grows.
+    const stemHit = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 1, 6), new THREE.MeshBasicMaterial())
+    stemHit.visible = false
+    stemHit.userData.proof = i
+    g.add(ring, seed, stem, tip, hit, stemHit)
     scene.add(g)
     // Dimension line from the shoot tip across to a mark on the gauge.
     const leader = new THREE.Group()
@@ -563,19 +577,28 @@ export function createScene(opts: SceneOptions): MangroveScene {
     scene.add(leader)
     // Every result starts grown (the poster already showed it); t runs 0 → 1
     // again on a replay.
-    return { height: def.height, group: g, ring, stem, tip, hit, leader, dashes, mark, dashCount: dashPos.length / 6, t: 1 }
+    return { height: def.height, group: g, ring, stem, tip, hit, stemHit, leader, dashes, mark, dashCount: dashPos.length / 6, t: 1 }
   })
-  const seedHits = proofs.map((p) => p.hit)
+  const seedHits = proofs.flatMap((p) => [p.hit, p.stemHit])
   // Each result written on its dimension line, against the gauge, following
   // the line as the shoot grows.
-  opts.results.slice(0, 3).forEach((def, i) => {
+  // From 900px the label beside the gauge has the number, so the line
+  // names the product (as in the poster).
+  const notes = opts.results.slice(0, 3).map((def, i) => {
     const pr = proofs[i]
     const a = anno(
-      'absolute left-0 top-0 whitespace-nowrap bg-ground/90 px-1 font-mono text-[11px] leading-[14px] font-medium text-mangrove will-change-transform',
+      'absolute left-0 top-0 whitespace-nowrap bg-ground/90 px-1 font-mono text-[11px] leading-[14px] font-medium text-mangrove will-change-transform data-active:font-bold',
       () => V(gx - 0.18, tide + pr.height * growHeight * growOf(pr.t) + 0.13, gaugeZ),
       { align: 'right', minWidth: 640 },
     )
-    a.el.textContent = def.text
+    const number = document.createElement('span')
+    number.className = 'hero:hidden'
+    number.textContent = def.text
+    const product = document.createElement('span')
+    product.className = 'uppercase max-hero:hidden'
+    product.textContent = def.product
+    a.el.append(number, product)
+    return a.el
   })
 
   // Leaders from each lane label to its mark on the gauge.
@@ -585,11 +608,23 @@ export function createScene(opts: SceneOptions): MangroveScene {
   overlay.appendChild(leaderSvg)
   const leaderPaths = proofs.map(() => {
     const p = document.createElementNS(svgNS, 'polyline')
-    p.setAttribute('class', 'fill-none stroke-mangrove [stroke-dasharray:3_3]')
+    p.setAttribute('class', 'fill-none stroke-mangrove [stroke-dasharray:3_3] data-active:[stroke-width:2]')
     p.setAttribute('stroke-width', '1')
     leaderSvg.appendChild(p)
     return p
   })
+
+  function setHighlight(index: number | null) {
+    proofs.forEach((p, i) => {
+      const on = i === index
+      p.stem.material = on ? M.mangroveHi : M.mangrove2
+      p.mark.material = on ? M.mangroveHi : M.mangrove2
+      p.dashes.material = on ? M.mangroveHiDash : M.mangrove1
+      notes[i].toggleAttribute('data-active', on)
+      leaderPaths[i].toggleAttribute('data-active', on)
+    })
+    wake()
+  }
 
   // Reduced motion: the result is already drawn; nothing replays.
   function replayProof(i: number) {
@@ -829,9 +864,19 @@ export function createScene(opts: SceneOptions): MangroveScene {
   const pickInteractive = () => raycaster.intersectObjects([mangoHit, ...seedHits], false)[0]?.object ?? null
   const inWater = (p: V3) => p.x > treeLeft - 4 && p.x < gx + 2 && p.z > -4 && p.z < 7
 
+  // The result under the pointer, reported when it changes.
+  let hovered: number | null = null
+  const hover = (index: number | null) => {
+    if (index === hovered) return
+    hovered = index
+    opts.onHover(index)
+  }
+  const onPointerLeave = () => hover(null)
   const onPointerMove = (e: PointerEvent) => {
     setNdc(e)
-    canvas.style.cursor = pickInteractive() ? 'pointer' : 'crosshair'
+    const picked = pickInteractive()
+    canvas.style.cursor = picked ? 'pointer' : 'crosshair'
+    hover((picked?.userData.proof as number | undefined) ?? null)
     if (raycaster.ray.intersectPlane(waterPlane, hitPoint) && inWater(hitPoint)) {
       const now = performance.now()
       if (now - lastRippleAt > 160 && hitPoint.distanceTo(lastRipple) > 0.5) {
@@ -859,6 +904,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
     }
   }
   canvas.addEventListener('pointermove', onPointerMove)
+  canvas.addEventListener('pointerleave', onPointerLeave)
   canvas.addEventListener('click', onClick)
 
   // ---- DOM placement ----
@@ -941,6 +987,8 @@ export function createScene(opts: SceneOptions): MangroveScene {
       const draw = drawOf(p.t)
       const hgt = p.height * growHeight * grow
       p.stem.scale.y = Math.max(0.001, hgt)
+      p.stemHit.scale.y = Math.max(0.001, hgt)
+      p.stemHit.position.y = hgt / 2
       p.tip.position.y = hgt
       p.tip.scale.setScalar(Math.max(0.001, grow))
       // The dashes draw from the shoot toward the gauge; the mark lands last.
@@ -1131,6 +1179,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
     if (idleHandle && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleHandle)
     cleanups.forEach((fn) => fn())
     canvas.removeEventListener('pointermove', onPointerMove)
+    canvas.removeEventListener('pointerleave', onPointerLeave)
     canvas.removeEventListener('click', onClick)
     scene.traverse((o) => {
       const mesh = o as THREE.Mesh
@@ -1156,6 +1205,7 @@ export function createScene(opts: SceneOptions): MangroveScene {
       writeLabels()
       wake()
     },
+    setHighlight,
     destroy,
   }
 }

@@ -24,8 +24,9 @@ interface ArchiveRowProps {
 // covers the row, so the whole row is clickable while the link's name stays
 // its visible text (WCAG 2.5.3). Hover: sunken surface, title and arrow in
 // mangrove; the row carries the focus ring while the link is focused. Its
-// id is the case study's in-page anchor (src/lib/inPage.ts). Title and
-// result morph into the case page's (src/lib/caseTransition.ts).
+// id is the case study's in-page anchor (src/lib/inPage.ts); data-role marks
+// its role on the timeline rail while the row is hovered or focused. Title
+// and result morph into the case page's (src/lib/caseTransition.ts).
 export function ArchiveRow({ caseStudy, lang, morph = true }: ArchiveRowProps) {
   const contextId = useId()
   const resultId = useId()
@@ -37,6 +38,7 @@ export function ArchiveRow({ caseStudy, lang, morph = true }: ArchiveRowProps) {
   return (
     <div
       id={caseAnchor(caseStudy.slug)}
+      data-role={caseStudy.roleId ?? undefined}
       className={cn(
         'group relative grid scroll-mt-16 grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-2 border-b border-line px-3 py-4 text-ink no-underline',
         'transition-colors duration-150 ease-out hover:bg-surface-sunken has-[a:focus-visible]:rounded-sm has-[a:focus-visible]:focus-ring',
