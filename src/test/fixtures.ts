@@ -83,6 +83,7 @@ export function caseStudyDetail(overrides: Partial<CaseStudyDetail> = {}): CaseS
       paragraphs('The old site scored 40 on Lighthouse.'),
       paragraphs('O site antigo tinha nota 40 no Lighthouse.'),
     ),
+    decision: null,
     approach: localeBlock(paragraphs('Rebuilt it with SSR.', 'Then trimmed the bundle.')),
     results: [
       metric(95, 'Lighthouse score', { before: 40 }),

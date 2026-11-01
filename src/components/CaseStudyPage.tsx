@@ -25,9 +25,9 @@ const PROSE =
   'type-body text-ink [&>*+*]:mt-4! [&_ol]:pl-6 [&_ol]:text-ink-muted [&_ul]:pl-6 [&_ul]:text-ink-muted'
 
 // Figma: Sections / Case study (32:573, 32:699, 32:823). Intro (back link,
-// meta, title, summary, live site), results strip, cover, numbered parts
-// (problem, approach, stack, then gallery and video when present), and the
-// next case study.
+// meta, title, summary, live site), results strip, numbered parts (problem,
+// decision, approach, stack, then gallery and video when present), the
+// cover, and the next case study.
 export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPageProps) {
   const { t } = useTranslation()
   const dates = formatMonthRange(caseStudy.startDate, caseStudy.endDate, t('work.present'), lang)
@@ -37,12 +37,16 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
   const stack = caseStudy.stack ?? []
   const gallery = (caseStudy.gallery ?? []).filter((image) => image.url)
   const problem = caseStudy.problem?.[lang]
+  const decision = caseStudy.decision?.[lang]
   const approach = caseStudy.approach?.[lang]
 
   // Parts are numbered in the order they appear, skipping empty ones.
   const parts: Array<{ id: string; label: string; content: ReactNode }> = []
   if (problem?.length) {
     parts.push({ id: 'problem', label: t('caseStudy.problem'), content: <RichText value={problem} className={PROSE} /> })
+  }
+  if (decision?.length) {
+    parts.push({ id: 'decision', label: t('caseStudy.decision'), content: <RichText value={decision} className={PROSE} /> })
   }
   if (approach?.length) {
     parts.push({ id: 'approach', label: t('caseStudy.approach'), content: <RichText value={approach} className={PROSE} /> })
@@ -144,16 +148,6 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
         </section>
       )}
 
-      {caseStudy.cover?.url && (
-        <img
-          src={caseStudy.cover.url}
-          alt={caseStudy.cover.alt[lang]}
-          width={2240}
-          height={1120}
-          className="aspect-2/1 h-auto w-full rounded-md border border-line bg-surface-sunken object-cover"
-        />
-      )}
-
       {parts.length > 0 && (
         <div className="flex flex-col gap-8 md:gap-12">
           {parts.map((part, i) => (
@@ -169,6 +163,18 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
             </section>
           ))}
         </div>
+      )}
+
+      {/* After the reading, not between the results and the story: the
+          covers are promo cards until real screenshots replace them. */}
+      {caseStudy.cover?.url && (
+        <img
+          src={caseStudy.cover.url}
+          alt={caseStudy.cover.alt[lang]}
+          width={2240}
+          height={1120}
+          className="aspect-2/1 h-auto w-full rounded-md border border-line bg-surface-sunken object-cover"
+        />
       )}
 
       {next && (
