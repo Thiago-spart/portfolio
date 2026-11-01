@@ -11,17 +11,32 @@ interface MetricProps {
   emphasis?: 'accent' | 'plain'
   className?: string
   style?: CSSProperties
+  id?: string
+  // A footnote number after the label, linking to how the number was
+  // measured (#73); `label` names the link for screen readers.
+  footnote?: { number: number; href: string; label: string }
 }
 
 // Figma: Components / Metric (10:82). Delta (a before value: struck and
 // muted, then → after) or Single (after only), Accent or Plain.
-export function Metric({ value, label, description, emphasis = 'plain', className, style }: MetricProps) {
+export function Metric({ value, label, description, emphasis = 'plain', className, style, id, footnote }: MetricProps) {
   const { t } = useTranslation()
   const { before, after } = formatMetricParts(value)
 
   return (
-    <div className={cn('flex min-w-0 flex-col items-start gap-2', className)} style={style}>
-      <p className="m-0 type-label text-ink-muted">{label}</p>
+    <div id={id} className={cn('flex min-w-0 flex-col items-start gap-2', className)} style={style}>
+      <p className="m-0 type-label text-ink-muted">
+        {label}
+        {footnote && (
+          <a
+            href={footnote.href}
+            aria-label={footnote.label}
+            className="ml-1 rounded-sm align-super type-code text-mangrove underline-offset-2 hover:underline focus-visible:focus-ring"
+          >
+            {footnote.number}
+          </a>
+        )}
+      </p>
       <p className="m-0 flex items-baseline gap-3 whitespace-nowrap">
         {before != null && (
           <span className="metric-before flex items-baseline gap-3">

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatMonthRange, formatResultPhrase, formatYearRange, nextCaseStudy } from '../lib/caseStudy'
+import { formatMeasuredWhen, formatMonthRange, formatResultPhrase, formatYearRange, nextCaseStudy } from '../lib/caseStudy'
 import { caseStudyCard, metric } from './fixtures'
 
 describe('formatYearRange', () => {
@@ -43,5 +43,22 @@ describe('nextCaseStudy', () => {
   it('returns null for an unknown slug or a single case study', () => {
     expect(nextCaseStudy(rows, 'z')).toBeNull()
     expect(nextCaseStudy(rows.slice(0, 1), 'a')).toBeNull()
+  })
+})
+
+describe('formatMeasuredWhen', () => {
+  it('gives the window to the month', () => {
+    expect(formatMeasuredWhen('2021-10-01', '2021-12-31', 'en')).toBe('Oct 2021 – Dec 2021')
+  })
+
+  it('gives one month when only one date is set, or both fall in it', () => {
+    expect(formatMeasuredWhen('2023-03-01', null, 'en')).toBe('Mar 2023')
+    expect(formatMeasuredWhen(null, '2023-11-30', 'en')).toBe('Nov 2023')
+    expect(formatMeasuredWhen('2023-03-01', '2023-03-20', 'en')).toBe('Mar 2023')
+  })
+
+  it('is empty without dates, and follows the language', () => {
+    expect(formatMeasuredWhen(null, undefined, 'en')).toBe('')
+    expect(formatMeasuredWhen('2021-10-01', '2021-12-31', 'pt')).toBe('out. de 2021 – dez. de 2021')
   })
 })

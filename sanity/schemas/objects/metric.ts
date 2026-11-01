@@ -15,6 +15,12 @@ export function changeHasNoBefore(value: unknown, context: ValidationContext) {
   const before = (context.parent as { before?: number } | undefined)?.before
   return value === 'change' && before != null ? 'A change has no Before value: clear Before or the qualifier' : true
 }
+// A measurement's window can't end before it starts.
+export function toNotBeforeFrom(value: unknown, context: ValidationContext) {
+  const from = (context.parent as { from?: string } | undefined)?.from
+  return typeof value === 'string' && from && value < from ? 'To is before From' : true
+}
+
 export const metric = defineType({
   name: 'metric',
   title: 'Metric',
@@ -50,6 +56,36 @@ export const metric = defineType({
       },
       initialValue: 'up',
       validation: (rule) => rule.required(),
+    }),
+    // How the number was measured, shown in the case study's Result part and
+    // linked from the number (#67, #73). Inside the result it describes, so
+    // it moves and goes with that result. Dates stay real dates; the site
+    // shows month and year. Leave them empty when the month isn't known.
+    defineField({
+      name: 'measurement',
+      title: 'How it was measured',
+      type: 'object',
+      description: 'Optional. Shown in the case study\'s Result part, linked from the number.',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'method',
+          title: 'Method',
+          type: 'localeString',
+          description: 'What was counted and how, e.g. "Lighthouse CLI, mobile, on the home page: 40 before, 95 after launch."',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({ name: 'tool', title: 'Tool', type: 'string', description: 'Optional, not translated, e.g. Lighthouse CLI, Jira.' }),
+        defineField({ name: 'from', title: 'From', type: 'date', description: 'Optional. The single reading, or the start of the window.' }),
+        defineField({
+          name: 'to',
+          title: 'To',
+          type: 'date',
+          description: 'Optional. The end of the window.',
+          validation: (rule) => rule.custom(toNotBeforeFrom),
+        }),
+        defineField({ name: 'source', title: 'Source', type: 'url', description: 'Optional. A public report, e.g. a PageSpeed run or a store listing.' }),
+      ],
     }),
   ],
   preview: {

@@ -5,7 +5,7 @@ import { READING_BAND } from '../lib/useReadingSection'
 import { FakeObserver, fire } from './fakeObserver'
 import { fakeViewTransition } from './fakeViewTransition'
 import { renderWithRouter } from './renderWithRouter'
-import { caseStudyCard, caseStudyDetail, localeBlock, localeString, paragraphs } from './fixtures'
+import { caseStudyCard, caseStudyDetail, localeBlock, localeString, metric, paragraphs } from './fixtures'
 
 const next = caseStudyCard({ _id: 'cs-2', slug: 'banking-tools', title: localeString({ en: 'Banking Tools' }), tier: 'archive' })
 
@@ -192,6 +192,94 @@ describe('CaseStudyPage', () => {
       } finally {
         vt.restore()
       }
+    })
+  })
+
+  // #67, #73: how each number was measured, linked both ways.
+  describe('measurement', () => {
+    const measured = () =>
+      caseStudyDetail({
+        results: [
+          metric(95, 'Lighthouse score', {
+            before: 40,
+            key: 'lh',
+            measurement: { method: localeString({ en: 'Lighthouse CLI, mobile, home page.' }), tool: 'Lighthouse CLI' },
+          }),
+          metric(40, 'Organic search', { unit: '%', qualifier: 'change', key: 'seo' }),
+          metric(-96, 'Production bugs', {
+            unit: '%',
+            qualifier: 'change',
+            key: 'bugs',
+            measurement: {
+              method: localeString({ en: 'Bugs per month in Jira.' }),
+              tool: 'Jira',
+              from: '2021-10-01',
+              to: '2021-12-31',
+              source: 'https://example.com/report',
+            },
+          }),
+        ],
+      })
+
+    it('adds a Measurement part after Approach, one row per measured result', async () => {
+      await renderPage(measured())
+      const parts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+      expect(parts).toEqual(['Results', '1Problem', '2Approach', '3Measurement', '4Stack', 'Next case study'])
+      const part = screen.getByRole('region', { name: 'Measurement' })
+      const rows = [...part.querySelectorAll('ol > li')] as HTMLElement[]
+      expect(rows.map((row) => row.id)).toEqual(['result-lh', 'result-bugs'])
+      expect(rows[0]).toHaveTextContent('40 → 95 · Lighthouse score')
+      expect(rows[0]).toHaveTextContent('Lighthouse CLI, mobile, home page.')
+      expect(rows[1]).toHaveTextContent('Jira · Oct 2021 – Dec 2021')
+      expect(within(rows[1]).getByRole('link', { name: 'Source' })).toHaveAttribute('href', 'https://example.com/report')
+      expect(within(rows[0]).queryByRole('link', { name: 'Source' })).toBeNull()
+    })
+
+    it('footnotes each measured number in the strip, numbered like its row, and links back', async () => {
+      await renderPage(measured())
+      const strip = screen.getByRole('region', { name: 'Results' })
+      const notes = within(strip).getAllByRole('link')
+      expect(notes.map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('aria-label')])).toEqual([
+        ['1', '#result-lh', 'How it was measured: Lighthouse score'],
+        ['2', '#result-bugs', 'How it was measured: Production bugs'],
+      ])
+      expect(document.getElementById('metric-seo')).not.toBeNull()
+      const back = screen.getByRole('link', { name: 'Back to Production bugs' })
+      expect(back).toHaveAttribute('href', '#metric-bugs')
+    })
+
+    it('has no Measurement part or footnotes when no result says how it was measured', async () => {
+      await renderPage()
+      expect(screen.queryByRole('region', { name: 'Measurement' })).toBeNull()
+      expect(within(screen.getByRole('region', { name: 'Results' })).queryAllByRole('link')).toHaveLength(0)
+    })
+
+    it('gives results measured the same way one row and one footnote number', async () => {
+      const lighthouse = { method: localeString({ en: 'Lighthouse, mobile, main page.' }), tool: 'Lighthouse' }
+      await renderPage(
+        caseStudyDetail({
+          results: [
+            metric(0.9, 'Largest Contentful Paint', { unit: 's', direction: 'down', key: 'lcp', measurement: lighthouse }),
+            metric(98, 'Performance, desktop', { key: 'desk', measurement: { ...lighthouse, method: localeString({ en: 'Lighthouse, desktop, main page.' }) } }),
+            metric(100, 'Accessibility', { key: 'a11y', measurement: { ...lighthouse } }),
+          ],
+        }),
+      )
+      const part = screen.getByRole('region', { name: 'Measurement' })
+      const rows = [...part.querySelectorAll('ol > li')] as HTMLElement[]
+      expect(rows.map((row) => row.id)).toEqual(['result-lcp', 'result-desk'])
+      expect(within(rows[0]).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+        '0.9s · Largest Contentful Paint',
+        '100 · Accessibility',
+      ])
+      expect(rows[0]).toHaveTextContent('Lighthouse, mobile, main page.')
+      const notes = within(screen.getByRole('region', { name: 'Results' })).getAllByRole('link')
+      expect(notes.map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+        ['1', '#result-lcp'],
+        ['2', '#result-desk'],
+        ['1', '#result-lcp'],
+      ])
+      expect(notes[2]).toHaveAccessibleName('How it was measured: Accessibility')
     })
   })
 })
