@@ -356,25 +356,29 @@ Record: tool `Jest, React Native Testing Library, Maestro`, no dates.
 
 Supported: a Storybook library of the tool's components (Approach); within Oct 2021 – Nov 2022.
 
-**[confirm Q21]** 80% of what: components and screens of the support tool that have a story? Counted how, and in which month?
+**Q21 answered:** components of the support tool with a Storybook story, 40 of 50. No dates.
 
-**en:** Components and screens of the support tool with a Storybook story, [n] of [total], [month year].
+Record: tool `Storybook`, no dates.
 
-**pt:** Componentes e telas da ferramenta de suporte com história no Storybook, [n] de [total], [mês ano].
+**en:** Components of the support tool with a Storybook story: 40 of 50.
 
-**es:** Componentes y pantallas de la herramienta de soporte con historia en Storybook, [n] de [total], [mes año].
+**pt:** Componentes da ferramenta de suporte com história no Storybook: 40 de 50.
+
+**es:** Componentes de la herramienta de soporte con historia en Storybook: 40 de 50.
 
 #### 4wk → 3wk · Onboarding time for new developers (`bc36fe065d83`)
 
 Supported: the two junior developers I mentored (Approach: "mentored two junior developers", "Mentoring cut the juniors' onboarding from 4 weeks to 3"); within Oct 2021 – Nov 2022.
 
-**[confirm Q22]** When does onboarding end (first merged PR, first ticket done alone)? The 4 weeks came from whom (earlier hires, the team's usual estimate)?
+**Q22 answered:** onboarding ends at the first ticket done alone; the 4 weeks is the team's usual estimate. No dates.
 
-**en:** Weeks from a junior developer's first day to [their first merged PR / first ticket done alone]: two juniors I mentored, against [earlier hires / the team's usual time].
+Record: method only, no tool, no dates.
 
-**pt:** Semanas entre o primeiro dia de um dev júnior e [o primeiro PR mergeado / o primeiro ticket feito sozinho]: dois juniores que mentorei, contra [contratações anteriores / o tempo usual do time].
+**en:** Time until each of the two junior developers finished a ticket alone: 3 weeks, against the team's usual estimate of 4.
 
-**es:** Semanas entre el primer día de un dev junior y [su primer PR fusionado / el primer ticket hecho solo]: dos juniors que mentoré, frente a [contrataciones anteriores / el tiempo habitual del equipo].
+**pt:** Tempo até cada um dos dois desenvolvedores juniores concluir um ticket sozinho: 3 semanas, contra a estimativa habitual da equipe de 4.
+
+**es:** Tiempo hasta que cada uno de los dos desarrolladores junior terminó un ticket solo: 3 semanas, frente a la estimación habitual del equipo de 4.
 
 ## 3. Approach trims (#67)
 
@@ -402,7 +406,7 @@ Cut: "React … GraphQL" and "an automated testing pipeline covering both E2E an
 
 ### C6 Bank, a landing page in under a second: trim
 
-Cut: "Vite SSR, TanStack Router/Start", "Cloudflare CDN caching" and "mobile-first design" (all in the summary: "I built the public site mobile first on Vite SSR and TanStack Start, with Cloudflare caching in front"). Also drops "with Server Components" **[confirm Q23]**.
+Cut: "Vite SSR, TanStack Router/Start", "Cloudflare CDN caching" and "mobile-first design" (all in the summary: "I built the public site mobile first on Vite SSR and TanStack Start, with Cloudflare caching in front"). Also drops "with Server Components": the site didn't use them. **Done 2026-10-31 (Q23)**: only that phrase is cut from the live Approach in all three languages; the rest of this trim waits for #67.
 
 **en:** I worked full-stack: React, TypeScript, Tailwind CSS and Shadcn UI on the front end, React Query cache policies behind the Cloudflare cache, and quick back-end changes to endpoints and metadata when the pages needed them.
 
@@ -427,7 +431,7 @@ Cut: "built with Vite, Vue.js 3, and TypeScript" and "stronger … security arou
 
 ### Numbers inside Approach
 
-The rule above says numbers go in Results. These Approach sentences repeat a result, or state a number with no result behind it **[confirm Q24]**:
+The rule above says numbers go in Results. These Approach sentences repeat a result, or state a number with no result behind it. **Done 2026-10-31 (Q24): all six cut** in all three languages (Lovefy's sentence was its own paragraph and is gone; the AI mentor chat now reads "Responses are streamed, and…"). Backup: `~/sanity-backups/before-approach-trims-2026-10-31.tar.gz`.
 
 - Lovefy: "The CI/CD pipeline (Vitest, RTL, Playwright E2E, Storybook) reached 100% test and documentation coverage." (repeats a result; its tools would move into that result's measurement)
 - Skydiet, web app: "covering 40+ components" (repeats a result)
@@ -447,7 +451,7 @@ Up to two case studies per answer, shown as "See it in: …".
 1. **Redação Online, core platform v2.** Its result "0 · Downtime during the rollout" is the answer's opener, and its Approach says "I led the incremental migration to Next.js App Router".
 2. **Redação Online, a checkout that keeps buyers.** Problem: "It had to move without interrupting purchases."
 
-**[confirm Q25]** The answer's method (reverse proxy, one module at a time) is from Plin, which has no case study. Link these two Redação cases anyway? (Alternative to the checkout: Redação Online, from PHP to Next.js, "The migration couldn't break existing search rankings.")
+**Q25 answered: keep these two.** The answer's method (reverse proxy, one module at a time) is from Plin, which has no case study; both Redação cases are migrations without downtime, so they stay as the evidence. (Alternative to the checkout: Redação Online, from PHP to Next.js, "The migration couldn't break existing search rankings.")
 
 ### 02 How do you get Lighthouse to 95+?
 
@@ -499,17 +503,17 @@ Results
 18. **Q18. Answered:** Redação checkout, 23% → 9% (hero): checkouts started and not paid, from the payment provider; periods unknown.
 19. **Q19. Answered:** Electromaps, 3 months: start of work → release on both stores (Nov 2022 – Jan 2023). Confirmed.
 20. **Q20. Answered:** Electromaps, 100%: a test for each critical flow (login, checkout, maps, offline), Jest + RNTL, Maestro E2E. No dates.
-21. **Q21.** Capitual support tool, 80% in Storybook: 80% of which components and screens, counted how, which month?
-22. **Q22.** Capitual support tool, onboarding 4 → 3 weeks: when does onboarding end? Where does the 4-week baseline come from?
+21. **Q21. Answered:** Capitual support tool, 80%: 40 of 50 components have a Storybook story. No dates.
+22. **Q22. Answered:** Capitual support tool, 4 → 3 weeks: until the first ticket done alone; 4 weeks is the team's usual estimate.
 
 Approach
 
-23. **Q23.** C6 Bank: drop "with Server Components" from the Approach, or did the site use them?
-24. **Q24.** Cut the six numbers inside Approach (section 3), or keep them until the Result part ships? For the AI mentor chat's "under a second", add it as a result (with how it was measured) or cut it?
+23. **Q23. Answered, applied:** "with Server Components" cut from C6 Bank's Approach.
+24. **Q24. Answered, applied:** all six numbers cut from the Approach texts.
 
 FAQ evidence
 
-25. **Q25.** 01 (migration): core platform v2 + checkout, though the method in the answer is from Plin? Or landing instead of checkout?
+25. **Q25. Answered:** migration FAQ links core platform v2 + checkout.
 26. **Q26.** 02 (Lighthouse): landing + core platform v2, or landing + C6 Bank? Which case is "page weight down 80%", and should it be a result?
 27. **Q27.** 03 (micro-frontends): core platform v2 + Capitual support tool? Which work had Module Federation and the GraphQL gateway?
 28. **Q28.** 04 (AI agents): Lovefy + Skydiet web app, or + Skydiet universal app? Is "Claude Code" in the answer the same as "Cursor and Claude" in Lovefy?
