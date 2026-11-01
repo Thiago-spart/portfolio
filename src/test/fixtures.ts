@@ -58,6 +58,7 @@ export function caseStudyCard(overrides: Partial<CASE_STUDIES_QUERY_RESULT[numbe
     tier: 'featured',
     summary: localeString({ en: 'A personal site.', pt: 'Um site pessoal.', es: 'Un sitio personal.' }),
     roleTitle: localeString({ en: 'Lead Frontend Engineer' }),
+    roleId: 'role-1',
     startDate: '2023-02-01',
     endDate: '2025-01-31',
     stack: ['React', 'TypeScript'],

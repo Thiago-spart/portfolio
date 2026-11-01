@@ -1,18 +1,27 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
-import SheetIndex from '../components/SheetIndex'
+import SheetIndex, { type SheetStats } from '../components/SheetIndex'
 import { FakeObserver, fire } from './fakeObserver'
 
 const IDS = ['projects', 'experience', 'stack', 'how-i-work', 'contact']
 
+const STATS: SheetStats = {
+  caseStudies: 13,
+  best: { before: 40, after: 95 },
+  roles: 6,
+  since: 2019,
+  techs: 14,
+  questions: 6,
+}
+
 // The home page's landmarks the index watches: the hero, the five sections
 // and the footer, around the index itself.
-function renderPage() {
+function renderPage(stats: SheetStats = STATS) {
   const utils = render(
     <LanguageProvider>
       <main>
-        <SheetIndex />
+        <SheetIndex stats={stats} />
         <section aria-labelledby="hero-heading">
           <h1 id="hero-heading">Engineering you can measure.</h1>
         </section>
@@ -160,5 +169,107 @@ describe('SheetIndex', () => {
       '05 Contato',
     ])
     expect(within(nav).getByRole('link', { name: 'Entre em contato' })).toBeInTheDocument()
+  })
+
+  describe('previews', () => {
+    const PREVIEWS = [
+      '13 case studies · best 40 → 95',
+      '6 roles since 2019',
+      '14 tools',
+      '6 questions',
+      'Email · EN, PT, ES',
+    ]
+
+    it('describes each section in one line, on hover or focus from 768px', () => {
+      renderPage()
+      const links = within(desktopList()).getAllByRole('link')
+      expect(links.map((a) => a.textContent)).toEqual([
+        '01 Projects',
+        '02 Experience',
+        '03 Stack',
+        '04 How I work',
+        '05 Contact',
+      ])
+      // The preview describes the link rather than naming it.
+      links.forEach((a, i) => expect(a).toHaveAccessibleDescription(PREVIEWS[i]))
+      const preview = document.getElementById(links[0].getAttribute('aria-describedby')!) as HTMLElement
+      expect(preview).toHaveClass('invisible', 'group-hover:visible', 'group-focus-within:visible')
+    })
+
+    it('shows the previews in the phone list', () => {
+      renderPage()
+      const toggle = within(nav()).getByRole('button')
+      const panel = document.getElementById(toggle.getAttribute('aria-controls')!) as HTMLElement
+      // Closed, so the links are hidden from the accessibility tree.
+      within(panel)
+        .getAllByRole('link', { hidden: true })
+        .forEach((a, i) => expect(a).toHaveTextContent(PREVIEWS[i]))
+    })
+
+    it('leaves out what it has no data for', () => {
+      renderPage({ ...STATS, best: null, since: null })
+      const [work, experience] = within(desktopList()).getAllByRole('link')
+      expect(work).toHaveAccessibleDescription('13 case studies')
+      expect(experience).toHaveAccessibleDescription('6 roles')
+    })
+
+    it('counts one in the singular', () => {
+      renderPage({ ...STATS, caseStudies: 1, best: null, roles: 1, techs: 1, questions: 1 })
+      expect(within(desktopList()).getAllByRole('link').map((a) => a.getAttribute('aria-describedby') && document.getElementById(a.getAttribute('aria-describedby')!)?.textContent)).toEqual([
+        '1 case study',
+        '1 role since 2019',
+        '1 tool',
+        '1 question',
+        'Email · EN, PT, ES',
+      ])
+    })
+
+    it('hides the previews with Escape until the pointer or focus moves on (WCAG 1.4.13)', () => {
+      renderPage()
+      const [first, second] = within(desktopList()).getAllByRole('link')
+      act(() => first.focus())
+      fireEvent.keyDown(first, { key: 'Escape' })
+      expect(nav()).toHaveAttribute('data-quiet', 'true')
+      act(() => second.focus())
+      expect(nav()).not.toHaveAttribute('data-quiet')
+    })
+
+    it('translates the previews', () => {
+      localStorage.setItem('lang', 'es')
+      renderPage()
+      const list = screen.getByRole('navigation', { name: 'Secciones' }).querySelector('ol') as HTMLElement
+      expect(within(list).getAllByRole('link')[0]).toHaveAccessibleDescription('13 casos de estudio · mejor 40 → 95')
+    })
+  })
+
+  describe('current marker', () => {
+    beforeEach(() => {
+      // jsdom has no layout: each link is 100px wide, side by side.
+      vi.spyOn(HTMLElement.prototype, 'offsetLeft', 'get').mockImplementation(function (this: HTMLElement) {
+        const li = this.closest('li')
+        return li ? [...li.parentElement!.children].indexOf(li) * 100 : 0
+      })
+      vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100)
+    })
+    afterEach(() => vi.restoreAllMocks())
+
+    it('is one rule that slides under the current section, without motion when reduced', () => {
+      renderPage()
+      const marker = within(nav()).getByTestId('index-marker')
+      expect(marker).toHaveAttribute('aria-hidden', 'true')
+      expect(marker).toHaveClass('opacity-0')
+      // The links no longer draw their own rule.
+      within(desktopList()).getAllByRole('link').forEach((a) => expect(a.className).not.toContain('shadow'))
+
+      fire(section('stack'), true)
+      expect(marker).not.toHaveClass('opacity-0')
+      expect(marker.style.translate).toBe('200px')
+      expect(marker.style.width).toBe('100px')
+
+      fire(section('stack'), false)
+      fire(section('how-i-work'), true)
+      expect(marker.style.translate).toBe('300px')
+      expect(marker).toHaveClass('transition-[translate,width]', 'motion-reduce:transition-none')
+    })
   })
 })
