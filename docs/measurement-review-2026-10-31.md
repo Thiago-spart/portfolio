@@ -196,13 +196,15 @@ Record: tool `Jira, GitHub`, no dates.
 
 Supported: the CI/CD pipeline ran "Vitest, RTL, Playwright E2E, Storybook" (Approach); within Jan – Mar 2026.
 
-**[confirm Q11]** Which tool reported the test coverage (Vitest coverage, lines or branches), and of which code? What does "documentation coverage" count (every component has a Storybook story)? Which month?
+**Q11 answered:** Vitest coverage over the whole app. **[confirm Q11b]** What does "documentation coverage" count: every component has a Storybook story? If unsure, the line drops the documentation half.
 
-**en:** [Line/branch] coverage from Vitest on [scope], and a Storybook story for every [component], [month year].
+Record: tool `Vitest, Storybook`, no dates.
 
-**pt:** Cobertura de [linhas/branches] do Vitest em [escopo], e uma história no Storybook para cada [componente], [mês ano].
+**en:** Vitest test coverage over the whole app, and a Storybook story for every component.
 
-**es:** Cobertura de [líneas/ramas] de Vitest en [alcance], y una historia en Storybook para cada [componente], [mes año].
+**pt:** Cobertura de testes do Vitest no app inteiro, e uma história no Storybook para cada componente.
+
+**es:** Cobertura de pruebas de Vitest en toda la app, y una historia en Storybook para cada componente.
 
 ### Skydiet, web app and UI library (archive · Jan 2026 – Aug 2026)
 
@@ -210,25 +212,29 @@ Supported: the CI/CD pipeline ran "Vitest, RTL, Playwright E2E, Storybook" (Appr
 
 Supported: CI/CD with Playwright, Vitest and RTL (Approach); within Jan – Aug 2026.
 
-**[confirm Q12]** Which tool reported the 90% (Vitest coverage?), lines or branches, of which code, and which month?
+**Q12 answered:** Vitest and Playwright, over the whole app. No dates.
 
-**en:** [Line/branch] coverage from [Vitest] on [scope], [month year].
+Record: tool `Vitest, Playwright`, no dates.
 
-**pt:** Cobertura de [linhas/branches] do [Vitest] em [escopo], [mês ano].
+**en:** Test coverage from Vitest and Playwright over the whole app.
 
-**es:** Cobertura de [líneas/ramas] de [Vitest] en [alcance], [mes año].
+**pt:** Cobertura de testes do Vitest e do Playwright no app inteiro.
+
+**es:** Cobertura de pruebas de Vitest y Playwright en toda la app.
 
 #### 40+ · Components in the Atomic Design library (`94e2466f3147`)
 
 Supported: a count of components in the Storybook library (Approach: "covering 40+ components"); within Jan – Aug 2026.
 
-**[confirm Q13]** Which month was the count taken?
+**Q13 answered:** counted in Storybook; month skipped.
 
-**en:** Components with a story in the project's Storybook, counted in [month year].
+Record: tool `Storybook`, no dates.
 
-**pt:** Componentes com história no Storybook do projeto, contados em [mês ano].
+**en:** Components with a story in the project's Storybook.
 
-**es:** Componentes con historia en el Storybook del proyecto, contados en [mes año].
+**pt:** Componentes com história no Storybook do projeto.
+
+**es:** Componentes con historia en el Storybook del proyecto.
 
 ### Skydiet, one app for web and mobile (archive · Jan 2026 – Aug 2026)
 
@@ -236,13 +242,15 @@ Supported: a count of components in the Storybook library (Approach: "covering 4
 
 Supported: the shared layer is Tamagui on React Native and Expo (Approach); within Jan – Aug 2026.
 
-**[confirm Q14]** How was "shared" measured: lines in shared packages against platform-specific files (with cloc or similar), or screens built once? Which month?
+**Q14 answered:** an estimate, not a count. No dates.
 
-**en:** [Lines of code / screens] in shared packages against platform-specific ones, [counted with tool], [month year].
+Record: method only, no tool, no dates.
 
-**pt:** [Linhas de código / telas] em pacotes compartilhados contra os específicos de cada plataforma, [contadas com ferramenta], [mês ano].
+**en:** An estimate of the code shared between the web and mobile apps, not a line count.
 
-**es:** [Líneas de código / pantallas] en paquetes compartidos frente a los específicos de cada plataforma, [contadas con herramienta], [mes año].
+**pt:** Uma estimativa do código compartilhado entre os apps web e mobile, não uma contagem de linhas.
+
+**es:** Una estimación del código compartido entre las apps web y móvil, no un conteo de líneas.
 
 ### Bask, 3D telehealth landing page (archive · Jul 2024 – Aug 2024)
 
@@ -254,15 +262,17 @@ No results. Nothing to measure.
 
 Supported: tool Lighthouse (label); within Feb 2023 – Jan 2025. FAQ 02 says "Lighthouse 95+ on mobile across my contract projects", which suggests mobile but is about contract work, not this platform.
 
-**[confirm Q15]** Which category (performance, or all four)? Mobile or desktop? Which pages (95+ on each, or the lowest of them)? Which month?
+**Q15 answered:** all four Lighthouse categories at 95 or more, desktop, on every page. No dates.
 
-**en:** Lighthouse [performance / every category], [mobile/desktop] lab run, [n] pages each at 95 or above, [month year].
+Record: tool `Lighthouse`, no dates.
 
-**pt:** Lighthouse, [performance / todas as categorias], execução em laboratório [mobile/desktop], [n] páginas, todas com 95 ou mais, [mês ano].
+**en:** Lighthouse, desktop: performance, accessibility, best practices and SEO all at 95 or more, on every page.
 
-**es:** Lighthouse, [rendimiento / todas las categorías], ejecución de laboratorio [móvil/escritorio], [n] páginas, todas con 95 o más, [mes año].
+**pt:** Lighthouse, desktop: performance, acessibilidade, boas práticas e SEO todas em 95 ou mais, em todas as páginas.
 
-#### 0 · Downtime during the rollout (`4610b96a70dc`)
+**es:** Lighthouse, escritorio: rendimiento, accesibilidad, buenas prácticas y SEO todas en 95 o más, en todas las páginas.
+
+### 0 · Downtime during the rollout (`4610b96a70dc`)
 
 Supported: the migration was incremental (Approach) and the platform was in daily use (Problem: "without any disruption to people actively using it"); within Feb 2023 – Jan 2025.
 
@@ -469,11 +479,11 @@ Results
 8. **Q8. Answered:** Capitual crypto app, mobile bugs −60%: Jira and store reviews, bugs not crashes. No dates.
 9. **Q9. Answered, applied:** C6 Bank numbers are mobile, main page, Lighthouse lab in production; desktop 98 added. No dates.
 10. **Q10. Answered:** Lovefy, 14 → 4 days: median, started (Jira) → merged (GitHub), over planned features delivered. No dates.
-11. **Q11.** Lovefy, 100% test and documentation coverage: which tool and which coverage (Vitest lines or branches)? What does documentation coverage count? Which month?
-12. **Q12.** Skydiet web app, 90% coverage: which tool, lines or branches, of which code, which month?
-13. **Q13.** Skydiet web app, 40+ components: month of the count?
-14. **Q14.** Skydiet universal app, 80%+ shared code: lines in shared packages (with which tool) or screens built once? Which month?
-15. **Q15.** Redação core platform v2, Lighthouse 95+: which category, mobile or desktop, which pages, which month?
+11. **Q11. Answered:** Lovefy, 100%: Vitest coverage over the whole app. **Q11b:** documentation coverage = a Storybook story per component?
+12. **Q12. Answered:** Skydiet web app, 90%: Vitest and Playwright over the whole app. No dates.
+13. **Q13. Answered:** Skydiet web app, 40+ components counted in Storybook. No dates.
+14. **Q14. Answered:** Skydiet universal app, 80%+ shared code is an estimate. No dates.
+15. **Q15. Answered:** Redação core platform v2, 95+: all four Lighthouse categories, desktop, every page. No dates.
 16. **Q16.** Redação core platform v2, zero downtime: uptime monitor (which) or incident log? Rollout from which month to which?
 17. **Q17.** Redação core platform v2, 45+ Storybook components: month of the count?
 18. **Q18.** Redação checkout, drop-off 23% → 9% (hero): which tool? Drop-off defined as opened checkout and didn't pay? Which two periods, which months?
