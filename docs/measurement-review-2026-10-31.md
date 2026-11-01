@@ -340,15 +340,15 @@ Record: tool `App Store, Google Play`, from `2022-11-01`, to `2023-01-31`.
 
 Supported: "full test coverage on critical flows" was a requirement (Problem); within Nov 2022 – Jan 2023. No test tool named.
 
-**Q20 answered:** line coverage from Jest with React Native Testing Library, plus Maestro end-to-end flows. Critical flows: onboarding, checkout, delivery notes, and the app's page recognition. **[confirm Q20b]** The owner described the flows as scanning textbook pages into the app (the core of that app), onboarding, checkout and delivery notes. None of that matches this case study, which is an EV charging locator (maps, offline caching, push alerts). Which app were these flows from, and which flows were critical in Electromaps?
+**Q20 answered:** one test for each critical flow, with Jest and React Native Testing Library, plus Maestro end-to-end flows. Critical flows: login, checkout, maps, and the offline architecture. (Q20b: the textbook-scanning flows given first belonged to another project.) Q19 confirmed for this project.
 
 Record: tool `Jest, React Native Testing Library, Maestro`, no dates.
 
-**en:** Line coverage from Jest and React Native Testing Library, with end-to-end flows in Maestro, on the critical flows: onboarding, checkout, delivery notes and [page recognition].
+**en:** A test for each critical flow (login, checkout, maps and offline use), in Jest and React Native Testing Library, with end-to-end flows in Maestro.
 
-**pt:** Cobertura de linhas do Jest e da React Native Testing Library, com fluxos end-to-end no Maestro, nos fluxos críticos: onboarding, checkout, notas de entrega e [reconhecimento de páginas].
+**pt:** Um teste para cada fluxo crítico (login, checkout, mapas e uso offline), em Jest e React Native Testing Library, com fluxos end-to-end no Maestro.
 
-**es:** Cobertura de líneas de Jest y React Native Testing Library, con flujos end-to-end en Maestro, en los flujos críticos: onboarding, checkout, notas de entrega y [reconocimiento de páginas].
+**es:** Una prueba para cada flujo crítico (login, checkout, mapas y uso sin conexión), en Jest y React Native Testing Library, con flujos end-to-end en Maestro.
 
 ### Capitual, customer support tool (archive · Oct 2021 – Nov 2022)
 
@@ -497,8 +497,8 @@ Results
 16. **Q16. Answered:** Redação core platform v2, zero downtime: Google Cloud incident log. No dates.
 17. **Q17. Answered:** Redação core platform v2, 45+ components counted in the internal UI library's Storybook. No dates.
 18. **Q18. Answered:** Redação checkout, 23% → 9% (hero): checkouts started and not paid, from the payment provider; periods unknown.
-19. **Q19. Answered:** Electromaps, 3 months: start of work → release on both stores (Nov 2022 – Jan 2023).
-20. **Q20. Partly answered:** Electromaps, 100%: Jest + RNTL line coverage, Maestro E2E. **Q20b:** the flows given (textbook scanning, checkout, delivery notes) belong to another app; which were Electromaps' critical flows?
+19. **Q19. Answered:** Electromaps, 3 months: start of work → release on both stores (Nov 2022 – Jan 2023). Confirmed.
+20. **Q20. Answered:** Electromaps, 100%: a test for each critical flow (login, checkout, maps, offline), Jest + RNTL, Maestro E2E. No dates.
 21. **Q21.** Capitual support tool, 80% in Storybook: 80% of which components and screens, counted how, which month?
 22. **Q22.** Capitual support tool, onboarding 4 → 3 weeks: when does onboarding end? Where does the 4-week baseline come from?
 
