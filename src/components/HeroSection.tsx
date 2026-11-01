@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction } from 'react'
 import type { HERO_RESULTS_QUERY_RESULT } from '#/types/sanity.generated'
 import { Button } from '#/components/ui/Button'
 import { Container } from '#/components/ui/Section'
@@ -35,7 +35,9 @@ interface HeroSectionProps {
 export default function HeroSection({ results: rows }: HeroSectionProps) {
   const { t, lang } = useTranslation()
   const results = useMemo(() => toHeroResults(rows ?? undefined, lang), [rows, lang])
-  const headline = results[0]
+  // The result whose label, or shoot, is hovered or focused: the label and
+  // its shoot and dimension line are marked together.
+  const [active, setActive] = useState<number | null>(null)
 
   return (
     <section aria-labelledby="hero-heading" className="group/section overflow-x-clip">
@@ -45,25 +47,43 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
             {`${t('hero.headline.line1')} ${t('hero.headline.line2')}`}
           </h1>
           <p className="m-0 type-lede text-ink">{t('hero.subtitle')}</p>
-          {/* Phones and tablets: the headline result above the actions, in
-              place of the lane's first label (from 900px it stands in the
-              lane beside the drawing). */}
-          {headline && (
-            <div data-testid="hero-headline-result" className="hero:hidden">
-              <ResultLabel result={headline} />
-            </div>
-          )}
           <div className="flex flex-wrap gap-3">
             <Button href="#contact">{t('hero.cta.contact')}</Button>
             <Button href="#projects" variant="secondary">
               {t('hero.cta.projects')}
             </Button>
           </div>
+          {/* Phones and tablets: the three results together, right after the
+              actions, and the drawing after them (from 900px they stand in
+              the lane beside the drawing instead). After the actions, not
+              before: three labels above the buttons would push both off a
+              phone's first screen, and here they lead from the copy into
+              the work, each to its case card. */}
+          {results.length > 0 && (
+            <ol
+              data-testid="hero-results-group"
+              aria-label={t('hero.results.label')}
+              className="m-0 grid w-full list-none gap-3 p-0 sm:grid-cols-3 hero:hidden"
+            >
+              {results.map((result, i) => (
+                <li key={result.key} className="flex">
+                  <ResultLabel result={result} active={active === i} onActive={labelActive(setActive, i)} className="w-full" />
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
-        <HeroDrawing results={results} />
+        <HeroDrawing results={results} active={active} onActive={setActive} />
       </Container>
     </section>
   )
+}
+
+// A label leaves the highlight only if it still holds it (moving from one
+// label to the next can fire the next one's enter first).
+const labelActive = (set: Dispatch<SetStateAction<number | null>>, i: number) => (on: boolean) => {
+  if (on) set(i)
+  else set((current) => (current === i ? null : current))
 }
 
 // The drawing's annotation text; a new object only when the language changes.
@@ -83,21 +103,30 @@ function useSceneLabels(): SceneLabels {
   return ref.current.labels
 }
 
-function HeroDrawing({ results }: { results: HeroResult[] }) {
+interface HeroDrawingProps {
+  results: HeroResult[]
+  active: number | null
+  onActive: Dispatch<SetStateAction<number | null>>
+}
+
+function HeroDrawing({ results, active, onActive }: HeroDrawingProps) {
   const { t } = useTranslation()
   const labels = useSceneLabels()
   const [mode, setMode] = useState<Mode>('poster')
   // Per result, bumped to replay its draw on the poster.
   const [replays, setReplays] = useState<number[]>(() => results.map(() => 0))
   const [hintSeen, setHintSeen] = useState(false)
+  // Below 900px the hint waits for a first tap on the drawing, so it isn't
+  // in the reading path between the results and the work.
+  const [tapped, setTapped] = useState(false)
 
   const heroRef = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const laneRefs = useRef<Array<HTMLLIElement | null>>([])
   const sceneRef = useRef<MangroveScene | null>(null)
-  const latest = useRef({ labels, results })
-  latest.current = { labels, results }
+  const latest = useRef({ labels, results, onActive })
+  latest.current = { labels, results, onActive }
 
   useEffect(() => {
     setHintSeen(readStore(HINT_KEY) === '1')
@@ -122,11 +151,12 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
             overlay,
             hero,
             lane: () => laneRefs.current,
-            results: latest.current.results.map((r) => ({ height: r.height, text: r.text })),
+            results: latest.current.results.map((r) => ({ height: r.height, text: r.text, product: r.product })),
             labels: latest.current.labels,
             reducedMotion: reduced,
             isDark: () => resolvedTheme() === 'dark',
             onMango: goToContact,
+            onHover: (i) => latest.current.onActive(i),
             onPlant: () => {
               setHintSeen(true)
               writeStore(HINT_KEY, '1')
@@ -158,6 +188,10 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
     sceneRef.current?.setLabels(labels)
   }, [labels])
 
+  useEffect(() => {
+    sceneRef.current?.setHighlight(active)
+  }, [active, mode])
+
   const resetGarden = () => {
     sceneRef.current?.reset()
     writeStore(ROOTS_KEY, null)
@@ -173,7 +207,6 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
   }
 
   const fallback = mode === 'fallback'
-  const shown = results.slice(0, 3)
 
   return (
     <div
@@ -185,13 +218,17 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
           layout shift when the canvas mounts). Drafting grid by day. */}
       <div
         ref={boxRef}
+        onPointerDown={() => setTapped(true)}
         className="relative aspect-[358/288] w-full overflow-hidden [background-image:linear-gradient(color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--line)_70%,transparent)_1px,transparent_1px)] [background-size:40px_40px] sm:aspect-[880/480] hero:max-h-[560px] hero:min-h-[300px] dark:[background-image:none]"
       >
         <MangrovePoster
-          results={shown.map((r) => r.height)}
-          labels={shown.map((r) => r.text)}
+          results={results.map((r) => r.height)}
+          labels={results.map((r) => r.text)}
+          products={results.map((r) => r.product)}
+          active={active}
           replays={replays}
           onSeed={replay}
+          onHover={onActive}
           className={cn(
             'mangrove-poster absolute transition-opacity duration-400 ease-out max-hero:top-0 max-hero:h-full max-sm:left-[-16.07%] max-sm:w-[147.35%] sm:max-hero:inset-0 sm:max-hero:w-full',
             mode === 'scene' && 'opacity-0',
@@ -201,44 +238,48 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
         <TitleBlock />
       </div>
 
-      {shown.length > 0 && (
+      {results.length > 0 && (
         <ol
+          data-testid="hero-lane"
           aria-label={t('hero.results.label')}
-          className="m-0 mt-6 flex list-none flex-col gap-3 p-0 sm:flex-row sm:flex-wrap hero:pointer-events-none hero:absolute hero:inset-x-0 hero:top-0 hero:z-20 hero:mt-0 hero:block hero:h-0"
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 m-0 block h-0 list-none p-0 max-hero:hidden"
         >
-          {shown.map((result, i) => (
+          {results.map((result, i) => (
             <li
               key={result.key}
+              data-active={active === i || undefined}
               ref={(el) => {
                 laneRefs.current[i] = el
               }}
               style={{ '--i': i, '--my': markY(result.height) } as CSSProperties}
-              // The first result already stands above the actions below 900px.
-              className={cn('mangrove-lane-item hero:pointer-events-auto', i === 0 && 'max-hero:hidden')}
+              className="mangrove-lane-item pointer-events-auto"
             >
               <span
                 key={replays[i] ?? 0}
                 aria-hidden="true"
+                data-active={active === i || undefined}
                 style={{ '--delay': `${950 + i * 200}ms` } as CSSProperties}
-                className="mangrove-leader max-hero:hidden group-data-[mode=scene]/sheet:hidden"
+                className="mangrove-leader group-data-[mode=scene]/sheet:hidden data-active:h-0.5"
               />
-              <ResultLabel result={result} className="w-full hero:p-2" />
+              <ResultLabel result={result} active={active === i} onActive={labelActive(onActive, i)} className="w-full hero:p-2" />
             </li>
           ))}
         </ol>
       )}
 
       <div className="mt-6 flex flex-col items-start gap-2 hero:mt-2 hero:flex-row hero:flex-wrap hero:items-center hero:gap-x-4 hero:gap-y-1 hero:pl-5">
-        {!fallback && <p className={cn('m-0 type-code text-ink-muted', hintSeen && 'invisible')}>{t('hero.hint')}</p>}
+        {!fallback && (
+          <p className={cn('m-0 type-code text-ink-muted', hintSeen && 'invisible', !tapped && 'max-hero:hidden')}>{t('hero.hint')}</p>
+        )}
         {/* Keyboard visitors: the same replay, from the buttons below. */}
-        {shown.length > 0 && (
+        {results.length > 0 && (
           <p className="m-0 hidden type-code text-ink-muted group-has-[:focus-visible]/section:block">{t('hero.hintKeys')}</p>
         )}
         {/* The seeds' keyboard twin: one stop replays every result (the
             labels already read them out). Hidden until focused. */}
-        {shown.length > 0 && (
+        {results.length > 0 && (
           <div className="sr-only focus-within:not-sr-only focus-within:flex focus-within:basis-full">
-            <Button variant="secondary" size="small" onClick={() => shown.forEach((_, i) => replay(i))}>
+            <Button variant="secondary" size="small" onClick={() => results.forEach((_, i) => replay(i))}>
               {t('hero.results.replay')}
             </Button>
           </div>

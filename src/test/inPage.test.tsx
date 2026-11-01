@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { caseAnchor, goTo, PULSE_MS } from '../lib/inPage'
+import { caseAnchor, goTo, PULSE_MS, revealSection } from '../lib/inPage'
 
 function reduceMotion(reduce: boolean) {
   vi.mocked(window.matchMedia).mockImplementation(
@@ -71,5 +71,36 @@ describe('goTo', () => {
   it('returns false and does nothing when the target is not on the page', () => {
     document.body.innerHTML = ''
     expect(goTo(caseAnchor('missing'))).toBe(false)
+  })
+})
+
+describe('revealSection', () => {
+  function section(top: number, bottom: number) {
+    document.body.innerHTML = '<section id="projects"></section>'
+    const el = document.getElementById('projects')!
+    el.getBoundingClientRect = () => ({ top, bottom }) as DOMRect
+    el.scrollIntoView = vi.fn()
+    return el
+  }
+
+  beforeEach(() => reduceMotion(false))
+
+  it('scrolls to a section that is off screen', () => {
+    const el = section(-3000, -1000)
+    revealSection('projects')
+    expect(el.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
+  })
+
+  it('leaves the page alone while any of the section is on screen', () => {
+    const el = section(-3000, 200)
+    revealSection('projects')
+    expect(el.scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('jumps without smooth scrolling under reduced motion', () => {
+    reduceMotion(true)
+    const el = section(window.innerHeight + 10, window.innerHeight + 2000)
+    revealSection('projects')
+    expect(el.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'start' })
   })
 })

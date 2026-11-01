@@ -39,3 +39,14 @@ export function goTo(id: string): boolean {
   )
   return true
 }
+
+// Brings a section into view only when none of it is on screen (the Stack
+// filter sends the reader to Work this way), so a reader already looking at
+// it isn't moved. Focus stays where it is.
+export function revealSection(id: string): void {
+  const section = document.getElementById(id)
+  if (!section) return
+  const { top, bottom } = section.getBoundingClientRect()
+  if (bottom > 0 && top < window.innerHeight) return
+  section.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+}

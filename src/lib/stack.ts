@@ -64,3 +64,47 @@ export function groupStack(techs: STACK_QUERY_RESULT['techs']): StackGroup[] {
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'en')),
   })).filter((group) => group.techs.length > 0)
 }
+
+// The Stack filter (?tech=…): one tech, shared by URL, that dims the work
+// that doesn't use it.
+
+/** "React Native" → "react-native", "Next.js" → "next-js": the ?tech= value. */
+export function techSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+/** The home route's search params: a non-empty ?tech=, trimmed and lower-cased. */
+export function techSearch(search: Record<string, unknown>): { tech?: string } {
+  const tech = typeof search.tech === 'string' ? search.tech.trim().toLowerCase() : ''
+  return tech ? { tech } : {}
+}
+
+/** The tech a ?tech= value names (by slug or name), if the Stack rows show it. */
+export function findTech(groups: StackGroup[], param: string | undefined): string | null {
+  if (!param) return null
+  const wanted = param.toLowerCase()
+  for (const group of groups) {
+    for (const tech of group.techs) {
+      if (techSlug(tech.name) === wanted || tech.name.toLowerCase() === wanted) return tech.name
+    }
+  }
+  return null
+}
+
+/**
+ * The case studies that use the selected tech, and the roles they belong
+ * to. A role's own stack doesn't mark it: those lists are long (React
+ * Native was on five of six), and a mark should lead to work you can open.
+ */
+export function filterByTech<C extends { stack: string[] | null; roleId: string | null }>(
+  caseStudies: C[],
+  tech: string | null,
+): { using: C[]; marked: Set<string> } {
+  const using = tech ? caseStudies.filter((c) => (c.stack ?? []).includes(tech)) : []
+  return { using, marked: new Set(using.flatMap((c) => (c.roleId ? [c.roleId] : []))) }
+}
