@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import ContactSection from '../components/ContactSection'
 
-const renderSection = (settings?: Parameters<typeof ContactSection>[0]['settings']) =>
-  render(<LanguageProvider><ContactSection settings={settings} /></LanguageProvider>)
+const renderSection = (settings?: Parameters<typeof ContactSection>[0]['settings'], subject?: string) =>
+  render(<LanguageProvider><ContactSection settings={settings} subject={subject} /></LanguageProvider>)
 
 describe('ContactSection', () => {
   it('keeps the anchor contract with the hero: #contact labelled by a focusable #contact-heading', () => {
@@ -26,6 +26,15 @@ describe('ContactSection', () => {
     expect(link).toHaveAttribute('href', 'mailto:thiagomoraes.contact@gmail.com')
     expect(link).toHaveClass('bg-mangrove')
     expect(link).not.toHaveAttribute('target')
+  })
+
+  // #79: from a case study, the email arrives saying which one it's about.
+  it('puts the case study in the email subject when given one', () => {
+    renderSection(undefined, 'Redação, a faster newsroom')
+    expect(screen.getByRole('link', { name: /email/i })).toHaveAttribute(
+      'href',
+      'mailto:thiagomoraes.contact@gmail.com?subject=About%3A%20Reda%C3%A7%C3%A3o%2C%20a%20faster%20newsroom',
+    )
   })
 
   it('renders LinkedIn as a secondary link that opens in a new tab', () => {

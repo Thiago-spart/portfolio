@@ -49,6 +49,7 @@
   "howIWork.title": "Como eu trabalho",
   "howIWork.lede": "Perguntas que gestores de engenharia me fazem, respondidas com o que eu de fato fiz.",
   "contact.github": "GitHub",
+  "contact.subject": "Sobre: {subject}",
   "contact.newTab": "(abre em uma nova aba)",
   "hero.hint": "Clique ou toque na água para uma raiz crescer. Clique em uma semente para rever o resultado dela.",
   "hero.hintKeys": "Pelo teclado: use Tab até “Rever os resultados” e pressione Enter.",
