@@ -1,7 +1,4 @@
-import { useId, useState } from 'react'
-import { Button } from '#/components/ui/Button'
 import { Tag } from '#/components/ui/Tag'
-import { useTranslation } from '#/i18n/useTranslation'
 import type { Lang } from '#/i18n/LanguageContext'
 import type { StackGroup as Group } from '#/lib/stack'
 
@@ -10,42 +7,21 @@ interface Props {
   lang: Lang
 }
 
-// Figma: Components / Stack group (37:570): the featured Tags, most-used
-// first, then "+N more" expands the rest in place.
+// Figma: Components / Stack group (37:570): the row's Tags, most-used first,
+// each with how many case studies use it.
 // One category row of the Stack section. Wide (640+): the category in a 232
 // column beside the tags; Compact: the category above them.
 export default function StackGroup({ group, lang }: Props) {
-  const { t } = useTranslation()
-  const [expanded, setExpanded] = useState(false)
-  const tagsId = useId()
-  const featured = group.techs.filter((tech) => tech.featured)
-  const hidden = group.techs.length - featured.length
-  // Featured techs stay first so expanding only appends.
-  const techs = expanded ? [...featured, ...group.techs.filter((tech) => !tech.featured)] : featured
-
   return (
     <li className="flex flex-col gap-3 border-t border-line py-4 sm:flex-row sm:gap-6">
       <h3 className="m-0 type-label text-ink-muted sm:w-58 sm:shrink-0">{group.label[lang]}</h3>
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-        <ul id={tagsId} className="contents">
-          {techs.map((tech) => (
-            <li key={tech.name} className="flex">
-              <Tag label={tech.name} core={tech.core} count={tech.count > 0 ? tech.count : undefined} />
-            </li>
-          ))}
-        </ul>
-        {hidden > 0 && (
-          <Button
-            variant="ghost"
-            size="small"
-            aria-expanded={expanded}
-            aria-controls={tagsId}
-            onClick={() => setExpanded((open) => !open)}
-          >
-            {expanded ? t('stack.less') : t('stack.more').replace('{count}', String(hidden))}
-          </Button>
-        )}
-      </div>
+      <ul className="m-0 flex min-w-0 flex-1 list-none flex-wrap items-center gap-2 p-0">
+        {group.techs.map((tech) => (
+          <li key={tech.name} className="flex">
+            <Tag label={tech.name} core={tech.core} count={tech.count > 0 ? tech.count : undefined} />
+          </li>
+        ))}
+      </ul>
     </li>
   )
 }

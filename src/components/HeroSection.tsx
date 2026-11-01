@@ -39,7 +39,7 @@ export default function HeroSection({ results: rows }: HeroSectionProps) {
 
   return (
     <section aria-labelledby="hero-heading" className="group/section overflow-x-clip">
-      <Container className="grid gap-8 pt-4 pb-12 hero:min-h-[calc(100svh-var(--space-16)-var(--space-2)-var(--space-24))] hero:grid-cols-[minmax(0,380px)_minmax(0,1fr)] hero:items-center hero:gap-0 hero:py-12 xl:grid-cols-[450px_minmax(0,1fr)]">
+      <Container className="grid gap-8 pt-4 pb-12 hero:grid-cols-[minmax(0,380px)_minmax(0,1fr)] hero:items-center hero:gap-0 hero:py-12 xl:grid-cols-[450px_minmax(0,1fr)]">
         <div className="flex flex-col items-start gap-6">
           <h1 id="hero-heading" className="m-0 type-display-l text-ink md:type-display-xl hero:type-display-l xl:type-display-xl">
             {`${t('hero.headline.line1')} ${t('hero.headline.line2')}`}
