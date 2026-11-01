@@ -196,7 +196,7 @@ Record: tool `Jira, GitHub`, no dates.
 
 Supported: the CI/CD pipeline ran "Vitest, RTL, Playwright E2E, Storybook" (Approach); within Jan – Mar 2026.
 
-**Q11 answered:** Vitest coverage over the whole app. **[confirm Q11b]** What does "documentation coverage" count: every component has a Storybook story? If unsure, the line drops the documentation half.
+**Q11 answered:** Vitest coverage over the whole app; documentation coverage means every component has a Storybook story (Q11b).
 
 Record: tool `Vitest, Storybook`, no dates.
 
@@ -262,7 +262,7 @@ No results. Nothing to measure.
 
 Supported: tool Lighthouse (label); within Feb 2023 – Jan 2025. FAQ 02 says "Lighthouse 95+ on mobile across my contract projects", which suggests mobile but is about contract work, not this platform.
 
-**Q15 answered:** all four Lighthouse categories at 95 or more, desktop, on every page. No dates.
+**Q15 answered:** all four Lighthouse categories at 95 or more, desktop, on every page. No dates. **Done 2026-10-31 (Q15b):** relabelled "Lighthouse scores, desktop" ("Notas no Lighthouse, desktop", "Puntuaciones en Lighthouse, escritorio"). Backup: `~/sanity-backups/before-lighthouse-relabel-2026-10-31.tar.gz`.
 
 Record: tool `Lighthouse`, no dates.
 
@@ -310,7 +310,7 @@ No results. (Its Approach says "Responses stream in under a second", a number wi
 
 Supported: 23% is the old checkout (Problem: "leaking nearly a quarter of its buyers before they finished paying"); within Feb 2023 – Jan 2025.
 
-**Q18 answered:** read from the payment provider's data. Periods unknown, so no dates. Drop-off is read as checkouts started that weren't paid (the payment provider's own measure); **[confirm Q18b]** if that's wrong.
+**Q18 answered:** read from the payment provider's data. Periods unknown, so no dates. Drop-off is checkouts started that weren't paid (Q18b confirmed).
 
 Record: tool `Payment provider`, no dates.
 
@@ -340,7 +340,7 @@ Record: tool `App Store, Google Play`, from `2022-11-01`, to `2023-01-31`.
 
 Supported: "full test coverage on critical flows" was a requirement (Problem); within Nov 2022 – Jan 2023. No test tool named.
 
-**Q20 answered:** line coverage from Jest with React Native Testing Library, plus Maestro end-to-end flows. Critical flows: onboarding, checkout, delivery notes, and the app's page recognition. **[confirm Q20b]** What is "page recognition" in the app (for example, scanning a charger's QR code to open its page)? The text needs a plain name for it.
+**Q20 answered:** line coverage from Jest with React Native Testing Library, plus Maestro end-to-end flows. Critical flows: onboarding, checkout, delivery notes, and the app's page recognition. **[confirm Q20b]** The owner described the flows as scanning textbook pages into the app (the core of that app), onboarding, checkout and delivery notes. None of that matches this case study, which is an EV charging locator (maps, offline caching, push alerts). Which app were these flows from, and which flows were critical in Electromaps?
 
 Record: tool `Jest, React Native Testing Library, Maestro`, no dates.
 
@@ -489,16 +489,16 @@ Results
 8. **Q8. Answered:** Capitual crypto app, mobile bugs −60%: Jira and store reviews, bugs not crashes. No dates.
 9. **Q9. Answered, applied:** C6 Bank numbers are mobile, main page, Lighthouse lab in production; desktop 98 added. No dates.
 10. **Q10. Answered:** Lovefy, 14 → 4 days: median, started (Jira) → merged (GitHub), over planned features delivered. No dates.
-11. **Q11. Answered:** Lovefy, 100%: Vitest coverage over the whole app. **Q11b:** documentation coverage = a Storybook story per component?
+11. **Q11. Answered:** Lovefy, 100%: Vitest coverage over the whole app, and a Storybook story for every component.
 12. **Q12. Answered:** Skydiet web app, 90%: Vitest and Playwright over the whole app. No dates.
 13. **Q13. Answered:** Skydiet web app, 40+ components counted in Storybook. No dates.
 14. **Q14. Answered:** Skydiet universal app, 80%+ shared code is an estimate. No dates.
-15. **Q15. Answered:** Redação core platform v2, 95+: all four Lighthouse categories, desktop, every page. No dates.
+15. **Q15. Answered, applied:** Redação core platform v2, 95+: all four Lighthouse categories, desktop, every page; relabelled "Lighthouse scores, desktop".
 16. **Q16. Answered:** Redação core platform v2, zero downtime: Google Cloud incident log. No dates.
 17. **Q17. Answered:** Redação core platform v2, 45+ components counted in the internal UI library's Storybook. No dates.
-18. **Q18. Answered:** Redação checkout, 23% → 9% (hero): payment provider; periods unknown. **Q18b:** drop-off = checkouts started and not paid?
+18. **Q18. Answered:** Redação checkout, 23% → 9% (hero): checkouts started and not paid, from the payment provider; periods unknown.
 19. **Q19. Answered:** Electromaps, 3 months: start of work → release on both stores (Nov 2022 – Jan 2023).
-20. **Q20. Answered:** Electromaps, 100%: Jest + RNTL line coverage, Maestro E2E; onboarding, checkout, delivery notes, page recognition. **Q20b:** what is page recognition?
+20. **Q20. Partly answered:** Electromaps, 100%: Jest + RNTL line coverage, Maestro E2E. **Q20b:** the flows given (textbook scanning, checkout, delivery notes) belong to another app; which were Electromaps' critical flows?
 21. **Q21.** Capitual support tool, 80% in Storybook: 80% of which components and screens, counted how, which month?
 22. **Q22.** Capitual support tool, onboarding 4 → 3 weeks: when does onboarding end? Where does the 4-week baseline come from?
 
