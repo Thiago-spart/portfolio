@@ -12,6 +12,22 @@ export function isCoreTech(name: string): boolean {
   return CORE_TECH.has(name)
 }
 
+// Store listings read better by store than by host.
+const STORE_HOSTS: Record<string, string> = {
+  'apps.apple.com': 'App Store',
+  'play.google.com': 'Google Play',
+}
+
+/** Where a live link goes, short: "capitual.com", "App Store"; null if the URL is invalid. */
+export function liveLabel(url: string): string | null {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '')
+    return STORE_HOSTS[host] ?? host
+  } catch {
+    return null
+  }
+}
+
 const EN_DASH = '–'
 
 function yearOf(date: string | null | undefined): string | null {

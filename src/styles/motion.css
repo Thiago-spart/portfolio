@@ -15,8 +15,9 @@
         animation-range: entry 10% cover 45%;
       }
 
-      /* Case cards: a tide line runs under the results and the after value
-         is uncovered behind it; the line then ebbs away. */
+      /* Case cards: a tide line runs under the results and uncovers each
+         before value behind it, then ebbs away. The after value, the
+         result, is never covered. */
       .case-tide {
         position: relative;
         view-timeline: --tide block;
@@ -35,7 +36,7 @@
         pointer-events: none;
       }
 
-      .case-tide .metric-after {
+      .case-tide .metric-before {
         animation: tide-reveal linear both;
         animation-timeline: --tide;
         animation-range: entry 40% entry 100%;

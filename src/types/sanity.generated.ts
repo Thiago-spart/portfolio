@@ -414,7 +414,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../src/lib/queries/caseStudies.ts
 // Variable: CASE_STUDIES_QUERY
-// Query: *[_type == "caseStudy" && defined(slug.current)]  | order(tier desc, order asc, startDate desc) {  _id,  title,  "slug": slug.current,  tier,  summary,  "roleTitle": role->title,  startDate,  endDate,  "stack": stack[]->name,  "results": results[0...2]{ _key, before, after, unit, qualifier, label, direction }}
+// Query: *[_type == "caseStudy" && defined(slug.current)]  | order(tier desc, order asc, startDate desc) {  _id,  title,  "slug": slug.current,  tier,  summary,  "roleTitle": role->title,  startDate,  endDate,  "stack": stack[]->name,  "results": results[0...2]{ _key, before, after, unit, qualifier, label, direction },  liveUrl}
 export type CASE_STUDIES_QUERY_RESULT = Array<{
   _id: string;
   title: LocaleString;
@@ -434,6 +434,7 @@ export type CASE_STUDIES_QUERY_RESULT = Array<{
     label: LocaleString;
     direction: "down" | "up";
   }> | null;
+  liveUrl: string | null;
 }>;
 
 // Source: ../src/lib/queries/caseStudies.ts
@@ -617,7 +618,7 @@ export type SITEMAP_CASE_STUDIES_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  tier,\n  summary,\n  "roleTitle": role->title,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "results": results[0...2]{ _key, before, after, unit, qualifier, label, direction }\n}': CASE_STUDIES_QUERY_RESULT;
+    '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  tier,\n  summary,\n  "roleTitle": role->title,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "results": results[0...2]{ _key, before, after, unit, qualifier, label, direction },\n  liveUrl\n}': CASE_STUDIES_QUERY_RESULT;
     '*[_type == "caseStudy" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  summary,\n  problem,\n  approach,\n  "results": results[]{ _key, before, after, unit, qualifier, label, direction },\n  "stack": stack[]->name,\n  "role": role->{ company, companyUrl, title },\n  "cover": cover{\n    "url": asset->url + "?w=2240&h=1120&fit=crop&auto=format&q=75",\n    alt\n  },\n  "gallery": gallery[]{\n    _key,\n    "url": asset->url + "?w=1000&auto=format&q=75",\n    alt\n  },\n  "videoUrl": video.asset->url,\n  liveUrl,\n  githubUrl,\n  startDate,\n  endDate\n}': CASE_STUDY_DETAIL_QUERY_RESULT;
     '*[_type == "faq"] | order(order asc) {\n  _id,\n  question,\n  answer\n}': FAQ_QUERY_RESULT;
     '*[_type == "role"] | order(startDate desc) {\n  _id,\n  company,\n  companyUrl,\n  title,\n  summary,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "caseStudies": *[_type == "caseStudy" && references(^._id) && defined(slug.current)]\n    | order(tier desc, order asc, startDate desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    "results": results[]{ _key, before, after, unit, qualifier, label, direction }\n  }\n}': ROLES_QUERY_RESULT;
