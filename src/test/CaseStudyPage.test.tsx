@@ -226,7 +226,7 @@ describe('CaseStudyPage', () => {
       const parts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
       expect(parts).toEqual(['Results', '1Problem', '2Approach', '3Measurement', '4Stack', 'Next case study'])
       const part = screen.getByRole('region', { name: 'Measurement' })
-      const rows = within(part).getAllByRole('listitem')
+      const rows = [...part.querySelectorAll('ol > li')] as HTMLElement[]
       expect(rows.map((row) => row.id)).toEqual(['result-lh', 'result-bugs'])
       expect(rows[0]).toHaveTextContent('40 → 95 · Lighthouse score')
       expect(rows[0]).toHaveTextContent('Lighthouse CLI, mobile, home page.')
@@ -253,6 +253,33 @@ describe('CaseStudyPage', () => {
       expect(screen.queryByRole('region', { name: 'Measurement' })).toBeNull()
       expect(within(screen.getByRole('region', { name: 'Results' })).queryAllByRole('link')).toHaveLength(0)
     })
+
+    it('gives results measured the same way one row and one footnote number', async () => {
+      const lighthouse = { method: localeString({ en: 'Lighthouse, mobile, main page.' }), tool: 'Lighthouse' }
+      await renderPage(
+        caseStudyDetail({
+          results: [
+            metric(0.9, 'Largest Contentful Paint', { unit: 's', direction: 'down', key: 'lcp', measurement: lighthouse }),
+            metric(98, 'Performance, desktop', { key: 'desk', measurement: { ...lighthouse, method: localeString({ en: 'Lighthouse, desktop, main page.' }) } }),
+            metric(100, 'Accessibility', { key: 'a11y', measurement: { ...lighthouse } }),
+          ],
+        }),
+      )
+      const part = screen.getByRole('region', { name: 'Measurement' })
+      const rows = [...part.querySelectorAll('ol > li')] as HTMLElement[]
+      expect(rows.map((row) => row.id)).toEqual(['result-lcp', 'result-desk'])
+      expect(within(rows[0]).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+        '0.9s · Largest Contentful Paint',
+        '100 · Accessibility',
+      ])
+      expect(rows[0]).toHaveTextContent('Lighthouse, mobile, main page.')
+      const notes = within(screen.getByRole('region', { name: 'Results' })).getAllByRole('link')
+      expect(notes.map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+        ['1', '#result-lcp'],
+        ['2', '#result-desk'],
+        ['1', '#result-lcp'],
+      ])
+      expect(notes[2]).toHaveAccessibleName('How it was measured: Accessibility')
+    })
   })
 })
-

@@ -8,7 +8,7 @@ import { caseAnchor } from '#/lib/inPage'
 import { ArchiveRow } from './ArchiveRow'
 import RichText from './RichText'
 import { CaseContents } from './CaseContents'
-import { CaseMeasurements, measuredResults, metricAnchor, resultAnchor } from './CaseMeasurements'
+import { CaseMeasurements, measurementGroups, metricAnchor, resultAnchor } from './CaseMeasurements'
 import { Button, buttonVariants } from './ui/Button'
 import { Callout } from './ui/Callout'
 import { Container } from './ui/Section'
@@ -48,14 +48,16 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
   const problem = caseStudy.problem?.[lang]
   const decision = caseStudy.decision?.[lang]
   const approach = caseStudy.approach?.[lang]
-  // Results that say how they were measured get a footnote in the strip and
-  // a row in the Measurement part, numbered alike (#73).
-  const measured = measuredResults(results)
+  // Results that say how they were measured get a footnote in the strip,
+  // numbered like their row in the Measurement part; results measured the
+  // same way share a row and a number (#73).
+  const groups = measurementGroups(results)
   const footnote = (key: string) => {
-    const i = measured.findIndex((result) => result._key === key)
-    return i < 0
-      ? undefined
-      : { number: i + 1, href: `#${resultAnchor(key)}`, label: t('caseStudy.howMeasured').replace('{label}', measured[i].label[lang]) }
+    const i = groups.findIndex((group) => group.results.some((result) => result._key === key))
+    const result = groups[i]?.results.find((r) => r._key === key)
+    return result
+      ? { number: i + 1, href: `#${resultAnchor(groups[i].key)}`, label: t('caseStudy.howMeasured').replace('{label}', result.label[lang]) }
+      : undefined
   }
 
   // Parts are numbered in the order they appear, skipping empty ones.
@@ -69,8 +71,8 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
   if (approach?.length) {
     parts.push({ id: 'approach', label: t('caseStudy.approach'), content: <RichText value={approach} className={PROSE} /> })
   }
-  if (measured.length > 0) {
-    parts.push({ id: 'measurement', label: t('caseStudy.measurement'), content: <CaseMeasurements results={measured} lang={lang} /> })
+  if (groups.length > 0) {
+    parts.push({ id: 'measurement', label: t('caseStudy.measurement'), content: <CaseMeasurements groups={groups} lang={lang} /> })
   }
   if (stack.length > 0) {
     parts.push({
