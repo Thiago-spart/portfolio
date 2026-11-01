@@ -251,18 +251,13 @@ function HeroDrawing({ results }: { results: HeroResult[] }) {
         {shown.length > 0 && (
           <p className="m-0 hidden type-code text-ink-muted group-has-[:focus-visible]/section:block">{t('hero.hintKeys')}</p>
         )}
-        {/* Keyboard twins of the seeds: hidden until focused. */}
+        {/* The seeds' keyboard twin: one stop replays every result (the
+            labels already read them out). Hidden until focused. */}
         {shown.length > 0 && (
-          <div
-            role="group"
-            aria-label={t('hero.results.label')}
-            className="sr-only focus-within:not-sr-only focus-within:flex focus-within:basis-full focus-within:flex-wrap focus-within:gap-2"
-          >
-            {shown.map((result, i) => (
-              <Button key={result.key} variant="secondary" size="small" onClick={() => replay(i)}>
-                {t('hero.results.replay').replace('{label}', result.label).replace('{value}', result.text)}
-              </Button>
-            ))}
+          <div className="sr-only focus-within:not-sr-only focus-within:flex focus-within:basis-full">
+            <Button variant="secondary" size="small" onClick={() => shown.forEach((_, i) => replay(i))}>
+              {t('hero.results.replay')}
+            </Button>
           </div>
         )}
         {!fallback && (

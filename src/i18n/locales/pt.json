@@ -51,11 +51,11 @@
   "contact.github": "GitHub",
   "contact.newTab": "(abre em uma nova aba)",
   "hero.hint": "Clique ou toque na água para uma raiz crescer. Clique em uma semente para rever o resultado dela.",
-  "hero.hintKeys": "Pelo teclado: use Tab até um resultado e Enter para revê-lo.",
+  "hero.hintKeys": "Pelo teclado: use Tab até “Rever os resultados” e pressione Enter.",
   "hero.reset": "Limpar jardim",
   "hero.resetShort": "Limpar",
   "hero.results.label": "Resultados",
-  "hero.results.replay": "Rever resultado: {label}, {value}",
+  "hero.results.replay": "Rever os resultados",
   "hero.drawing.propRoot": "Raiz-escora",
   "hero.drawing.canopy": "Copa",
   "hero.drawing.contact": "Contato",
@@ -68,5 +68,6 @@
   "hero.drawing.night": "Noite · Maré alta",
   "hero.drawing.rev": "Rev 0.2",
   "index.label": "Seções",
-  "index.contact": "Contato"
+  "index.contact": "Contato",
+  "a11y.skip": "Pular para o conteúdo"
 }

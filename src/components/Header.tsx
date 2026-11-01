@@ -19,6 +19,14 @@ export default function Header() {
 
   return (
     <header>
+      {/* First stop for keyboard and screen-reader visitors: past the header
+          and the sheet index, straight to the page's content. */}
+      <a
+        href="#main"
+        className="sr-only rounded-sm border border-line bg-surface-raised px-3 py-2 type-small text-ink no-underline focus:not-sr-only focus:fixed focus:top-2 focus:left-4 focus:z-50"
+      >
+        {t('a11y.skip')}
+      </a>
       <Container className="flex h-18 items-center justify-between gap-2 md:gap-3">
         <Link
           to="/"

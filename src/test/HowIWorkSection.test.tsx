@@ -38,6 +38,12 @@ describe('HowIWorkSection', () => {
     ])
   })
 
+  it('keeps the number and toggle glyph out of the question names', () => {
+    renderSection()
+    expect(screen.getByRole('button', { name: 'Are you available?' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Do you work remotely?' })).toBeInTheDocument()
+  })
+
   it('starts with the first question open and the others closed', () => {
     renderSection()
     expect(question(/are you available/i)).toHaveAttribute('aria-expanded', 'true')

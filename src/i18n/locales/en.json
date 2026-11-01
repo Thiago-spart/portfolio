@@ -51,11 +51,11 @@
   "contact.github": "GitHub",
   "contact.newTab": "(opens in a new tab)",
   "hero.hint": "Click or tap the water to grow a root. Click a seed to replay its result.",
-  "hero.hintKeys": "From the keyboard: Tab to a result and press Enter to replay it.",
+  "hero.hintKeys": "From the keyboard: Tab to “Replay the results” and press Enter.",
   "hero.reset": "Reset garden",
   "hero.resetShort": "Reset",
   "hero.results.label": "Results",
-  "hero.results.replay": "Replay result: {label}, {value}",
+  "hero.results.replay": "Replay the results",
   "hero.drawing.propRoot": "Prop root",
   "hero.drawing.canopy": "Canopy",
   "hero.drawing.contact": "Contact",
@@ -68,5 +68,6 @@
   "hero.drawing.night": "Night · High tide",
   "hero.drawing.rev": "Rev 0.2",
   "index.label": "Sections",
-  "index.contact": "Contact"
+  "index.contact": "Contact",
+  "a11y.skip": "Skip to content"
 }

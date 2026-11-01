@@ -40,7 +40,7 @@ export const Route = createFileRoute('/projects/$slug')({
 function ProjectNotFound() {
   const { t } = useTranslation()
   return (
-    <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+    <main id="main" tabIndex={-1} className="flex min-h-[60vh] focus:outline-none flex-col items-center justify-center gap-4 px-4 text-center">
       <p className="m-0 type-heading text-ink">{t('caseStudy.notFound')}</p>
       <Button variant="ghost" size="small" href="/#projects">
         {t('caseStudy.back')}
@@ -57,7 +57,7 @@ function ProjectPage() {
   // The case study closes on the same Contact block as the home page: the
   // reader who got this far is the one most likely to write.
   return (
-    <main>
+    <main id="main" tabIndex={-1} className="focus:outline-none">
       <CaseStudyPage caseStudy={project} next={next} lang={lang} />
       <ContactSection settings={settings} />
     </main>

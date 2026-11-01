@@ -151,16 +151,17 @@ describe('HeroSection', () => {
     expect(scene.options).toBeNull()
   })
 
-  it('replays a result from its seed button without hiding or toggling it', () => {
+  it('replays every result from the one keyboard button without hiding or toggling them', () => {
     renderHero()
-    const leaderBefore = resultItems()[1].querySelector('.mangrove-leader')
-    const maskBefore = screen.getByTestId('hero-poster').querySelectorAll('mask')[1].id
-    const button = screen.getByRole('button', { name: 'Replay result: Production bugs, −96%' })
+    const leadersBefore = resultItems().map((li) => li.querySelector('.mangrove-leader'))
+    const masksBefore = [...screen.getByTestId('hero-poster').querySelectorAll('mask')].map((m) => m.id)
+    const button = screen.getByRole('button', { name: 'Replay the results' })
+    expect(screen.getAllByRole('button', { name: /Replay/ })).toHaveLength(1)
     fireEvent.click(button)
     resultItems().forEach((li) => expect(li).toBeVisible())
-    // Remounted, so the draw runs again.
-    expect(resultItems()[1].querySelector('.mangrove-leader')).not.toBe(leaderBefore)
-    expect(screen.getByTestId('hero-poster').querySelectorAll('mask')[1].id).not.toBe(maskBefore)
+    // Remounted, so every draw runs again.
+    resultItems().forEach((li, i) => expect(li.querySelector('.mangrove-leader')).not.toBe(leadersBefore[i]))
+    ;[...screen.getByTestId('hero-poster').querySelectorAll('mask')].forEach((m, i) => expect(m.id).not.toBe(masksBefore[i]))
     fireEvent.click(button)
     resultItems().forEach((li) => expect(li).toBeVisible())
   })
@@ -169,8 +170,8 @@ describe('HeroSection', () => {
     renderHero()
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
-    fireEvent.click(screen.getByRole('button', { name: 'Replay result: Checkout drop-off, 23% → 9%' }))
-    expect(scene.replayProof).toHaveBeenCalledWith(2)
+    fireEvent.click(screen.getByRole('button', { name: 'Replay the results' }))
+    ;[0, 1, 2].forEach((i) => expect(scene.replayProof).toHaveBeenCalledWith(i))
     resultItems().forEach((li) => expect(li).toBeVisible())
   })
 
@@ -218,7 +219,7 @@ describe('HeroSection', () => {
       resultItems().forEach((li) => expect(li).toBeVisible())
       expect(screen.queryByText(/Click or tap the water/)).toBeNull()
       expect(screen.queryByRole('button', { name: 'Reset garden' })).toBeNull()
-      expect(screen.getByRole('button', { name: 'Replay result: Production bugs, −96%' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Replay the results' })).toBeInTheDocument()
     } finally {
       HTMLCanvasElement.prototype.getContext = original
     }
@@ -272,7 +273,7 @@ describe('HeroSection', () => {
       expect(locale['hero.hint']).not.toMatch(/marked|marcada/)
       expect(locale['hero.hintKeys']).toMatch(/Tab/)
       expect(locale['hero.hintKeys']).toMatch(/Enter/)
-      expect(locale['hero.results.replay']).toContain('{label}')
+      expect(locale['hero.hintKeys']).toContain(locale['hero.results.replay'])
       expect(locale['hero.reset']).toContain(locale['hero.resetShort'])
     }
     renderHero()

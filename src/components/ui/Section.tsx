@@ -37,7 +37,7 @@ export function Section({ id, heading, lede, className, children }: SectionProps
             <h2 id={headingId} className="m-0 type-heading text-ink">
               {heading}
             </h2>
-            {lede && <p className="m-0 type-lede text-ink-muted">{lede}</p>}
+            {lede && <p className="m-0 max-w-measure type-lede text-ink-muted">{lede}</p>}
           </div>
         )}
         {children}
