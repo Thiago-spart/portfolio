@@ -458,21 +458,21 @@ Up to two case studies per answer, shown as "See it in: …".
 1. **Redação Online, from PHP to Next.js.** Result "40 → 95 · Lighthouse performance score"; Approach: "Next.js SSG … SSG pre-rendering" (the answer's "static generation").
 2. **Redação Online, core platform v2.** Result "95+ · Lighthouse score"; Approach: "SSR, ISG, and Server Components" (the answer's "SSR, React Server Components").
 
-**[confirm Q26]** Or C6 Bank second: "Cloudflare CDN caching" matches "cache at the CDN edge", but its Lighthouse performance is 90, not 95+. Also, "page weight down 80% at Redação Online" (the answer's opener) appears in no case study: which case is it, and should it become a result there?
+**Q26 answered: Redação Online, from PHP to Next.js + C6 Bank** (replacing core platform v2 above). Since 2026-10-31 the answer opens with exactly those two: "Lighthouse performance from 40 to 95 at Redação Online, and a 0.9 s Largest Contentful Paint at C6 Bank". The unsourced 80% page-weight line is gone.
 
 ### 03 How do you keep micro-frontends consistent?
 
 1. **Redação Online, core platform v2.** Approach: "a Storybook library documenting 45+ UI components"; the role summary places it "across the micro-frontends".
 2. **Capitual, customer support tool.** Approach: "front-end delivery within a Micro-Frontend architecture … built out a Storybook library"; result "80% · Components and screens in Storybook".
 
-**[confirm Q27]** Module Federation, the GraphQL gateway and per-app error boundaries (the rest of the answer) are in neither case. Which work were they? If Redação Online, core platform v2 should say so.
+**Q27 answered: Redação Online, core platform v2.** **Done 2026-10-31:** its Approach gained a paragraph in all three languages: "The platform was split into micro-frontends with Module Federation behind a single GraphQL gateway, and each app had its own error boundaries and cache, so a failure stayed local." Links stay as above. Backup: `~/sanity-backups/before-v2-microfrontends-2026-10-31.tar.gz`.
 
 ### 04 How do you put AI agents into your pipeline?
 
 1. **Lovefy, AI dating platform.** Result "14d → 4d · Feature delivery time" is the answer's opener; Approach: "AI agent workflows (Cursor and Claude) to speed up day-to-day development", with a CI/CD pipeline in Vitest, RTL and Playwright.
 2. **Skydiet, web app and UI library.** Approach: "used AI agents (GitHub & Claude) to build out shareholder-requested modules faster"; result "90% · Test coverage" backs "nothing merges without passing tests".
 
-**[confirm Q28]** Skydiet web app, or Skydiet, one app for web and mobile ("custom MCP servers to speed up AI-assisted feature development")? Also: the answer names Claude Code; Lovefy's Approach says "Cursor and Claude". Same thing?
+**Q28 answered: Lovefy + Skydiet web app**, as above. **[open]** The answer names Claude Code; Lovefy's Approach says "Cursor and Claude". Same thing? Not blocking.
 
 ## 5. Questions for the owner
 
@@ -514,6 +514,6 @@ Approach
 FAQ evidence
 
 25. **Q25. Answered:** migration FAQ links core platform v2 + checkout.
-26. **Q26.** 02 (Lighthouse): landing + core platform v2, or landing + C6 Bank? Which case is "page weight down 80%", and should it be a result?
-27. **Q27.** 03 (micro-frontends): core platform v2 + Capitual support tool? Which work had Module Federation and the GraphQL gateway?
-28. **Q28.** 04 (AI agents): Lovefy + Skydiet web app, or + Skydiet universal app? Is "Claude Code" in the answer the same as "Cursor and Claude" in Lovefy?
+26. **Q26. Answered:** Lighthouse FAQ links Redação landing (PHP → Next.js) + C6 Bank, matching its new opener.
+27. **Q27. Answered, applied:** Module Federation, GraphQL gateway and error boundaries were Redação core platform v2; added to its Approach.
+28. **Q28. Answered:** AI agents FAQ links Lovefy + Skydiet web app. Open, not blocking: is "Claude Code" the same as Lovefy's "Cursor and Claude"?
