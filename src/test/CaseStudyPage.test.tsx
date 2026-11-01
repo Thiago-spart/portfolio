@@ -1,8 +1,9 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import CaseStudyPage from '../components/CaseStudyPage'
 import { READING_BAND } from '../lib/useReadingSection'
 import { FakeObserver, fire } from './fakeObserver'
+import { fakeViewTransition } from './fakeViewTransition'
 import { renderWithRouter } from './renderWithRouter'
 import { caseStudyCard, caseStudyDetail, localeBlock, localeString, paragraphs } from './fixtures'
 
@@ -16,7 +17,7 @@ const renderPage = (caseStudy: Detail = caseStudyDetail(), lang: 'en' | 'pt' = '
 describe('CaseStudyPage', () => {
   it('renders the intro: back link, role · company, dates, title and summary', async () => {
     await renderPage()
-    expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/#projects')
+    expect(screen.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/#case-portfolio-site')
     expect(screen.getByText('Senior Developer · Acme Corp')).toBeInTheDocument()
     expect(screen.getByText('Jan 2024 – Jun 2024')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1, name: 'Portfolio Site' })).toBeInTheDocument()
@@ -161,6 +162,36 @@ describe('CaseStudyPage', () => {
     it('has no contents when there are no parts', async () => {
       await renderPage(caseStudyDetail({ problem: null, approach: null, stack: [] }))
       expect(screen.queryByRole('navigation', { name: 'Contents' })).not.toBeInTheDocument()
+    })
+  })
+
+  // #77: the card's title and first result morph into these, and back.
+  describe('view transition', () => {
+    it('names the title and the first result like the case card does', async () => {
+      const { container } = await renderPage()
+      expect(screen.getByRole('heading', { level: 1 })).toHaveStyle({ viewTransitionName: 'case-title-portfolio-site' })
+      const named = [...container.querySelectorAll<HTMLElement>('[style*="view-transition-name"]')]
+      expect(named.map((el) => el.style.viewTransitionName)).toEqual(['case-title-portfolio-site', 'case-result-portfolio-site'])
+      expect(named[1]).toHaveTextContent(/^Lighthouse score/)
+    })
+
+    it('leaves the names off the next case study, so its home card stays put', async () => {
+      await renderPage()
+      const nav = screen.getByRole('navigation', { name: 'Next case study' })
+      expect(nav.querySelector('[style*="view-transition-name"]')).toBeNull()
+    })
+
+    it('goes back to its card on the home page in a view transition', async () => {
+      const vt = fakeViewTransition()
+      try {
+        await renderPage()
+        const back = screen.getByRole('link', { name: 'All projects' })
+        expect(back).toHaveAttribute('href', '/#case-portfolio-site')
+        fireEvent.click(back)
+        await waitFor(() => expect(vt.calls).toHaveLength(1))
+      } finally {
+        vt.restore()
+      }
     })
   })
 })

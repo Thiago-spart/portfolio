@@ -3,12 +3,17 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { formatResultPhrase, startYear, type CaseStudyRow } from '#/lib/caseStudy'
 import { caseAnchor } from '#/lib/inPage'
+import { caseMorph, caseViewTransition } from '#/lib/caseTransition'
 import { cn } from '#/lib/utils'
 import type { Lang } from '#/i18n/LanguageContext'
 
 interface ArchiveRowProps {
   caseStudy: CaseStudyRow
   lang: Lang
+  // Names the title and result for the morph into the case page. Off for
+  // the next case study on a case page: there, the names would pair with
+  // that case's card on the home page during the morph from it.
+  morph?: boolean
 }
 
 // Figma: Components / Archive row (29:350). One case study in "More work"
@@ -20,8 +25,9 @@ interface ArchiveRowProps {
 // its visible text (WCAG 2.5.3). Hover: sunken surface, title and arrow in
 // mangrove; the row carries the focus ring while the link is focused. Its
 // id is the case study's in-page anchor (src/lib/inPage.ts); data-role marks
-// its role on the timeline rail while the row is hovered or focused.
-export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
+// its role on the timeline rail while the row is hovered or focused. Title
+// and result morph into the case page's (src/lib/caseTransition.ts).
+export function ArchiveRow({ caseStudy, lang, morph = true }: ArchiveRowProps) {
   const contextId = useId()
   const resultId = useId()
   const year = startYear(caseStudy.startDate)
@@ -44,6 +50,8 @@ export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
       <Link
         to="/projects/$slug"
         params={{ slug: caseStudy.slug }}
+        viewTransition={caseViewTransition}
+        style={morph ? caseMorph(caseStudy.slug, 'title') : undefined}
         aria-describedby={result ? `${contextId} ${resultId}` : contextId}
         className="col-span-2 col-start-1 row-start-2 type-body-strong text-ink no-underline outline-none group-hover:text-mangrove after:absolute after:inset-0 after:content-[''] sm:col-span-1 sm:col-start-2 sm:row-start-1"
       >
@@ -57,6 +65,7 @@ export function ArchiveRow({ caseStudy, lang }: ArchiveRowProps) {
       </span>
       <span
         id={resultId}
+        style={morph && result ? caseMorph(caseStudy.slug, 'result') : undefined}
         className={cn(
           'col-span-3 col-start-1 row-start-3 type-code text-ink sm:col-span-1 sm:col-start-4 sm:row-start-1 sm:text-right',
           !result && 'max-sm:hidden',

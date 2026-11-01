@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { formatMetricParts, type MetricValue } from '#/lib/metric'
 import { useTranslation } from '#/i18n/useTranslation'
 import { cn } from '#/lib/utils'
@@ -9,16 +10,17 @@ interface MetricProps {
   // Accent sets the after value in mango: once per view. Plain elsewhere.
   emphasis?: 'accent' | 'plain'
   className?: string
+  style?: CSSProperties
 }
 
 // Figma: Components / Metric (10:82). Delta (a before value: struck and
 // muted, then → after) or Single (after only), Accent or Plain.
-export function Metric({ value, label, description, emphasis = 'plain', className }: MetricProps) {
+export function Metric({ value, label, description, emphasis = 'plain', className, style }: MetricProps) {
   const { t } = useTranslation()
   const { before, after } = formatMetricParts(value)
 
   return (
-    <div className={cn('flex min-w-0 flex-col items-start gap-2', className)}>
+    <div className={cn('flex min-w-0 flex-col items-start gap-2', className)} style={style}>
       <p className="m-0 type-label text-ink-muted">{label}</p>
       <p className="m-0 flex items-baseline gap-3 whitespace-nowrap">
         {before != null && (

@@ -176,3 +176,22 @@
     clip-path: inset(0 0 0 0);
   }
 }
+
+/* Case card or archive row to case page (src/lib/caseTransition.ts): the
+   title and first result morph, the rest of the page crossfades. Under
+   reduced motion the router starts no transition; where transition types
+   aren't supported it may still start one, so it's stilled here. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

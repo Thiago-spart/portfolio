@@ -7,7 +7,7 @@ import { cn } from '#/lib/utils'
 // view; Secondary supports it; Ghost is inline navigation. Small (32px) is
 // for toolbars. Never a mango fill, never a pill. Focus ring comes from the
 // global :focus-visible rule (2px mango, 2px offset).
-const buttonVariants = cva(
+export const buttonVariants = cva(
   [
     'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent no-underline',
     'transition-[background-color,border-color,box-shadow,translate] duration-150 ease-out',
