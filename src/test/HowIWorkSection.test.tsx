@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { LanguageProvider } from '../i18n/LanguageContext'
 import HowIWorkSection from '../components/HowIWorkSection'
 import { localeBlock, localeString, paragraphs } from './fixtures'
+import { renderWithRouter } from './renderWithRouter'
 import type { FAQ_QUERY_RESULT } from '../types/sanity.generated'
 
 const mockItems: FAQ_QUERY_RESULT = [
@@ -10,11 +11,13 @@ const mockItems: FAQ_QUERY_RESULT = [
     _id: '1',
     question: localeString({ en: 'Are you available?', pt: 'Está disponível?', es: '¿Estás disponible?' }),
     answer: localeBlock(paragraphs('Yes, I am.'), paragraphs('Sim, estou.'), paragraphs('Sí, lo estoy.')),
+    caseStudies: null,
   },
   {
     _id: '2',
     question: localeString({ en: 'Do you work remotely?', pt: 'Você trabalha remotamente?', es: '¿Trabajas de forma remota?' }),
     answer: localeBlock(paragraphs('Absolutely.', 'Across time zones, too.')),
+    caseStudies: null,
   },
 ]
 
@@ -103,4 +106,29 @@ describe('HowIWorkSection', () => {
     expect(question(/está disponível/i)).toBeInTheDocument()
     expect(screen.getByText('Sim, estou.')).toBeVisible()
   })
+
+  // #78: each answer links the case studies that back it.
+  it('links the case studies behind an answer under it, in the visitor\'s language', async () => {
+    const items: FAQ_QUERY_RESULT = [
+      {
+        ...mockItems[0],
+        caseStudies: [
+          { _id: 'a', slug: 'redacao-landing', title: localeString({ en: 'Redação Online, from PHP to Next.js', pt: 'Redação Online, de PHP para Next.js' }) },
+          { _id: 'b', slug: 'c6-bank', title: localeString({ en: 'C6 Bank, a landing page in under a second' }) },
+        ],
+      },
+      mockItems[1],
+    ]
+    await renderWithRouter(<HowIWorkSection items={items} lang="en" />)
+    const answer = screen.getByRole('region', { name: 'Are you available?' })
+    const list = within(answer).getByRole('list', { name: 'See it in:' })
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      'Redação Online, from PHP to Next.js',
+      '·C6 Bank, a landing page in under a second',
+    ])
+    expect(screen.getByRole('link', { name: 'Redação Online, from PHP to Next.js' })).toHaveAttribute('href', '/projects/redacao-landing')
+    expect(screen.getByRole('link', { name: 'C6 Bank, a landing page in under a second' })).toHaveAttribute('href', '/projects/c6-bank')
+    expect(screen.getAllByText(/See it in/)).toHaveLength(1)
+  })
 })
+

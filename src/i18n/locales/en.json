@@ -53,6 +53,7 @@
   "stack.title": "Stack",
   "stack.lede": "What I build with, and how many of the {count} case studies use it.",
   "howIWork.title": "How I work",
+  "howIWork.seeIn": "See it in:",
   "howIWork.lede": "Questions engineering managers ask me, answered with what I actually did.",
   "contact.github": "GitHub",
   "contact.subject": "About: {subject}",

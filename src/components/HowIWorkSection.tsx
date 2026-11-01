@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { Container } from '#/components/ui/Section'
 import { useTranslation } from '#/i18n/useTranslation'
 import RichText from './RichText'
@@ -17,7 +18,8 @@ const COLUMNS = 'grid grid-cols-[--spacing(8)_minmax(0,1fr)_--spacing(6)] gap-x-
 
 // Figma: Components / Question (38:523). The header is a disclosure button
 // (aria-expanded, aria-controls); the answer stays in the DOM, hidden when
-// closed, so find-in-page and crawlers still see it.
+// closed, so find-in-page and crawlers still see it. Under the answer, "See
+// it in" links the case studies that back it (#78).
 function Question({
   item,
   number,
@@ -31,8 +33,10 @@ function Question({
   open: boolean
   onToggle: () => void
 }) {
+  const { t } = useTranslation()
   const id = useId()
   const buttonId = `${id}-question`
+  const caseStudies = item.caseStudies ?? []
   const answerId = `${id}-answer`
 
   return (
@@ -57,6 +61,26 @@ function Question({
       </h3>
       <div id={answerId} role="region" aria-labelledby={buttonId} hidden={!open} className={COLUMNS}>
         <RichText value={item.answer[lang]} className="col-start-2 max-w-measure type-body text-ink-muted" />
+        {/* A list, not commas: the titles have commas of their own. */}
+        {caseStudies.length > 0 && (
+          <div className="col-start-2 mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 type-small text-ink-muted">
+            <span id={`${id}-see`}>{t('howIWork.seeIn')}</span>
+            <ul aria-labelledby={`${id}-see`} className="m-0 flex list-none flex-wrap gap-x-2 gap-y-1 p-0">
+              {caseStudies.map((caseStudy, i) => (
+                <li key={caseStudy._id} className="flex gap-x-2">
+                  {i > 0 && <span aria-hidden="true">·</span>}
+                  <Link
+                    to="/projects/$slug"
+                    params={{ slug: caseStudy.slug }}
+                    className="rounded-sm text-mangrove underline underline-offset-2 focus-visible:focus-ring"
+                  >
+                    {caseStudy.title[lang]}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </li>
   )
