@@ -108,13 +108,15 @@ Record: tool `Jira`, from `2021-10-01`, to `2021-12-31`.
 
 Supported: E2E and unit tests (Approach); the role summary names Cypress and Jest for Capitual's testing pipeline; within Oct 2021 – Nov 2022.
 
-**[confirm Q6]** Which tool reported the 80% (Jest coverage report, Cypress, or a count of flows with a test)? Line, branch or flow coverage? Which flows counted as critical, and which month?
+**Q6 answered:** Jest and Cypress, with React Testing Library on web and React Native Testing Library on mobile. Critical flows: onboarding, account creation and account configuration. Month unknown, so no dates.
 
-**en:** [Line/branch coverage from Jest / share of critical flows with an end-to-end test in Cypress] on [the flows], [month year].
+Record: tool `Jest, Cypress`, no dates.
 
-**pt:** [Cobertura de linhas/branches do Jest / parcela dos fluxos críticos com teste end-to-end no Cypress] em [os fluxos], [mês ano].
+**en:** Critical flows with tests in Jest and Cypress (React Testing Library on web, React Native Testing Library on mobile): onboarding, account creation and account configuration.
 
-**es:** [Cobertura de líneas/ramas de Jest / proporción de flujos críticos con prueba end-to-end en Cypress] en [los flujos], [mes año].
+**pt:** Fluxos críticos com testes em Jest e Cypress (React Testing Library na web, React Native Testing Library no mobile): onboarding, criação de conta e configuração da conta.
+
+**es:** Flujos críticos con pruebas en Jest y Cypress (React Testing Library en web, React Native Testing Library en móvil): onboarding, creación de cuenta y configuración de la cuenta.
 
 ### Capitual, crypto bank app (featured 3 · Oct 2021 – Nov 2022)
 
@@ -122,25 +124,31 @@ Supported: E2E and unit tests (Approach); the role summary names Cypress and Jes
 
 Supported: the App Store (label); within Oct 2021 – Nov 2022.
 
-**[confirm Q7]** iOS App Store only, or Google Play too? The overall average or the current version's rating? Which months were the 3.5 and the 4.8 read? Note: the case's live URL is `apps.apple.com/.../bitcoin-trading-capital-com/id1487443266`, which reads as Capital.com's app, not Capitual's; is it the right link?
+**Q7 answered:** the 3.5 → 4.8 is the overall rating on **Google Play**, not the App Store. The App Store rating was 4.2. Months unknown; no archived listing. The live URL (Capital.com's app) was cleared on 2026-10-31.
 
-**en:** Average rating on the [iOS App Store / App Store and Google Play], [all versions / current version]: 3.5 in [month year], 4.8 in [month year].
+**Content fix needed:** the result's label says "App Store rating"; it should say "Google Play rating" ("Nota na Google Play", "Valoración en Google Play"). **[confirm Q7b]** Change the label? And show the App Store's 4.2 as its own result, or leave it out?
 
-**pt:** Nota média na [App Store do iOS / App Store e Google Play], [todas as versões / versão atual]: 3,5 em [mês ano], 4,8 em [mês ano].
+Record: tool `Google Play`, no dates, no source.
 
-**es:** Valoración media en la [App Store de iOS / App Store y Google Play], [todas las versiones / versión actual]: 3,5 en [mes año], 4,8 en [mes año].
+**en:** Overall rating on Google Play: 3.5 before, 4.8 after.
+
+**pt:** Nota geral na Google Play: 3,5 antes, 4,8 depois.
+
+**es:** Valoración general en Google Play: 3,5 antes, 4,8 después.
 
 #### −60% · Mobile bugs (`c92f62b84310`)
 
 Supported: nothing about the method; within Oct 2021 – Nov 2022. Approach: "reviewed pull requests to help enforce the team's testing standards".
 
-**[confirm Q8]** Where were mobile bugs counted (Jira, Crashlytics, Sentry, store reviews)? Bugs reported or crashes? Which two periods, which months?
+**Q8 answered:** bug reports counted in Jira and in store reviews; bugs, not crashes. Periods unknown, so no dates.
 
-**en:** [Bug tickets / crashes] on the mobile app in [tool], [period after] against [period before] ([months]).
+Record: tool `Jira, store reviews`, no dates.
 
-**pt:** [Tickets de bug / crashes] no app em [ferramenta], [período depois] contra [período antes] ([meses]).
+**en:** Bugs on the mobile app, counted from Jira tickets and store reviews, after the work against before.
 
-**es:** [Tickets de bug / crashes] en la app en [herramienta], [periodo después] frente a [periodo antes] ([meses]).
+**pt:** Bugs no app, contados nos tickets do Jira e nas avaliações das lojas, depois do trabalho contra antes.
+
+**es:** Bugs en la app, contados en los tickets de Jira y en las reseñas de las tiendas, después del trabajo frente a antes.
 
 ### C6 Bank, a landing page in under a second (featured 4 · Jan 2025 – Mar 2025)
 
@@ -154,23 +162,17 @@ Five results, all Lighthouse metrics or categories, so one question covers them.
 
 Supported: tool Lighthouse for the three scores (labels); LCP and FCP are Lighthouse metrics too, but could also be field data; within Jan – Mar 2025. Live URL https://www.c6bank.com.br/.
 
-**[confirm Q9]** Were all five from one Lighthouse run? Mobile or desktop, which URL, which month? Are LCP and FCP from that lab run, or field data (PageSpeed Insights / CrUX, 75th percentile over 28 days)?
+**Q9 answered:** Lighthouse, run in production, mobile and desktop, on three pages: the main page, the privacy clients page and the create account page. Desktop was all green, performance 98. LCP and FCP come from the same Lighthouse runs (lab, not field data). Month unknown, so no dates.
 
-Lab run (one line for all five rows, with the metric name in front):
+**[confirm Q9b]** Desktop scored 98, so the published 90 reads as the mobile run. Are all five published numbers from mobile, and from the main page (or the worst of the three pages)? And show desktop 98 as its own result, or leave it out?
 
-**en:** Lighthouse [mobile/desktop] lab run on [URL], [month year].
+Record: tool `Lighthouse`, no dates, source https://www.c6bank.com.br/.
 
-**pt:** Execução do Lighthouse em laboratório, [mobile/desktop], em [URL], [mês ano].
+**en:** Lighthouse, run in production, mobile, on the main page.
 
-**es:** Ejecución de Lighthouse en laboratorio, [móvil/escritorio], en [URL], [mes año].
+**pt:** Lighthouse, executado em produção, mobile, na página inicial.
 
-If LCP and FCP are field data, those two rows read instead:
-
-**en:** Field data from PageSpeed Insights (Chrome UX Report), 75th percentile, [mobile/desktop], 28 days to [date].
-
-**pt:** Dados de campo do PageSpeed Insights (Chrome UX Report), percentil 75, [mobile/desktop], 28 dias até [data].
-
-**es:** Datos de campo de PageSpeed Insights (Chrome UX Report), percentil 75, [móvil/escritorio], 28 días hasta [fecha].
+**es:** Lighthouse, ejecutado en producción, móvil, en la página de inicio.
 
 ### Lovefy, AI dating platform (archive · Jan 2026 – Mar 2026)
 
@@ -178,13 +180,15 @@ If LCP and FCP are field data, those two rows read instead:
 
 Supported: the change came with "AI agent workflows (Cursor and Claude)" and a CI/CD pipeline (Approach); within Jan – Mar 2026.
 
-**[confirm Q10]** From when to when is "delivery" (ticket opened → in production, or work started → merged)? Where was it read (Jira, Linear, GitHub)? Median or average, over how many features, and which periods?
+**Q10 answered:** work started → merged, median, over the planned features that were delivered. Periods unknown, so no dates.
 
-**en:** [Median/average] time from [ticket opened / work started] to [in production / merged], in [tool], over [n] features: [period before] against [period after].
+**[confirm Q10b]** Which tool held the two dates: the planning board (Jira, Linear, Trello…) for "started", GitHub for "merged", or both from one place?
 
-**pt:** Tempo [mediano/médio] de [abertura do ticket / início do trabalho] até [produção / merge], no [ferramenta], em [n] funcionalidades: [período antes] contra [período depois].
+**en:** Median time from work started to merged, over the planned features delivered, in [tool]: before against after.
 
-**es:** Tiempo [mediano/medio] desde [la apertura del ticket / el inicio del trabajo] hasta [producción / el merge], en [herramienta], sobre [n] funcionalidades: [periodo antes] frente a [periodo después].
+**pt:** Tempo mediano do início do trabalho até o merge, nas funcionalidades planejadas e entregues, no [ferramenta]: antes contra depois.
+
+**es:** Tiempo mediano desde el inicio del trabajo hasta el merge, en las funcionalidades planificadas y entregadas, en [herramienta]: antes frente a después.
 
 #### 100% · Test and documentation coverage (`4c50bf00652b`)
 
@@ -458,11 +462,11 @@ Results
 3. **Q3. Answered:** Redação landing, Lighthouse 40 → 95 (hero): mobile, Lighthouse CLI, home page only. Months unknown, so no dates.
 4. **Q4. Answered:** Redação landing, organic search +40%: organic sessions in Google Analytics; windows unknown, so no dates.
 5. **Q5. Answered:** Capitual internal tools, production bugs −96% (hero): Jira, from error monitoring and support team reports; bugs per month in Oct–Dec 2021 against the monthly average before.
-6. **Q6.** Capitual internal tools, 80% coverage on critical flows: which tool (Jest, Cypress, a count of flows)? Line, branch or flow coverage? Which flows, which month?
-7. **Q7.** Capitual crypto app, App Store 3.5 → 4.8: iOS only or Google Play too? Overall or current version? Months of both readings? Is the live URL (Capital.com's app id 1487443266) the right app?
-8. **Q8.** Capitual crypto app, mobile bugs −60%: counted where (Jira, Crashlytics, Sentry, reviews)? Bugs or crashes? Which periods, which months?
-9. **Q9.** C6 Bank, all five numbers: one Lighthouse run? Mobile or desktop, which URL, which month? LCP and FCP lab or field (PageSpeed / CrUX p75)?
-10. **Q10.** Lovefy, delivery 14 → 4 days: from what to what (ticket opened → production, started → merged)? In which tool? Median or average, over how many features, which periods?
+6. **Q6. Answered:** Capitual internal tools, 80% on critical flows: Jest and Cypress (RTL on web, RNTL on mobile); onboarding, account creation, account configuration. No dates.
+7. **Q7. Answered:** Capitual crypto app, 3.5 → 4.8 is the overall Google Play rating (App Store 4.2). No dates, no source. **Q7b:** relabel to "Google Play rating"? Show the App Store 4.2?
+8. **Q8. Answered:** Capitual crypto app, mobile bugs −60%: Jira and store reviews, bugs not crashes. No dates.
+9. **Q9. Answered:** C6 Bank: Lighthouse in production, mobile and desktop (desktop 98), on the main, privacy clients and create account pages; lab LCP and FCP. **Q9b:** published numbers are mobile, main page? Show desktop 98?
+10. **Q10. Answered:** Lovefy, 14 → 4 days: median, work started → merged, over planned features delivered. **Q10b:** which tool held the dates?
 11. **Q11.** Lovefy, 100% test and documentation coverage: which tool and which coverage (Vitest lines or branches)? What does documentation coverage count? Which month?
 12. **Q12.** Skydiet web app, 90% coverage: which tool, lines or branches, of which code, which month?
 13. **Q13.** Skydiet web app, 40+ components: month of the count?
