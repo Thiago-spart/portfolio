@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderToString } from 'react-dom/server'
@@ -9,6 +9,8 @@ import HeroSection from '../components/HeroSection'
 import { goToContact, HINT_KEY, ROOTS_KEY } from '../components/hero/heroShell'
 import type { SceneOptions } from '../components/hero/mangroveScene'
 import { localeString, metric } from './fixtures'
+import { renderWithRouter } from './renderWithRouter'
+import { RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 import en from '../i18n/locales/en.json'
 import pt from '../i18n/locales/pt.json'
 import es from '../i18n/locales/es.json'
@@ -49,11 +51,25 @@ const RESULTS: HERO_RESULTS_QUERY_RESULT = [
 ]
 
 function renderHero(results: HERO_RESULTS_QUERY_RESULT = RESULTS) {
-  return render(
-    <LanguageProvider>
-      <HeroSection results={results} />
-    </LanguageProvider>,
-  )
+  return renderWithRouter(<HeroSection results={results} />)
+}
+
+// Server render inside a router, so the result labels' <Link>s resolve.
+async function renderHeroHtml() {
+  const rootRoute = createRootRoute({
+    component: () => (
+      <LanguageProvider>
+        <HeroSection results={RESULTS} />
+      </LanguageProvider>
+    ),
+  })
+  const projectRoute = createRoute({ getParentRoute: () => rootRoute, path: '/projects/$slug', component: () => null })
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([projectRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  })
+  await router.load()
+  return renderToString(<RouterProvider router={router} />)
 }
 
 function mockMatchMedia(matching: string[]) {
@@ -93,12 +109,8 @@ function engage() {
 }
 
 describe('HeroSection', () => {
-  it('server-renders the headline, the buttons and the poster', () => {
-    const html = renderToString(
-      <LanguageProvider>
-        <HeroSection results={RESULTS} />
-      </LanguageProvider>,
-    )
+  it('server-renders the headline, the buttons and the poster', async () => {
+    const html = await renderHeroHtml()
     expect(html).toMatch(/<h1[^>]*>Engineering you can measure\.<\/h1>/)
     expect(html).toContain('href="#contact"')
     expect(html).toContain('href="#projects"')
@@ -107,52 +119,65 @@ describe('HeroSection', () => {
     expect(html).not.toContain('<canvas')
   })
 
-  it('renders the headline as the one h1, with both actions', () => {
-    renderHero()
+  it('renders the headline as the one h1, with both actions', async () => {
+    await renderHero()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Engineering you can measure.')
     expect(screen.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '#contact')
     expect(screen.getByRole('link', { name: 'See my work' })).toHaveAttribute('href', '#projects')
     expect(screen.getByTestId('hero-poster')).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('formats the results lane from Sanity data, in order, with a real minus sign', () => {
-    renderHero()
+  it('formats the results lane from Sanity data, in order, with a real minus sign', async () => {
+    await renderHero()
     const items = resultItems()
     expect(items).toHaveLength(3)
-    expect(items[0]).toHaveTextContent('Lighthouse performance score40→ to 95')
+    expect(items[0]).toHaveTextContent('Redação OnlineLighthouse performance score 40→ to 95')
     expect(items[1]).toHaveTextContent('−96%')
     expect(items[1].textContent).not.toContain('-')
     expect(items[2]).toHaveTextContent('23%→ to 9%')
     // The Lighthouse score carries its band glyph (● good); the others don't.
     expect(items[0].querySelector('circle.fill-score-good')).not.toBeNull()
-    expect(items[1].querySelector('svg')).toBeNull()
+    expect(items[1].querySelector('[class*="fill-score"]')).toBeNull()
     // Plain emphasis: no mango in the results.
     expect(items[0].innerHTML).not.toContain('mango')
   })
 
-  it('server-renders every result as text, each with its dimension line on the drawing', () => {
-    const html = renderToString(
-      <LanguageProvider>
-        <HeroSection results={RESULTS} />
-      </LanguageProvider>,
-    )
+  it('names each result\'s product and links it to its case study', async () => {
+    await renderHero()
+    const items = resultItems()
+    const link = within(items[1]).getByRole('link', { name: 'Capitual' })
+    expect(link).toHaveAttribute('href', '/projects/capitual')
+    expect(link).toHaveAccessibleDescription('Production bugs −96%')
+    expect(within(items[0]).getByRole('link', { name: 'Redação Online' })).toHaveAttribute('href', '/projects/redacao')
+  })
+
+  it('shows the headline result once on phones: above the actions, not again in the lane', async () => {
+    await renderHero()
+    expect(resultItems()[0]).toHaveClass('max-hero:hidden')
+    expect(resultItems()[1]).not.toHaveClass('max-hero:hidden')
+    expect(within(screen.getByTestId('hero-headline-result')).getByRole('link', { name: 'Redação Online' })).toBeInTheDocument()
+  })
+
+  it('server-renders every result as text, each with its dimension line on the drawing', async () => {
+    const html = await renderHeroHtml()
     expect(html).toContain('Lighthouse performance score')
     expect(html).toContain('Production bugs')
     expect(html).toContain('Checkout drop-off')
-    expect(html).not.toMatch(/<li[^>]*hidden/)
+    // No hidden attribute (the first label hides by class below 900px only).
+    expect(html).not.toMatch(/<li[^>]*\shidden[\s=>]/)
     // Three shoots with their dashed lines to the gauge, and three leaders.
     expect(html.match(/<mask /g)).toHaveLength(3)
     expect(html.match(/mangrove-leader/g)).toHaveLength(3)
   })
 
-  it('shows the results before any interaction', () => {
-    renderHero()
+  it('shows the results before any interaction', async () => {
+    await renderHero()
     resultItems().forEach((li) => expect(li).toBeVisible())
     expect(scene.options).toBeNull()
   })
 
-  it('replays every result from the one keyboard button without hiding or toggling them', () => {
-    renderHero()
+  it('replays every result from the one keyboard button without hiding or toggling them', async () => {
+    await renderHero()
     const leadersBefore = resultItems().map((li) => li.querySelector('.mangrove-leader'))
     const masksBefore = [...screen.getByTestId('hero-poster').querySelectorAll('mask')].map((m) => m.id)
     const button = screen.getByRole('button', { name: 'Replay the results' })
@@ -167,7 +192,7 @@ describe('HeroSection', () => {
   })
 
   it('replays through the scene once it has loaded', async () => {
-    renderHero()
+    await renderHero()
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     fireEvent.click(screen.getByRole('button', { name: 'Replay the results' }))
@@ -175,8 +200,8 @@ describe('HeroSection', () => {
     resultItems().forEach((li) => expect(li).toBeVisible())
   })
 
-  it('puts the headline result under the subtitle on phones, above the actions', () => {
-    renderHero()
+  it('puts the headline result under the subtitle on phones, above the actions', async () => {
+    await renderHero()
     const line = screen.getByTestId('hero-headline-result')
     expect(line).toHaveTextContent('Lighthouse performance score')
     expect(line).toHaveTextContent('40→ to 95')
@@ -187,15 +212,15 @@ describe('HeroSection', () => {
     expect(line.compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('still renders without results', () => {
-    renderHero(null)
+  it('still renders without results', async () => {
+    await renderHero(null)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
     expect(screen.queryByRole('list', { name: 'Results', hidden: true })).toBeNull()
   })
 
   it('shows the final grown state with all three results under reduced motion', async () => {
     mockMatchMedia(['prefers-reduced-motion'])
-    renderHero()
+    await renderHero()
     resultItems().forEach((li) => expect(li).toBeVisible())
     expect(screen.getByTestId('hero-poster').querySelectorAll('.mangrove-draw')).toHaveLength(9)
     engage()
@@ -210,11 +235,11 @@ describe('HeroSection', () => {
     expect(css).toMatch(/\.mangrove-draw \{\s*stroke-dasharray: 1;\s*animation:/)
   })
 
-  it('keeps the poster and lists the results when WebGL is unavailable', () => {
+  it('keeps the poster and lists the results when WebGL is unavailable', async () => {
     const original = HTMLCanvasElement.prototype.getContext
     HTMLCanvasElement.prototype.getContext = (() => null) as typeof original
     try {
-      renderHero()
+      await renderHero()
       expect(screen.getByTestId('hero-poster')).toBeInTheDocument()
       resultItems().forEach((li) => expect(li).toBeVisible())
       expect(screen.queryByText(/Click or tap the water/)).toBeNull()
@@ -226,7 +251,7 @@ describe('HeroSection', () => {
   })
 
   it('keeps the poster until the visitor engages, then loads the 3D scene with the drawing box', async () => {
-    renderHero()
+    await renderHero()
     await new Promise((resolve) => setTimeout(resolve, 50))
     expect(scene.options).toBeNull()
     engage()
@@ -240,7 +265,7 @@ describe('HeroSection', () => {
   })
 
   it('hides the hint after the first root and remembers it; Reset garden brings it back', async () => {
-    renderHero()
+    await renderHero()
     const hint = screen.getByText(/Click or tap the water/)
     expect(hint).not.toHaveClass('invisible')
     engage()
@@ -258,8 +283,8 @@ describe('HeroSection', () => {
     expect(localStorage.getItem(ROOTS_KEY)).toBeNull()
   })
 
-  it('keeps Reset garden as a quiet text button by the hint, out of the actions', () => {
-    renderHero()
+  it('keeps Reset garden as a quiet text button by the hint, out of the actions', async () => {
+    await renderHero()
     const reset = screen.getByRole('button', { name: 'Reset garden' })
     expect(reset).toHaveTextContent(/^Reset$/)
     expect(reset.closest('div')).toContainElement(screen.getByText(/Click or tap the water/))
@@ -267,7 +292,7 @@ describe('HeroSection', () => {
     expect(actions).not.toContainElement(reset)
   })
 
-  it('words the hint for replays and for the keyboard, in all three languages', () => {
+  it('words the hint for replays and for the keyboard, in all three languages', async () => {
     expect(en['hero.hint']).toBe('Click or tap the water to grow a root. Click a seed to replay its result.')
     for (const locale of [en, pt, es]) {
       expect(locale['hero.hint']).not.toMatch(/marked|marcada/)
@@ -276,25 +301,25 @@ describe('HeroSection', () => {
       expect(locale['hero.hintKeys']).toContain(locale['hero.results.replay'])
       expect(locale['hero.reset']).toContain(locale['hero.resetShort'])
     }
-    renderHero()
+    await renderHero()
     expect(screen.getByText(en['hero.hintKeys'])).toBeInTheDocument()
   })
 
   it('renders the hint in Portuguese', async () => {
     localStorage.setItem('lang', 'pt')
-    renderHero()
+    await renderHero()
     expect(await screen.findByText(pt['hero.hint'])).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Limpar jardim' })).toHaveTextContent('Limpar')
   })
 
-  it('keeps the hint hidden on a return visit', () => {
+  it('keeps the hint hidden on a return visit', async () => {
     localStorage.setItem(HINT_KEY, '1')
-    renderHero()
+    await renderHero()
     expect(screen.getByText(/Click or tap the water/)).toHaveClass('invisible')
   })
 
   it('cleans up the scene on unmount', async () => {
-    const { unmount } = renderHero()
+    const { unmount } = await renderHero()
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     unmount()
@@ -327,7 +352,7 @@ describe('goToContact (the mango)', () => {
   })
 
   it('is what the scene calls when the mango is clicked', async () => {
-    renderHero()
+    await renderHero()
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
     expect(scene.options!.onMango).toBe(goToContact)
