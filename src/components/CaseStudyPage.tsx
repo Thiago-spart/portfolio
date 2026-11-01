@@ -4,6 +4,7 @@ import { useTranslation } from '#/i18n/useTranslation'
 import { formatMonthRange, isCoreTech, type CaseStudyRow } from '#/lib/caseStudy'
 import { ArchiveRow } from './ArchiveRow'
 import RichText from './RichText'
+import { CaseContents } from './CaseContents'
 import { Button } from './ui/Button'
 import { Callout } from './ui/Callout'
 import { Container } from './ui/Section'
@@ -26,9 +27,10 @@ const PROSE =
 
 // Figma: Sections / Case study (32:573, 32:699, 32:823). Intro (back link,
 // meta, title, summary, live site), results strip, numbered parts (problem,
-// decision, approach, stack, then gallery and video when present), and the
-// next case study. The cover stays in Sanity but isn't shown: the covers are
-// promo cards until real screenshots replace them (#66).
+// decision, approach, stack, then gallery and video when present) with their
+// contents beside them from 1024px, and the next case study. The cover
+// stays in Sanity but isn't shown: the covers are promo cards until real
+// screenshots replace them (#66).
 export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPageProps) {
   const { t } = useTranslation()
   const dates = formatMonthRange(caseStudy.startDate, caseStudy.endDate, t('work.present'), lang)
@@ -150,19 +152,28 @@ export default function CaseStudyPage({ caseStudy, next, lang }: CaseStudyPagePr
       )}
 
       {parts.length > 0 && (
-        <div className="flex flex-col gap-8 md:gap-12">
-          {parts.map((part, i) => (
-            <section
-              key={part.id}
-              aria-labelledby={`part-${part.id}`}
-              className="flex flex-col gap-3 md:flex-row md:gap-6"
-            >
-              <h2 id={`part-${part.id}`} className="m-0 shrink-0 md:w-58">
-                <Callout number={i + 1} label={part.label} />
-              </h2>
-              <div className="min-w-0 flex-1 md:max-w-measure">{part.content}</div>
-            </section>
-          ))}
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
+          {/* Padding, not gap: the parts touch, so one is always on the
+              reading band and the contents marker never blinks off. A
+              part reached from the contents starts at 44% of the viewport,
+              just above the band, so it covers the band and is the one
+              marked (at the top edge it would be above the band). */}
+          <div className="flex flex-col">
+            {parts.map((part, i) => (
+              <section
+                key={part.id}
+                id={`part-${part.id}`}
+                aria-labelledby={`part-${part.id}-heading`}
+                className="flex flex-col gap-3 pb-8 last:pb-0 md:flex-row md:gap-6 md:pb-12 lg:scroll-mt-[44vh]"
+              >
+                <h2 id={`part-${part.id}-heading`} className="m-0 shrink-0 md:w-58">
+                  <Callout number={i + 1} label={part.label} />
+                </h2>
+                <div className="min-w-0 flex-1 md:max-w-measure">{part.content}</div>
+              </section>
+            ))}
+          </div>
+          <CaseContents parts={parts} />
         </div>
       )}
 
