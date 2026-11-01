@@ -6,6 +6,7 @@ import type {
   LocaleBlock,
   LocaleString,
   LocaleText,
+  Measurement,
 } from '../types/sanity.generated'
 
 type Translations = { en: string; pt?: string; es?: string }
@@ -38,15 +39,16 @@ export function localeBlock(en: Blocks, pt: Blocks = en, es: Blocks = en): Local
 export function metric(
   after: number,
   label: string,
-  { before = null, unit = null, qualifier = null, direction = 'up', key = label }: {
+  { before = null, unit = null, qualifier = null, direction = 'up', key = label, measurement = null }: {
     before?: number | null
     unit?: string | null
     qualifier?: 'atLeast' | 'change' | null
     direction?: 'up' | 'down'
     key?: string
+    measurement?: Measurement | null
   } = {},
 ) {
-  return { _key: key, before, after, unit, qualifier, label: localeString({ en: label }), direction }
+  return { _key: key, before, after, unit, qualifier, label: localeString({ en: label }), direction, measurement }
 }
 
 /** A CASE_STUDIES_QUERY row (Case card or Archive row). */

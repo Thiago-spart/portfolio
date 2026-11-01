@@ -60,13 +60,23 @@ export function formatMonthRange(
   lang: Lang,
 ): string {
   if (!startDate) return ''
-  // Build a local date from the parts: `new Date('YYYY-MM-DD')` is UTC
-  // midnight and shows the previous month west of Greenwich.
-  const month = (date: string) => {
-    const [y, m, d] = date.split('-').map(Number)
-    return new Date(y, m - 1, d).toLocaleDateString(lang, { month: 'short', year: 'numeric' })
-  }
-  return `${month(startDate)} ${EN_DASH} ${endDate ? month(endDate) : presentLabel}`
+  return `${monthYear(startDate, lang)} ${EN_DASH} ${endDate ? monthYear(endDate, lang) : presentLabel}`
+}
+
+// "Oct 2021". Built from the date's parts: `new Date('YYYY-MM-DD')` is UTC
+// midnight and shows the previous month west of Greenwich.
+function monthYear(date: string, lang: Lang): string {
+  const [y, m, d] = date.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString(lang, { month: 'short', year: 'numeric' })
+}
+
+/**
+ * When a result was measured, to the month: "Oct 2021 – Dec 2021", or one
+ * month when both dates fall in it or only one is set; empty without dates.
+ */
+export function formatMeasuredWhen(from: string | null | undefined, to: string | null | undefined, lang: Lang): string {
+  const months = [from, to].filter((date): date is string => !!date).map((date) => monthYear(date, lang))
+  return [...new Set(months)].join(` ${EN_DASH} `)
 }
 
 // Words that stay capitalized at the start of a result label.

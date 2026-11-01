@@ -5,7 +5,7 @@ import { READING_BAND } from '../lib/useReadingSection'
 import { FakeObserver, fire } from './fakeObserver'
 import { fakeViewTransition } from './fakeViewTransition'
 import { renderWithRouter } from './renderWithRouter'
-import { caseStudyCard, caseStudyDetail, localeBlock, localeString, paragraphs } from './fixtures'
+import { caseStudyCard, caseStudyDetail, localeBlock, localeString, metric, paragraphs } from './fixtures'
 
 const next = caseStudyCard({ _id: 'cs-2', slug: 'banking-tools', title: localeString({ en: 'Banking Tools' }), tier: 'archive' })
 
@@ -194,4 +194,65 @@ describe('CaseStudyPage', () => {
       }
     })
   })
+
+  // #67, #73: how each number was measured, linked both ways.
+  describe('measurement', () => {
+    const measured = () =>
+      caseStudyDetail({
+        results: [
+          metric(95, 'Lighthouse score', {
+            before: 40,
+            key: 'lh',
+            measurement: { method: localeString({ en: 'Lighthouse CLI, mobile, home page.' }), tool: 'Lighthouse CLI' },
+          }),
+          metric(40, 'Organic search', { unit: '%', qualifier: 'change', key: 'seo' }),
+          metric(-96, 'Production bugs', {
+            unit: '%',
+            qualifier: 'change',
+            key: 'bugs',
+            measurement: {
+              method: localeString({ en: 'Bugs per month in Jira.' }),
+              tool: 'Jira',
+              from: '2021-10-01',
+              to: '2021-12-31',
+              source: 'https://example.com/report',
+            },
+          }),
+        ],
+      })
+
+    it('adds a Measurement part after Approach, one row per measured result', async () => {
+      await renderPage(measured())
+      const parts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+      expect(parts).toEqual(['Results', '1Problem', '2Approach', '3Measurement', '4Stack', 'Next case study'])
+      const part = screen.getByRole('region', { name: 'Measurement' })
+      const rows = within(part).getAllByRole('listitem')
+      expect(rows.map((row) => row.id)).toEqual(['result-lh', 'result-bugs'])
+      expect(rows[0]).toHaveTextContent('40 → 95 · Lighthouse score')
+      expect(rows[0]).toHaveTextContent('Lighthouse CLI, mobile, home page.')
+      expect(rows[1]).toHaveTextContent('Jira · Oct 2021 – Dec 2021')
+      expect(within(rows[1]).getByRole('link', { name: 'Source' })).toHaveAttribute('href', 'https://example.com/report')
+      expect(within(rows[0]).queryByRole('link', { name: 'Source' })).toBeNull()
+    })
+
+    it('footnotes each measured number in the strip, numbered like its row, and links back', async () => {
+      await renderPage(measured())
+      const strip = screen.getByRole('region', { name: 'Results' })
+      const notes = within(strip).getAllByRole('link')
+      expect(notes.map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('aria-label')])).toEqual([
+        ['1', '#result-lh', 'How it was measured: Lighthouse score'],
+        ['2', '#result-bugs', 'How it was measured: Production bugs'],
+      ])
+      expect(document.getElementById('metric-seo')).not.toBeNull()
+      const back = screen.getByRole('link', { name: 'Back to Production bugs' })
+      expect(back).toHaveAttribute('href', '#metric-bugs')
+    })
+
+    it('has no Measurement part or footnotes when no result says how it was measured', async () => {
+      await renderPage()
+      expect(screen.queryByRole('region', { name: 'Measurement' })).toBeNull()
+      expect(within(screen.getByRole('region', { name: 'Results' })).queryAllByRole('link')).toHaveLength(0)
+    })
+  })
 })
+

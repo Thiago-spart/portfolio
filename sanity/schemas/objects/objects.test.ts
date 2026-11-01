@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { fieldOf, isRequired } from '../testing'
 import type { ValidationContext } from 'sanity'
-import { metric, formatMetric, changeHasNoBefore } from './metric'
+import { metric, formatMetric, changeHasNoBefore, toNotBeforeFrom } from './metric'
 import { imageWithAlt } from './imageWithAlt'
 import { localeBlock } from '../locale/localeBlock'
 
@@ -40,6 +40,28 @@ describe('metric schema', () => {
     expect(fieldOf(metric, 'qualifier')).toMatchObject({
       options: { list: [{ value: 'atLeast' }, { value: 'change' }] },
     })
+  })
+
+  it('takes an optional measurement: method required, tool, dates and source optional', () => {
+    const measurement = fieldOf(metric, 'measurement') as unknown as { name: string; fields: { name: string; type: string; validation?: unknown }[] }
+    expect(isRequired(measurement)).toBe(false)
+    expect(measurement.fields.map((f) => [f.name, f.type])).toEqual([
+      ['method', 'localeString'],
+      ['tool', 'string'],
+      ['from', 'date'],
+      ['to', 'date'],
+      ['source', 'url'],
+    ])
+    expect(isRequired(fieldOf(measurement, 'method'))).toBe(true)
+    for (const name of ['tool', 'from', 'to', 'source']) expect(isRequired(fieldOf(measurement, name))).toBe(false)
+  })
+
+  it('rejects a measurement that ends before it starts', () => {
+    const withParent = (parent: object) => ({ parent }) as unknown as ValidationContext
+    expect(toNotBeforeFrom('2021-09-01', withParent({ from: '2021-10-01' }))).toEqual(expect.any(String))
+    expect(toNotBeforeFrom('2021-12-31', withParent({ from: '2021-10-01' }))).toBe(true)
+    expect(toNotBeforeFrom('2021-12-31', withParent({}))).toBe(true)
+    expect(toNotBeforeFrom(undefined, withParent({ from: '2021-10-01' }))).toBe(true)
   })
 
   it('rejects a change that also has a before value', () => {

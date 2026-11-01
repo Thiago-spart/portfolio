@@ -43,7 +43,7 @@ export const CASE_STUDY_DETAIL_QUERY = defineQuery(`*[_type == "caseStudy" && sl
   problem,
   decision,
   approach,
-  "results": results[]{ ${METRIC_FIELDS} },
+  "results": results[]{ ${METRIC_FIELDS}, measurement },
   // The tools, not the practices (SEO, BFF, i18n…): the story carries those.
   "stack": stack[@->category != "practice"]->name,
   "role": role->{ company, companyUrl, title },
