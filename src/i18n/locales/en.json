@@ -55,6 +55,7 @@
   "stack.result": "{count} case studies use {tech}",
   "stack.resultOne": "1 case study uses {tech}",
   "howIWork.title": "How I work",
+  "howIWork.seeIn": "See it in:",
   "howIWork.lede": "Questions engineering managers ask me, answered with what I actually did.",
   "contact.github": "GitHub",
   "contact.subject": "About: {subject}",

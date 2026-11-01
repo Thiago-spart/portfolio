@@ -23,6 +23,13 @@ export type Measurement = {
   source?: string;
 };
 
+export type CaseStudyReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "caseStudy";
+};
+
 export type Faq = {
   _id: string;
   _type: "faq";
@@ -32,6 +39,11 @@ export type Faq = {
   question: LocaleString;
   answer: LocaleBlock;
   order?: number;
+  caseStudies?: Array<
+    {
+      _key: string;
+    } & CaseStudyReference
+  >;
 };
 
 export type LocaleBlock = {
@@ -173,13 +185,6 @@ export type LocaleText = {
   en: string;
   pt: string;
   es: string;
-};
-
-export type CaseStudyReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "caseStudy";
 };
 
 export type HeroResult = {
@@ -395,6 +400,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Measurement
+  | CaseStudyReference
   | Faq
   | LocaleBlock
   | LocaleString
@@ -404,7 +410,6 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | ImageWithAlt
   | LocaleText
-  | CaseStudyReference
   | HeroResult
   | RoleReference
   | TechReference
@@ -494,11 +499,16 @@ export type CASE_STUDY_DETAIL_QUERY_RESULT = {
 
 // Source: ../src/lib/queries/faq.ts
 // Variable: FAQ_QUERY
-// Query: *[_type == "faq"] | order(order asc) {  _id,  question,  answer}
+// Query: *[_type == "faq"] | order(order asc) {  _id,  question,  answer,  // "See it in": the case studies behind the answer that are published.  "caseStudies": caseStudies[defined(@->slug.current)]->{ _id, title, "slug": slug.current }}
 export type FAQ_QUERY_RESULT = Array<{
   _id: string;
   question: LocaleString;
   answer: LocaleBlock;
+  caseStudies: Array<{
+    _id: string;
+    title: LocaleString;
+    slug: string;
+  }> | null;
 }>;
 
 // Source: ../src/lib/queries/roles.ts
@@ -633,7 +643,7 @@ declare global {
   interface SanityQueries {
     '*[_type == "caseStudy" && defined(slug.current)]\n  | order(tier desc, order asc, startDate desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  tier,\n  summary,\n  "roleTitle": role->title,\n  "roleId": role._ref,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "results": results[0...2]{ _key, before, after, unit, qualifier, label, direction },\n  liveUrl\n}': CASE_STUDIES_QUERY_RESULT;
     '*[_type == "caseStudy" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  summary,\n  problem,\n  decision,\n  approach,\n  "results": results[]{ _key, before, after, unit, qualifier, label, direction, measurement },\n  // The tools, not the practices (SEO, BFF, i18n\u2026): the story carries those.\n  "stack": stack[@->category != "practice"]->name,\n  "role": role->{ company, companyUrl, title },\n  "cover": cover{\n    "url": asset->url + "?w=2240&h=1120&fit=crop&auto=format&q=75",\n    alt\n  },\n  "gallery": gallery[]{\n    _key,\n    "url": asset->url + "?w=1000&auto=format&q=75",\n    alt\n  },\n  "videoUrl": video.asset->url,\n  liveUrl,\n  githubUrl,\n  startDate,\n  endDate\n}': CASE_STUDY_DETAIL_QUERY_RESULT;
-    '*[_type == "faq"] | order(order asc) {\n  _id,\n  question,\n  answer\n}': FAQ_QUERY_RESULT;
+    '*[_type == "faq"] | order(order asc) {\n  _id,\n  question,\n  answer,\n  // "See it in": the case studies behind the answer that are published.\n  "caseStudies": caseStudies[defined(@->slug.current)]->{ _id, title, "slug": slug.current }\n}': FAQ_QUERY_RESULT;
     '*[_type == "role"] | order(startDate desc) {\n  _id,\n  company,\n  companyUrl,\n  title,\n  summary,\n  startDate,\n  endDate,\n  "stack": stack[]->name,\n  "caseStudies": *[_type == "caseStudy" && references(^._id) && defined(slug.current)]\n    | order(tier desc, order asc, startDate desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    "results": results[]{ _key, before, after, unit, qualifier, label, direction }\n  }\n}': ROLES_QUERY_RESULT;
     '*[_id == "siteSettings"][0]{\n  availability,\n  email,\n  linkedin,\n  github,\n  "seo": seo{\n    title,\n    description,\n    "ogImage": ogImage{\n      "url": asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",\n      alt\n    }\n  }\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_id == "siteSettings"][0].heroResults[]{\n  _key,\n  "caseStudy": caseStudy->{ title, "slug": slug.current },\n  "result": caseStudy->results[_key == ^.resultKey][0]{ _key, before, after, unit, qualifier, label, direction }\n}': HERO_RESULTS_QUERY_RESULT;

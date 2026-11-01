@@ -55,6 +55,7 @@
   "stack.result": "{count} casos de estudio usan {tech}",
   "stack.resultOne": "1 caso de estudio usa {tech}",
   "howIWork.title": "Cómo trabajo",
+  "howIWork.seeIn": "Míralo en:",
   "howIWork.lede": "Preguntas que me hacen los responsables de ingeniería, respondidas con lo que de verdad hice.",
   "contact.github": "GitHub",
   "contact.subject": "Sobre: {subject}",

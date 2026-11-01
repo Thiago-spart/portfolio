@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 import { HelpCircleIcon } from '@sanity/icons/HelpCircle'
 
 // "How I work": short questions with rich-text answers. llms.txt renders a
@@ -12,6 +12,15 @@ export const faq = defineType({
     defineField({ name: 'question', title: 'Question', type: 'localeString', validation: (rule) => rule.required() }),
     defineField({ name: 'answer',   title: 'Answer',   type: 'localeBlock',  validation: (rule) => rule.required() }),
     defineField({ name: 'order',    title: 'Order',    type: 'number', description: 'Lowest first.' }),
+    // The case studies that back the answer, linked under it (#78).
+    defineField({
+      name: 'caseStudies',
+      title: 'See it in',
+      type: 'array',
+      description: 'Optional. Up to two case studies that show the answer in practice, linked under it.',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'caseStudy' }] })],
+      validation: (rule) => rule.max(2).unique(),
+    }),
   ],
   orderings: [{ title: 'Order', name: 'orderAsc', by: [{ field: 'order', direction: 'asc' }] }],
   preview: {
