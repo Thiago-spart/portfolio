@@ -108,15 +108,15 @@ Record: tool `Jira`, from `2021-10-01`, to `2021-12-31`.
 
 Supported: E2E and unit tests (Approach); the role summary names Cypress and Jest for Capitual's testing pipeline; within Oct 2021 – Nov 2022.
 
-**Q6 answered:** Jest and Cypress, with React Testing Library on web and React Native Testing Library on mobile. Critical flows: onboarding, account creation and account configuration. Month unknown, so no dates.
+**Q6 answered:** Jest and Cypress, with React Testing Library on web and React Native Testing Library on mobile. Critical flows: onboarding, account creation and account configuration. The 80% is Cypress code coverage on those flows (Q6b). Month unknown, so no dates.
 
 Record: tool `Jest, Cypress`, no dates.
 
-**en:** Critical flows with tests in Jest and Cypress (React Testing Library on web, React Native Testing Library on mobile): onboarding, account creation and account configuration.
+**en:** Cypress code coverage on the critical flows: onboarding, account creation and account configuration. Unit tests in Jest (React Testing Library on web, React Native Testing Library on mobile).
 
-**pt:** Fluxos críticos com testes em Jest e Cypress (React Testing Library na web, React Native Testing Library no mobile): onboarding, criação de conta e configuração da conta.
+**pt:** Cobertura de código do Cypress nos fluxos críticos: onboarding, criação de conta e configuração da conta. Testes unitários em Jest (React Testing Library na web, React Native Testing Library no mobile).
 
-**es:** Flujos críticos con pruebas en Jest y Cypress (React Testing Library en web, React Native Testing Library en móvil): onboarding, creación de cuenta y configuración de la cuenta.
+**es:** Cobertura de código de Cypress en los flujos críticos: onboarding, creación de cuenta y configuración de la cuenta. Pruebas unitarias en Jest (React Testing Library en web, React Native Testing Library en móvil).
 
 ### Capitual, crypto bank app (featured 3 · Oct 2021 – Nov 2022)
 
@@ -126,7 +126,7 @@ Supported: the App Store (label); within Oct 2021 – Nov 2022.
 
 **Q7 answered:** the 3.5 → 4.8 is the overall rating on **Google Play**, not the App Store. The App Store rating was 4.2. Months unknown; no archived listing. The live URL (Capital.com's app) was cleared on 2026-10-31.
 
-**Content fix needed:** the result's label says "App Store rating"; it should say "Google Play rating" ("Nota na Google Play", "Valoración en Google Play"). **[confirm Q7b]** Change the label? And show the App Store's 4.2 as its own result, or leave it out?
+**Done 2026-10-31 (Q7b):** relabelled to "Google Play rating" ("Nota na Google Play", "Valoración en Google Play"), and added "App Store rating · 4.2" as a third result (`3ef3470ce3bd`, no dates). Backup: `~/sanity-backups/before-results-relabel-2026-10-31.tar.gz`.
 
 Record: tool `Google Play`, no dates, no source.
 
@@ -164,7 +164,7 @@ Supported: tool Lighthouse for the three scores (labels); LCP and FCP are Lighth
 
 **Q9 answered:** Lighthouse, run in production, mobile and desktop, on three pages: the main page, the privacy clients page and the create account page. Desktop was all green, performance 98. LCP and FCP come from the same Lighthouse runs (lab, not field data). Month unknown, so no dates.
 
-**[confirm Q9b]** Desktop scored 98, so the published 90 reads as the mobile run. Are all five published numbers from mobile, and from the main page (or the worst of the three pages)? And show desktop 98 as its own result, or leave it out?
+**Done 2026-10-31 (Q9b):** the five published numbers are the mobile run on the main page. The 90 is relabelled "Lighthouse performance score, mobile", and "Lighthouse performance score, desktop · 98" sits right after it. The desktop row takes the same record with "desktop" in place of "mobile".
 
 Record: tool `Lighthouse`, no dates, source https://www.c6bank.com.br/.
 
@@ -182,13 +182,15 @@ Supported: the change came with "AI agent workflows (Cursor and Claude)" and a C
 
 **Q10 answered:** work started → merged, median, over the planned features that were delivered. Periods unknown, so no dates.
 
-**[confirm Q10b]** Which tool held the two dates: the planning board (Jira, Linear, Trello…) for "started", GitHub for "merged", or both from one place?
+Q10b: "started" read from Jira, "merged" from GitHub.
 
-**en:** Median time from work started to merged, over the planned features delivered, in [tool]: before against after.
+Record: tool `Jira, GitHub`, no dates.
 
-**pt:** Tempo mediano do início do trabalho até o merge, nas funcionalidades planejadas e entregues, no [ferramenta]: antes contra depois.
+**en:** Median time from work started (Jira) to merged (GitHub), over the planned features delivered: before against after.
 
-**es:** Tiempo mediano desde el inicio del trabajo hasta el merge, en las funcionalidades planificadas y entregadas, en [herramienta]: antes frente a después.
+**pt:** Tempo mediano do início do trabalho (Jira) até o merge (GitHub), nas funcionalidades planejadas e entregues: antes contra depois.
+
+**es:** Tiempo mediano desde el inicio del trabajo (Jira) hasta el merge (GitHub), en las funcionalidades planificadas y entregadas: antes frente a después.
 
 #### 100% · Test and documentation coverage (`4c50bf00652b`)
 
@@ -462,11 +464,11 @@ Results
 3. **Q3. Answered:** Redação landing, Lighthouse 40 → 95 (hero): mobile, Lighthouse CLI, home page only. Months unknown, so no dates.
 4. **Q4. Answered:** Redação landing, organic search +40%: organic sessions in Google Analytics; windows unknown, so no dates.
 5. **Q5. Answered:** Capitual internal tools, production bugs −96% (hero): Jira, from error monitoring and support team reports; bugs per month in Oct–Dec 2021 against the monthly average before.
-6. **Q6. Answered:** Capitual internal tools, 80% on critical flows: Jest and Cypress (RTL on web, RNTL on mobile); onboarding, account creation, account configuration. No dates.
-7. **Q7. Answered:** Capitual crypto app, 3.5 → 4.8 is the overall Google Play rating (App Store 4.2). No dates, no source. **Q7b:** relabel to "Google Play rating"? Show the App Store 4.2?
+6. **Q6. Answered:** Capitual internal tools, 80% is Cypress code coverage on onboarding, account creation and account configuration. No dates.
+7. **Q7. Answered, applied:** relabelled "Google Play rating" (3.5 → 4.8); App Store 4.2 added as its own result. No dates, no source.
 8. **Q8. Answered:** Capitual crypto app, mobile bugs −60%: Jira and store reviews, bugs not crashes. No dates.
-9. **Q9. Answered:** C6 Bank: Lighthouse in production, mobile and desktop (desktop 98), on the main, privacy clients and create account pages; lab LCP and FCP. **Q9b:** published numbers are mobile, main page? Show desktop 98?
-10. **Q10. Answered:** Lovefy, 14 → 4 days: median, work started → merged, over planned features delivered. **Q10b:** which tool held the dates?
+9. **Q9. Answered, applied:** C6 Bank numbers are mobile, main page, Lighthouse lab in production; desktop 98 added. No dates.
+10. **Q10. Answered:** Lovefy, 14 → 4 days: median, started (Jira) → merged (GitHub), over planned features delivered. No dates.
 11. **Q11.** Lovefy, 100% test and documentation coverage: which tool and which coverage (Vitest lines or branches)? What does documentation coverage count? Which month?
 12. **Q12.** Skydiet web app, 90% coverage: which tool, lines or branches, of which code, which month?
 13. **Q13.** Skydiet web app, 40+ components: month of the count?
