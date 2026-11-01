@@ -2,7 +2,7 @@
 
 Drafts for issues #67 (Result part, Approach trim), #73 (each result links to how it was measured) and #78 (How I work answers link to a case study), in en / pt / es. Content read from the live Sanity dataset on 2026-10-31 (13 case studies, 24 results, 4 FAQs, 3 hero results). Only what the published content already says is stated; everything else is **[confirm Qn]**, and every Qn is collected in section 5 so it can be answered in one pass.
 
-**Status (2026-10-31):** draft, not approved. Nothing written to Sanity, no app code changed.
+**Status (2026-10-31):** all 28 questions answered and applied. Measurements, Approach trims and FAQ links are live in Sanity production (backups in `~/sanity-backups/`); the code is in #89 (measurements) and #90 (FAQ links). This file is the record of the answers.
 
 What the content supports, in short: the tool when the label names it (Lighthouse, App Store, Storybook), test tools named in an Approach, a "before" value stated in a Problem, and a window no wider than the case study's start and end dates. No case study says how a number was measured, on which device, or in which month.
 
@@ -382,7 +382,7 @@ Record: method only, no tool, no dates.
 
 ## 3. Approach trims (#67)
 
-Only Redação Online, from PHP to Next.js has a Decision. Since the summary now shows as the lede on every case page, an Approach that restates the summary also counts. Four trims; the other nine: no change.
+Only Redação Online, from PHP to Next.js has a Decision. Since the summary now shows as the lede on every case page, an Approach that restates the summary also counts. Four trims; the other nine: no change. **Done 2026-10-31:** all four applied in en/pt/es as written below, except that the checkout's "for sub-second loads" stays cut (Q24). Backup: `~/sanity-backups/before-approach-rewrites-2026-10-31.tar.gz`.
 
 ### Redação Online, from PHP to Next.js: trim
 
@@ -406,7 +406,7 @@ Cut: "React … GraphQL" and "an automated testing pipeline covering both E2E an
 
 ### C6 Bank, a landing page in under a second: trim
 
-Cut: "Vite SSR, TanStack Router/Start", "Cloudflare CDN caching" and "mobile-first design" (all in the summary: "I built the public site mobile first on Vite SSR and TanStack Start, with Cloudflare caching in front"). Also drops "with Server Components": the site didn't use them. **Done 2026-10-31 (Q23)**: only that phrase is cut from the live Approach in all three languages; the rest of this trim waits for #67.
+Cut: "Vite SSR, TanStack Router/Start", "Cloudflare CDN caching" and "mobile-first design" (all in the summary: "I built the public site mobile first on Vite SSR and TanStack Start, with Cloudflare caching in front"). Also drops "with Server Components": the site didn't use them (Q23), and the React Server Components tag is gone from its stack.
 
 **en:** I worked full-stack: React, TypeScript, Tailwind CSS and Shadcn UI on the front end, React Query cache policies behind the Cloudflare cache, and quick back-end changes to endpoints and metadata when the pages needed them.
 
@@ -472,7 +472,7 @@ Up to two case studies per answer, shown as "See it in: …".
 1. **Lovefy, AI dating platform.** Result "14d → 4d · Feature delivery time" is the answer's opener; Approach: "AI agent workflows (Cursor and Claude) to speed up day-to-day development", with a CI/CD pipeline in Vitest, RTL and Playwright.
 2. **Skydiet, web app and UI library.** Approach: "used AI agents (GitHub & Claude) to build out shareholder-requested modules faster"; result "90% · Test coverage" backs "nothing merges without passing tests".
 
-**Q28 answered: Lovefy + Skydiet web app**, as above. **[open]** The answer names Claude Code; Lovefy's Approach says "Cursor and Claude". Same thing? Not blocking.
+**Q28 answered: Lovefy + Skydiet web app**, as above. "Claude Code" in the answer and "Cursor and Claude" in Lovefy's Approach are the same tooling (confirmed).
 
 ## 5. Questions for the owner
 
@@ -516,4 +516,4 @@ FAQ evidence
 25. **Q25. Answered:** migration FAQ links core platform v2 + checkout.
 26. **Q26. Answered:** Lighthouse FAQ links Redação landing (PHP → Next.js) + C6 Bank, matching its new opener.
 27. **Q27. Answered, applied:** Module Federation, GraphQL gateway and error boundaries were Redação core platform v2; added to its Approach.
-28. **Q28. Answered:** AI agents FAQ links Lovefy + Skydiet web app. Open, not blocking: is "Claude Code" the same as Lovefy's "Cursor and Claude"?
+28. **Q28. Answered:** AI agents FAQ links Lovefy + Skydiet web app. "Claude Code" = Lovefy's "Cursor and Claude" (confirmed).
