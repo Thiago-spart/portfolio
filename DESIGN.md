@@ -224,7 +224,7 @@ A restrained green-neutral palette from a mangrove at the tide line, with a sing
 - **Small** (400, 14px, 20px): secondary notes.
 - **Metric** (mono 500, 48px, line-height 1, −0.03em) and **Metric S** (mono 500, 24px): results.
 - **Label** (mono 500, 12px, 0.06em, uppercase): roles, metric labels, callouts, category names.
-- Nothing is set below 11px. Drawing annotations (ticks, callout numbers, the title block) use 11px mono; only the hero's gauge ticks drop to 10px where the drawing is smallest.
+- Nothing is set below 11px. Drawing annotations (callout numbers, the results on the shoots, the title block) use 11px mono.
 - **Code** (mono 400, 13px, 22px): dates and years, emails, archive results.
 
 ### Named Rules
@@ -286,10 +286,10 @@ Precise and quiet: one primary action per view.
 - Monogram and wordmark on the left; the EN / PT / ES switch and the theme toggle on the right, within the content column. No nav links: the page is one scroll plus case studies.
 
 ### The Mangrove (signature)
-The hero drawing: an SVG poster of a mangrove at the tide line on a drafting grid (line art by day, points by night), with a tide gauge, dimension lines, numbered callouts and a title block. A three.js version replaces it on the visitor's first interaction; clicking the water grows roots, clicking a seed reveals a result in the lane beside the gauge, and the mango leads to Contact.
+The hero drawing: an SVG poster of a mangrove at the tide line on a drafting grid (line art by day, points by night), with an unnumbered tide gauge, numbered callouts and a title block. The drawing measures the work, not the tree: each result grows as a shoot with its value written above it and a dimension line to its mark on the gauge, and its label in the lane beside the gauge names the product and links to the case study. A three.js version replaces the poster on the visitor's first interaction; clicking the water grows roots, clicking a seed replays a result, and the mango leads to Contact.
 
 ### Scroll motion
-Two drawings, both tied to scroll position in CSS (`src/styles/motion.css`) and finished by the time their element is fully in view: the Experience rail draws down from each marker, and a Mangrove tide line runs under each case card's results, uncovering the after value, then fades. Nothing else moves on scroll. Browsers without scroll-driven animations, and reduced motion, get the finished drawing.
+Two drawings, both tied to scroll position in CSS (`src/styles/motion.css`) and finished by the time their element is fully in view: the Experience rail draws down from each marker, and a Mangrove tide line runs under each case card's results, uncovering the before value, then fades. The after value, the result, is never covered. Nothing else moves on scroll. Browsers without scroll-driven animations, and reduced motion, get the finished drawing.
 
 ## Do's and Don'ts
 

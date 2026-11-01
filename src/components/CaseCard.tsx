@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ExternalLink } from 'lucide-react'
 import { useTranslation } from '#/i18n/useTranslation'
-import { formatYearRange, isCoreTech, liveLabel, type CaseStudyRow } from '#/lib/caseStudy'
+import { formatYearRange, isCoreTech, liveLink, type CaseStudyRow } from '#/lib/caseStudy'
 import { Metric } from './ui/Metric'
 import { Tag } from './ui/Tag'
 import type { Lang } from '#/i18n/LanguageContext'
@@ -32,7 +32,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
   const summary = caseStudy.summary?.[lang]
   const tags = (caseStudy.stack ?? []).slice(0, MAX_TAGS)
   const results = (caseStudy.results ?? []).slice(0, MAX_METRICS)
-  const live = caseStudy.liveUrl ? liveLabel(caseStudy.liveUrl) : null
+  const live = caseStudy.liveUrl ? liveLink(caseStudy.liveUrl) : null
 
   return (
     <article className="relative flex h-full flex-col items-start gap-4 rounded-md border border-line bg-surface-raised p-6 text-ink transition-colors duration-150 ease-out has-[h3_a:hover]:border-mangrove has-[h3_a:focus-visible]:focus-ring">
@@ -89,7 +89,7 @@ export function CaseCard({ caseStudy, lang, accent = false }: CaseCardProps) {
           className="relative z-10 mt-auto -mb-1 inline-flex min-h-6 items-center gap-1.5 rounded-sm type-code text-ink-muted underline-offset-4 hover:text-mangrove hover:underline"
         >
           <ExternalLink aria-hidden="true" size={14} strokeWidth={1.5} />
-          {t('work.live').replace('{site}', live)}
+          {t(live.store ? 'work.liveStore' : 'work.live').replace('{site}', live.name)}
           {' '}
           <span className="sr-only">{t('contact.newTab')}</span>
         </a>

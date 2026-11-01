@@ -12,6 +12,7 @@ interface Props {
 
 // Figma: Hero / Contact (23:3570, 23:3593). Email is the one Primary action;
 // LinkedIn and GitHub support it; the address stays readable underneath.
+// Under the brief, the languages the work happens in.
 //
 // Contract with the hero: the mango scrolls to #contact and focuses
 // #contact-heading (tabIndex -1), which then shows the mango focus ring.
@@ -44,6 +45,7 @@ export default function ContactSection({ settings }: Props) {
           </p>
         )}
         <p className="m-0 max-w-160 type-lede text-ink-muted">{t('contact.subtitle')}</p>
+        <p className="-mt-3 mb-0 type-small text-ink-muted">{t('contact.languages')}</p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Button href={`mailto:${email}`} icon={Mail}>
             {t('contact.email')}

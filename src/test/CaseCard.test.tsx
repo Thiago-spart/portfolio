@@ -89,6 +89,6 @@ describe('CaseCard', () => {
     await renderWithRouter(
       <CaseCard caseStudy={caseStudyCard({ liveUrl: 'https://apps.apple.com/app/id1' })} lang="en" />,
     )
-    expect(screen.getByRole('link', { name: /Live at App Store/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^On the App Store/ })).toBeInTheDocument()
   })
 })

@@ -268,6 +268,8 @@ describe('HeroSection', () => {
     await renderHero()
     const hint = screen.getByText(/Click or tap the water/)
     expect(hint).not.toHaveClass('invisible')
+    // Nothing planted yet, so nothing to reset.
+    expect(screen.queryByRole('button', { name: 'Reset garden' })).toBeNull()
     engage()
     await waitFor(() => expect(scene.options).not.toBeNull())
 
@@ -281,9 +283,11 @@ describe('HeroSection', () => {
     expect(hint).not.toHaveClass('invisible')
     expect(localStorage.getItem(HINT_KEY)).toBeNull()
     expect(localStorage.getItem(ROOTS_KEY)).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Reset garden' })).toBeNull()
   })
 
   it('keeps Reset garden as a quiet text button by the hint, out of the actions', async () => {
+    localStorage.setItem(HINT_KEY, '1')
     await renderHero()
     const reset = screen.getByRole('button', { name: 'Reset garden' })
     expect(reset).toHaveTextContent(/^Reset$/)
@@ -305,10 +309,13 @@ describe('HeroSection', () => {
     expect(screen.getByText(en['hero.hintKeys'])).toBeInTheDocument()
   })
 
-  it('renders the hint in Portuguese', async () => {
+  it('renders the hint and Reset in Portuguese', async () => {
     localStorage.setItem('lang', 'pt')
     await renderHero()
     expect(await screen.findByText(pt['hero.hint'])).toBeInTheDocument()
+    engage()
+    await waitFor(() => expect(scene.options).not.toBeNull())
+    act(() => scene.options!.onPlant())
     expect(screen.getByRole('button', { name: 'Limpar jardim' })).toHaveTextContent('Limpar')
   })
 
