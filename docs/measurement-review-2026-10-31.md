@@ -276,25 +276,29 @@ Record: tool `Lighthouse`, no dates.
 
 Supported: the migration was incremental (Approach) and the platform was in daily use (Problem: "without any disruption to people actively using it"); within Feb 2023 – Jan 2025.
 
-**[confirm Q16]** How was zero downtime checked: an uptime monitor (which one), or no incident logged? From which month to which month did the rollout run?
+**Q16 answered:** no incident in the Google Cloud (GCP) incident log during the rollout. No dates.
 
-**en:** No downtime recorded by [uptime monitor / the incident log] during the rollout, [month year] to [month year].
+Record: tool `Google Cloud incident log`, no dates.
 
-**pt:** Nenhuma indisponibilidade registrada pelo [monitor de uptime / registro de incidentes] durante o rollout, de [mês ano] a [mês ano].
+**en:** No downtime in the Google Cloud incident log during the rollout.
 
-**es:** Ninguna caída registrada por el [monitor de disponibilidad / registro de incidentes] durante el rollout, de [mes año] a [mes año].
+**pt:** Nenhuma indisponibilidade no registro de incidentes do Google Cloud durante o rollout.
+
+**es:** Ninguna caída en el registro de incidentes de Google Cloud durante el rollout.
 
 #### 45+ · Components documented in Storybook (`acf0d70e7f1d`)
 
 Supported: a count of components in the Storybook library (Approach: "documenting 45+ UI components"; the role summary says it was shared across the micro-frontends); within Feb 2023 – Jan 2025.
 
-**[confirm Q17]** Which month was the count taken?
+**Q17 answered:** counted in the Storybook of the internal UI library. No dates.
 
-**en:** Components with a story in the shared Storybook, counted in [month year].
+Record: tool `Storybook`, no dates.
 
-**pt:** Componentes com história no Storybook compartilhado, contados em [mês ano].
+**en:** Components with a story in the internal UI library's Storybook.
 
-**es:** Componentes con historia en el Storybook compartido, contados en [mes año].
+**pt:** Componentes com história no Storybook da biblioteca de UI interna.
+
+**es:** Componentes con historia en el Storybook de la biblioteca de UI interna.
 
 ### Redação Online, AI mentor chat (archive · Feb 2023 – Jan 2025)
 
@@ -306,13 +310,15 @@ No results. (Its Approach says "Responses stream in under a second", a number wi
 
 Supported: 23% is the old checkout (Problem: "leaking nearly a quarter of its buyers before they finished paying"); within Feb 2023 – Jan 2025.
 
-**[confirm Q18]** Which tool (Google Analytics funnel, the payment provider's dashboard, the database)? What counts as drop-off (opened checkout and didn't pay)? Which two periods were compared, and which months?
+**Q18 answered:** read from the payment provider's data. Periods unknown, so no dates. Drop-off is read as checkouts started that weren't paid (the payment provider's own measure); **[confirm Q18b]** if that's wrong.
 
-**en:** Share of buyers who opened checkout and didn't pay, from [tool]: [period before the migration] against [period after] ([months]).
+Record: tool `Payment provider`, no dates.
 
-**pt:** Parcela dos compradores que abriram o checkout e não pagaram, segundo [ferramenta]: [período antes da migração] contra [período depois] ([meses]).
+**en:** Share of checkouts started and not paid, from the payment provider: the old checkout against the new one.
 
-**es:** Proporción de compradores que abrieron el checkout y no pagaron, según [herramienta]: [periodo antes de la migración] frente a [periodo después] ([meses]).
+**pt:** Parcela dos checkouts iniciados e não pagos, segundo o provedor de pagamento: o checkout antigo contra o novo.
+
+**es:** Proporción de checkouts iniciados y no pagados, según el proveedor de pagos: el checkout antiguo frente al nuevo.
 
 ### Electromaps, EV charging app (archive · Nov 2022 – Jan 2023)
 
@@ -320,25 +326,29 @@ Supported: 23% is the old checkout (Problem: "leaking nearly a quarter of its bu
 
 Supported: the deadline was 3 months (Problem) and the case runs Nov 2022 – Jan 2023. The role on the timeline runs to Feb 2023.
 
-**[confirm Q19]** Is "ship" the store release of the full app, in Jan 2023? Or did the release land in Feb 2023?
+**Q19 answered:** from the start of work to the full app's release on both stores. The case's own dates (Nov 2022 – Jan 2023) bound it.
 
-**en:** From the start of the contract (Nov 2022) to the full app's release on [Google Play / both stores] ([month year]).
+Record: tool `App Store, Google Play`, from `2022-11-01`, to `2023-01-31`.
 
-**pt:** Do início do contrato (nov. 2022) ao lançamento do app completo na [Google Play / nas duas lojas] ([mês ano]).
+**en:** From the start of work (Nov 2022) to the full app's release on the App Store and Google Play (Jan 2023).
 
-**es:** Desde el inicio del contrato (nov. 2022) hasta el lanzamiento de la app completa en [Google Play / las dos tiendas] ([mes año]).
+**pt:** Do início do trabalho (nov. 2022) ao lançamento do app completo na App Store e na Google Play (jan. 2023).
+
+**es:** Desde el inicio del trabajo (nov. 2022) hasta el lanzamiento de la app completa en la App Store y Google Play (ene. 2023).
 
 #### 100% · Test coverage on critical flows (`f67222c099e0`)
 
 Supported: "full test coverage on critical flows" was a requirement (Problem); within Nov 2022 – Jan 2023. No test tool named.
 
-**[confirm Q20]** Which tool (Jest, Detox, something else)? Which flows counted as critical? Line coverage of those modules, or every flow has a test?
+**Q20 answered:** line coverage from Jest with React Native Testing Library, plus Maestro end-to-end flows. Critical flows: onboarding, checkout, delivery notes, and the app's page recognition. **[confirm Q20b]** What is "page recognition" in the app (for example, scanning a charger's QR code to open its page)? The text needs a plain name for it.
 
-**en:** [Line coverage from tool on / a test for each of] the critical flows ([flows]), at release ([month year]).
+Record: tool `Jest, React Native Testing Library, Maestro`, no dates.
 
-**pt:** [Cobertura de linhas da ferramenta em / um teste para cada um d]os fluxos críticos ([fluxos]), no lançamento ([mês ano]).
+**en:** Line coverage from Jest and React Native Testing Library, with end-to-end flows in Maestro, on the critical flows: onboarding, checkout, delivery notes and [page recognition].
 
-**es:** [Cobertura de líneas de la herramienta en / una prueba para cada uno de] los flujos críticos ([flujos]), en el lanzamiento ([mes año]).
+**pt:** Cobertura de linhas do Jest e da React Native Testing Library, com fluxos end-to-end no Maestro, nos fluxos críticos: onboarding, checkout, notas de entrega e [reconhecimento de páginas].
+
+**es:** Cobertura de líneas de Jest y React Native Testing Library, con flujos end-to-end en Maestro, en los flujos críticos: onboarding, checkout, notas de entrega y [reconocimiento de páginas].
 
 ### Capitual, customer support tool (archive · Oct 2021 – Nov 2022)
 
@@ -484,11 +494,11 @@ Results
 13. **Q13. Answered:** Skydiet web app, 40+ components counted in Storybook. No dates.
 14. **Q14. Answered:** Skydiet universal app, 80%+ shared code is an estimate. No dates.
 15. **Q15. Answered:** Redação core platform v2, 95+: all four Lighthouse categories, desktop, every page. No dates.
-16. **Q16.** Redação core platform v2, zero downtime: uptime monitor (which) or incident log? Rollout from which month to which?
-17. **Q17.** Redação core platform v2, 45+ Storybook components: month of the count?
-18. **Q18.** Redação checkout, drop-off 23% → 9% (hero): which tool? Drop-off defined as opened checkout and didn't pay? Which two periods, which months?
-19. **Q19.** Electromaps, 3 months to ship: store release of the full app in Jan 2023 (the role runs to Feb 2023)? Which store(s)?
-20. **Q20.** Electromaps, 100% coverage on critical flows: which tool? Which flows? Line coverage or a test per flow?
+16. **Q16. Answered:** Redação core platform v2, zero downtime: Google Cloud incident log. No dates.
+17. **Q17. Answered:** Redação core platform v2, 45+ components counted in the internal UI library's Storybook. No dates.
+18. **Q18. Answered:** Redação checkout, 23% → 9% (hero): payment provider; periods unknown. **Q18b:** drop-off = checkouts started and not paid?
+19. **Q19. Answered:** Electromaps, 3 months: start of work → release on both stores (Nov 2022 – Jan 2023).
+20. **Q20. Answered:** Electromaps, 100%: Jest + RNTL line coverage, Maestro E2E; onboarding, checkout, delivery notes, page recognition. **Q20b:** what is page recognition?
 21. **Q21.** Capitual support tool, 80% in Storybook: 80% of which components and screens, counted how, which month?
 22. **Q22.** Capitual support tool, onboarding 4 → 3 weeks: when does onboarding end? Where does the 4-week baseline come from?
 
