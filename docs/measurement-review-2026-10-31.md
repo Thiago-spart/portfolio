@@ -272,7 +272,7 @@ Record: tool `Lighthouse`, no dates.
 
 **es:** Lighthouse, escritorio: rendimiento, accesibilidad, buenas prácticas y SEO todas en 95 o más, en todas las páginas.
 
-### 0 · Downtime during the rollout (`4610b96a70dc`)
+#### 0 · Downtime during the rollout (`4610b96a70dc`)
 
 Supported: the migration was incremental (Approach) and the platform was in daily use (Problem: "without any disruption to people actively using it"); within Feb 2023 – Jan 2025.
 
