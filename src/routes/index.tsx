@@ -13,7 +13,7 @@ import ProjectsSection       from '#/components/ProjectsSection'
 import StackSection          from '#/components/StackSection'
 import HowIWorkSection       from '#/components/HowIWorkSection'
 import ContactSection        from '#/components/ContactSection'
-import SheetIndex            from '#/components/SheetIndex'
+import SheetIndex, { type SheetStats } from '#/components/SheetIndex'
 import type { SITE_SETTINGS_QUERY_RESULT } from '#/types/sanity.generated'
 
 // siteSettings is loaded once by the root route (the footer needs it too).
@@ -69,10 +69,21 @@ function HomePage() {
   const settings = rootRoute.useLoaderData()
   const { lang } = useLanguage()
 
+  // The sheet index's previews, counted from what the sections show.
+  const years = roles.map((role) => Number(role.startDate.slice(0, 4)))
+  const stats: SheetStats = {
+    caseStudies: caseStudies.length,
+    best: caseStudies[0]?.results?.[0] ?? null,
+    roles: roles.length,
+    since: years.length > 0 ? Math.min(...years) : null,
+    techs: stack.groups.reduce((sum, group) => sum + group.techs.length, 0),
+    questions: faq.length,
+  }
+
   return (
     <>
       {/* Navigation, so outside main: the skip link lands past it. */}
-      <SheetIndex />
+      <SheetIndex stats={stats} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <HeroSection results={heroResults} />
         <ProjectsSection projects={caseStudies} lang={lang} />
