@@ -77,5 +77,13 @@ describe('TimelineSection', () => {
     )
     expect(container.querySelector('style')?.textContent ?? '').not.toContain('color: red')
   })
+
+  it('marks the roles that use the selected tech', () => {
+    const { container } = render(
+      <LanguageProvider><TimelineSection roles={mockRoles} lang="en" marked={new Set(['2'])} /></LanguageProvider>,
+    )
+    expect(container.querySelector('[data-role-entry="2"]')).toHaveAttribute('data-tech-match')
+    expect(container.querySelector('[data-role-entry="1"]')).not.toHaveAttribute('data-tech-match')
+  })
 })
 

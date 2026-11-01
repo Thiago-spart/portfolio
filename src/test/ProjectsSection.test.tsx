@@ -69,4 +69,20 @@ describe('ProjectsSection', () => {
     await renderSection([])
     expect(screen.getByText('No case studies yet. Check back soon.')).toBeInTheDocument()
   })
+
+  it('dims the cards and archive rows that don\'t use the selected tech, keeping them reachable', async () => {
+    await renderWithRouter(<ProjectsSection projects={mockProjects} lang="en" tech="Node.js" />)
+    const item = (name: string) => screen.getByRole('link', { name }).closest('li') as HTMLElement
+    expect(item('Portfolio Site')).toHaveAttribute('data-dim')
+    expect(item('Sparse Project')).toHaveAttribute('data-dim')
+    expect(item('API Service')).not.toHaveAttribute('data-dim')
+    // Dimmed, not removed: every link is still there.
+    expect(screen.getAllByRole('link')).toHaveLength(4)
+  })
+
+  it('dims nothing without a selected tech', async () => {
+    const { container } = await renderSection(mockProjects)
+    expect(container.querySelector('[data-dim]')).toBeNull()
+  })
 })
+

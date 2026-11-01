@@ -7,6 +7,8 @@ import type { ROLES_QUERY_RESULT } from '#/types/sanity.generated'
 interface Props {
   roles: ROLES_QUERY_RESULT
   lang: Lang
+  // The roles that use the Stack filter's tech, marked on the rail.
+  marked?: ReadonlySet<string>
 }
 
 // Figma: Sections / Experience (35:851, 35:1341). Roles newest first on one
@@ -32,7 +34,7 @@ function roleMarkCss(ids: string[]): string {
     .join(',\n')} { fill: var(--mangrove); }`
 }
 
-export default function TimelineSection({ roles, lang }: Props) {
+export default function TimelineSection({ roles, lang, marked }: Props) {
   const { t } = useTranslation()
   const words = t('experience.countWords').split(',')
   const count = words[roles.length - 1] ?? String(roles.length)
@@ -48,7 +50,7 @@ export default function TimelineSection({ roles, lang }: Props) {
       <ol className="m-0 list-none p-0">
         {roles.map((role, i) => (
           <li key={role._id}>
-            <TimelineEntry entry={role} lang={lang} last={i === roles.length - 1} compact={i >= FULL_ROLES} />
+            <TimelineEntry entry={role} lang={lang} last={i === roles.length - 1} compact={i >= FULL_ROLES} marked={marked?.has(role._id)} />
           </li>
         ))}
       </ol>
